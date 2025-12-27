@@ -72,7 +72,9 @@ RUN mkdir -p /var/www/var/cache/prod /var/www/var/log \
   && mkdir -p /var/log/nginx /run/nginx \
   && mkdir -p /var/www/build/html \
   && mkdir -p /var/www/storage \
-  && chown -R www-data:www-data /var/www/var /var/www/build /var/www/storage
+  && mkdir -p /var/www/cron \
+  && chown -R www-data:www-data /var/www/var /var/www/build /var/www/storage /var/www/cron \
+  && chmod -R 775 /var/www/var /var/www/build /var/www/storage /var/www/cron
 
 # Warm up cache manually (skip if it fails - will warm up on first request)
 RUN APP_ENV=prod bin/console cache:clear --no-warmup || true \
