@@ -23,8 +23,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-configure gd --with-jpeg --with-freetype
 
-RUN docker-php-ext-install pdo
-RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql
 RUN docker-php-ext-install zip
 RUN docker-php-ext-install gd
 RUN docker-php-ext-install exif

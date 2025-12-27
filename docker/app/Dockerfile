@@ -22,7 +22,9 @@ RUN set -eux; \
         mbstring \
         opcache \
         pdo \
+        pdo_pgsql \
         pdo_sqlite \
+        pgsql \
         phar \
         session \
         simplexml \
