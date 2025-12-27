@@ -1,6 +1,8 @@
+/.env
 /.env.local
 /.env.local.php
 /.env.*.local
+/.vercel
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -33,4 +35,7 @@ phpstan.neon
 /ollama
 /mercure
 /tests/strava.db
+/public/css/dist/
+/public/js/dist/
+/public/css/tailwind.output.css
 ###> app-build ###
