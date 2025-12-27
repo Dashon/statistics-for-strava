@@ -227,6 +227,14 @@ services:
         factory: [ null, 'fromOptionalString' ]
         arguments: ['@=app_config("zwift.racingScore")']
 
+    # Run Letters configuration
+    App\Domain\Letter\RunLetterRepository:
+        class: App\Domain\Letter\DbalRunLetterRepository
+
+    App\Domain\Letter\LetterGenerator:
+        arguments:
+            $claudeApiKey: '%env(string:CLAUDE_API_KEY)%'
+
     # Autowiring of vendor classes
     League\Flysystem\FilesystemOperator: '@default.storage'
 

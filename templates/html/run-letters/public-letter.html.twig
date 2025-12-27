@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Run Letter - {{ activity.getStartDate().format('F j, Y') }} | {{ athlete.getName() }}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#F26822">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Run Letter - {{ activity.getStartDate().format('F j, Y') }}">
+    <meta property="og:description" content="{{ letter.getLetterText()|slice(0, 150) }}...">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Run Letter - {{ activity.getStartDate().format('F j, Y') }}">
+    <meta name="twitter:description" content="{{ letter.getLetterText()|slice(0, 150) }}...">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3/dist/tailwind.min.css" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .serif {
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2 serif">Run Letters</h1>
+                <p class="text-gray-600">A record of showing up</p>
+            </div>
+
+            <!-- Letter Card -->
+            <div class="bg-white rounded-lg shadow-lg p-8 sm:p-12">
+                <!-- Date -->
+                <div class="text-center mb-8">
+                    <p class="text-sm text-gray-500 uppercase tracking-wide">{{ activity.getSportType() }}</p>
+                    <h2 class="text-3xl font-bold text-gray-900 mt-2 serif">
+                        {{ activity.getStartDate().formatLocalized('%B %e, %Y') }}
+                    </h2>
+                </div>
+
+                <!-- Letter Text -->
+                <div class="prose prose-lg mx-auto mb-8">
+                    <blockquote class="text-xl leading-relaxed text-gray-700 italic border-l-4 border-orange-500 pl-6 serif">
+                        "{{ letter.getLetterText() }}"
+                    </blockquote>
+                </div>
+
+                <!-- Activity Stats -->
+                <div class="grid grid-cols-3 gap-4 py-6 border-t border-b border-gray-200 my-8">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-orange-600">{{ activity.getDistanceInKilometer().getFormatted() }}</p>
+                        <p class="text-sm text-gray-600 mt-1">Distance</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-orange-600">{{ activity.getFormattedMovingTime() }}</p>
+                        <p class="text-sm text-gray-600 mt-1">Time</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-orange-600">{{ activity.getFormattedAverageSpeed() }}</p>
+                        <p class="text-sm text-gray-600 mt-1">Pace</p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-center text-sm text-gray-500">
+                    <p>Shared by {{ athlete.getName() }}</p>
+                    {% if letter.wasEdited() %}
+                        <p class="mt-2">Edited {{ letter.getEditedAt().formatLocalized('%B %e, %Y') }}</p>
+                    {% else %}
+                        <p class="mt-2">Generated {{ letter.getGeneratedAt().formatLocalized('%B %e, %Y') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Powered By -->
+            <div class="text-center mt-8">
+                <p class="text-sm text-gray-500">
+                    Powered by
+                    <a href="https://github.com/robiningelbrecht/statistics-for-strava" target="_blank" class="text-orange-600 hover:text-orange-700 font-medium">
+                        Statistics for Strava
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
