@@ -6,7 +6,9 @@
       "Bash(git push:*)",
       "Bash(php -v:*)",
       "Bash(composer validate:*)",
-      "Bash(composer install:*)"
+      "Bash(composer install:*)",
+      "Bash(composer require:*)",
+      "Bash(test:*)"
     ]
   }
 }

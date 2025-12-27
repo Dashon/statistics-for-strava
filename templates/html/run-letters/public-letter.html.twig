@@ -26,67 +26,51 @@
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-3xl mx-auto">
-            <!-- Header -->
-            <div class="text-center mb-12">
-                <h1 class="text-4xl font-bold text-gray-900 mb-2 serif">Run Letters</h1>
-                <p class="text-gray-600">A record of showing up</p>
-            </div>
-
+<body class="bg-white">
+    <div class="min-h-screen py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl mx-auto">
             <!-- Letter Card -->
-            <div class="bg-white rounded-lg shadow-lg p-8 sm:p-12">
+            <div class="space-y-12">
                 <!-- Date -->
-                <div class="text-center mb-8">
-                    <p class="text-sm text-gray-500 uppercase tracking-wide">{{ activity.getSportType() }}</p>
-                    <h2 class="text-3xl font-bold text-gray-900 mt-2 serif">
+                <div class="text-center">
+                    <p class="text-xs text-gray-400 uppercase tracking-widest mb-4">{{ activity.getSportType() }}</p>
+                    <h2 class="text-2xl font-light text-gray-900 serif">
                         {{ activity.getStartDate().formatLocalized('%B %e, %Y') }}
                     </h2>
                 </div>
 
                 <!-- Letter Text -->
-                <div class="prose prose-lg mx-auto mb-8">
-                    <blockquote class="text-xl leading-relaxed text-gray-700 italic border-l-4 border-orange-500 pl-6 serif">
-                        "{{ letter.getLetterText() }}"
-                    </blockquote>
+                <div class="max-w-xl mx-auto">
+                    <p class="text-lg leading-relaxed text-gray-800 serif text-center">
+                        {{ letter.getLetterText() }}
+                    </p>
                 </div>
 
                 <!-- Activity Stats -->
-                <div class="grid grid-cols-3 gap-4 py-6 border-t border-b border-gray-200 my-8">
+                <div class="flex justify-center gap-12 py-8 border-t border-gray-100">
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-orange-600">{{ activity.getDistanceInKilometer().getFormatted() }}</p>
-                        <p class="text-sm text-gray-600 mt-1">Distance</p>
+                        <p class="text-xl font-light text-gray-900">{{ activity.getDistanceInKilometer().getFormatted() }}</p>
+                        <p class="text-xs text-gray-400 mt-1 uppercase tracking-wide">Distance</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-orange-600">{{ activity.getFormattedMovingTime() }}</p>
-                        <p class="text-sm text-gray-600 mt-1">Time</p>
+                        <p class="text-xl font-light text-gray-900">{{ activity.getFormattedMovingTime() }}</p>
+                        <p class="text-xs text-gray-400 mt-1 uppercase tracking-wide">Time</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-orange-600">{{ activity.getFormattedAverageSpeed() }}</p>
-                        <p class="text-sm text-gray-600 mt-1">Pace</p>
+                        <p class="text-xl font-light text-gray-900">{{ activity.getFormattedAverageSpeed() }}</p>
+                        <p class="text-xs text-gray-400 mt-1 uppercase tracking-wide">Pace</p>
                     </div>
                 </div>
 
                 <!-- Footer -->
-                <div class="text-center text-sm text-gray-500">
-                    <p>Shared by {{ athlete.getName() }}</p>
+                <div class="text-center text-xs text-gray-300 border-t border-gray-100 pt-8">
+                    <p>{{ athlete.getName() }}</p>
                     {% if letter.wasEdited() %}
-                        <p class="mt-2">Edited {{ letter.getEditedAt().formatLocalized('%B %e, %Y') }}</p>
+                        <p class="mt-1">{{ letter.getEditedAt().formatLocalized('%B %e, %Y') }}</p>
                     {% else %}
-                        <p class="mt-2">Generated {{ letter.getGeneratedAt().formatLocalized('%B %e, %Y') }}</p>
+                        <p class="mt-1">{{ letter.getGeneratedAt().formatLocalized('%B %e, %Y') }}</p>
                     {% endif %}
                 </div>
-            </div>
-
-            <!-- Powered By -->
-            <div class="text-center mt-8">
-                <p class="text-sm text-gray-500">
-                    Powered by
-                    <a href="https://github.com/robiningelbrecht/statistics-for-strava" target="_blank" class="text-orange-600 hover:text-orange-700 font-medium">
-                        Statistics for Strava
-                    </a>
-                </p>
             </div>
         </div>
     </div>

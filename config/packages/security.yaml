@@ -1,0 +1,46 @@
+security:
+    # Simple password hasher for basic auth
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: 'plaintext'
+
+    # Define providers
+    providers:
+        in_memory:
+            memory:
+                users:
+                    # Username: admin, Password: set via APP_ADMIN_PASSWORD env var
+                    admin:
+                        password: '%env(APP_ADMIN_PASSWORD)%'
+                        roles: ['ROLE_ADMIN']
+
+    # Define firewalls
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # Public letter sharing - NO authentication required
+        public_letters:
+            pattern: ^/letter/
+            security: false
+
+        # Strava OAuth callbacks - NO authentication required
+        strava_auth:
+            pattern: ^/strava-(oauth|webhook)
+            security: false
+
+        # Main app - HTTP Basic Auth required
+        main:
+            lazy: true
+            http_basic:
+                realm: "QT's Running Dashboard"
+            provider: in_memory
+
+    # Access control
+    access_control:
+        # Public letter URLs are accessible to everyone
+        - { path: ^/letter/, roles: PUBLIC_ACCESS }
+        # Strava OAuth/webhook endpoints are public
+        - { path: ^/strava-(oauth|webhook), roles: PUBLIC_ACCESS }
+        # Everything else requires authentication
+        - { path: ^/, roles: ROLE_ADMIN }

@@ -1,6 +1,6 @@
-# Welcome to Your Personal Running Dashboard, QT! 🏃‍♂️
+# Welcome to Your Personal Running Dashboard, QT!
 
-This is a **custom build** of Statistics for Strava, specifically tailored for you with the new **Run Letters** feature.
+This is your **custom running dashboard**, designed specifically for you with the **Run Letters** feature at its heart.
 
 ---
 
@@ -29,18 +29,18 @@ This turns every run into a reflective letter. Think of it like a journal that w
 
 ---
 
-### 2. **All Original Training Tools**
-You still have access to everything from the original app:
+### 2. **Complete Training Analysis**
+Your dashboard includes comprehensive training tools:
 
 - **Dashboard** - Overview of your training
 - **Activities** - Full list of all your runs
-- **Segments** - Your performance on Strava segments
+- **Segments** - Your performance on segments
 - **Monthly Stats** - Calendar view of your training
 - **Eddington Chart** - Distance milestones
 - **Heatmap** - Map of everywhere you've run
 - **Best Efforts** - Your fastest times
 - **Rewind** - Year in review
-- **Challenges** - Strava challenges you've completed
+- **Challenges** - Challenges you've completed
 - **Photos** - Pictures from your runs
 
 ---
@@ -95,7 +95,7 @@ People who click the link will see:
 
 **Example share URL:**
 ```
-https://your-site.com/letter/a3f2b91c8d4e...
+https://qt.run/letter/a3f2b91c8d4e...
 ```
 
 ---
@@ -133,27 +133,45 @@ You can edit/share whenever you want
 
 ---
 
+## Security & Login
+
+**Your dashboard is now password-protected!**
+
+When you visit your site, you'll see a login prompt:
+- **Username:** `admin`
+- **Password:** (Your developer will provide this)
+
+**Important:**
+- ✅ Your main dashboard requires login
+- ✅ Public letter links work WITHOUT login (that's by design!)
+- ✅ Keep your username/password safe
+- ⚠️ Don't share your main URL publicly - only share individual letter links
+
+---
+
 ## Support & Questions
 
 **If something doesn't work:**
 - Check that Strava is connected (green status in settings)
 - Make sure data is syncing (Activities page should show recent runs)
+- If you forgot your password, contact your developer
 - Contact your developer (that's me!)
 
 **If you want to:**
 - Change the letter writing style → I can adjust the AI prompts
 - Add more features → Just ask!
 - Export all letters → I can add that
+- Change your password → I can update it
 
 ---
 
 ## What Makes This Special
 
-This isn't just Statistics for Strava - it's:
-- ✅ **Customized for you** with Run Letters
-- ✅ **Automated** so you don't think about it
-- ✅ **Brand-ready** with beautiful shareable pages
-- ✅ **Complete** with all original training tools
+Your personal running dashboard is:
+- ✅ **Built for you** - Customized with Run Letters
+- ✅ **Automated** - No manual work required
+- ✅ **Shareable** - Beautiful pages for your brand
+- ✅ **Complete** - Training data + reflective letters
 
 ---
 
