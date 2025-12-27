@@ -44,10 +44,17 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 # Add application
 COPY . /var/www/
 RUN touch /var/www/.env
 RUN rm -Rf docker
+
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+
 RUN mkdir -p /var/www/var/cache/prod /var/www/var/log \
   && mkdir -p /var/log/nginx /run/nginx \
   && chown -R www-data:www-data /var/www/var
