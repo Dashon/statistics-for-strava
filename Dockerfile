@@ -59,6 +59,7 @@ RUN if [ ! -f /var/www/config/app/config.yaml ]; then \
     echo '  appUrl: "https://www.qt.run"' >> /var/www/config/app/config.yaml && \
     echo '  athlete:' >> /var/www/config/app/config.yaml && \
     echo '    birthday: "1990-01-01"' >> /var/www/config/app/config.yaml && \
+    echo '    maxHeartRateFormula: "fox"' >> /var/www/config/app/config.yaml && \
     echo 'import:' >> /var/www/config/app/config.yaml && \
     echo '  sportTypesToImport: []' >> /var/www/config/app/config.yaml && \
     echo '  activityVisibilitiesToImport: ["everyone", "only_me"]' >> /var/www/config/app/config.yaml; \
