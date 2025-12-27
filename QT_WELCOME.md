@@ -1,6 +1,11 @@
-# Welcome to Your Personal Running Dashboard, QT!
+# Welcome to QT.run - Your Personal Running Dashboard
 
-This is your **custom running dashboard**, designed specifically for you with the **Run Letters** feature at its heart.
+This is **QT.run**, your custom running dashboard designed specifically for you with the **Run Letters** feature at its heart.
+
+**What's New:**
+- 🏠 **Beautiful Landing Page** - Minimalist design at [qt.run](https://qt.run)
+- 🔐 **Easter Egg Login** - Double-click the logo to access your dashboard
+- 🎨 **QT.run Branding** - Consistent styling across all pages
 
 ---
 
@@ -135,11 +140,19 @@ You can edit/share whenever you want
 
 ## Security & Login
 
-**Your dashboard is now password-protected!**
+**Your dashboard is password-protected!**
 
-When you visit your site, you'll see a login prompt:
-- **Username:** `admin`
-- **Password:** (Your developer will provide this)
+### How to Log In
+
+1. Go to [qt.run](https://qt.run) - you'll see the beautiful landing page
+2. **Double-click the logo** to reveal the admin login
+3. Enter your credentials:
+   - **Username:** `admin`
+   - **Password:** (Check your `.env.local` file for `APP_ADMIN_PASSWORD`)
+
+### Alternative Login Methods
+- Direct URL: `https://qt.run/admin`
+- Any protected page will prompt for login automatically
 
 **Important:**
 - ✅ Your main dashboard requires login
