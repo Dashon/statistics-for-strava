@@ -14,7 +14,10 @@
       "Bash(docker logs:*)",
       "Bash(curl:*)",
       "Bash(python3:*)",
-      "Bash(docker compose exec:*)"
+      "Bash(docker compose exec:*)",
+      "Bash(php bin/console app:build:*)",
+      "Bash(php bin/console app:strava:build-files:*)",
+      "Bash(docker compose:*)"
     ]
   }
 }

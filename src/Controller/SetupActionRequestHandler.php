@@ -132,4 +132,39 @@ final readonly class SetupActionRequestHandler
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    #[Route(path: '/api/run-letters/generate', methods: ['POST'])]
+    public function generateRunLetters(): JsonResponse
+    {
+        try {
+            $process = new Process(
+                command: ['php', 'bin/console', 'app:backfill:run-letters'],
+                cwd: $this->kernel->getProjectDir(),
+                timeout: 600
+            );
+
+            $process->run();
+
+            if ($process->isSuccessful()) {
+                return new JsonResponse([
+                    'success' => true,
+                    'message' => 'Run letters generated successfully',
+                    'output' => $process->getOutput(),
+                ], Response::HTTP_OK);
+            }
+
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Failed to generate run letters',
+                'output' => $process->getErrorOutput(),
+                'error' => $process->getErrorOutput(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (\Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Failed to generate run letters: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
