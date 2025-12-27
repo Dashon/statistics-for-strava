@@ -8,7 +8,8 @@
       "Bash(composer validate:*)",
       "Bash(composer install:*)",
       "Bash(composer require:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(docker-compose restart:*)"
     ]
   }
 }
