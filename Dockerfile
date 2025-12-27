@@ -56,7 +56,7 @@ RUN rm -Rf docker
 RUN if [ ! -f /var/www/config/app/config.yaml ]; then \
     mkdir -p /var/www/config/app && \
     echo 'general:' > /var/www/config/app/config.yaml && \
-    echo '  appUrl: "${APP_URL}"' >> /var/www/config/app/config.yaml && \
+    echo '  appUrl: "https://www.qt.run"' >> /var/www/config/app/config.yaml && \
     echo '  athlete:' >> /var/www/config/app/config.yaml && \
     echo '    birthday: "1990-01-01"' >> /var/www/config/app/config.yaml && \
     echo 'import:' >> /var/www/config/app/config.yaml && \
