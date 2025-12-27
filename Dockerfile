@@ -53,11 +53,16 @@ RUN touch /var/www/.env
 RUN rm -Rf docker
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist --no-scripts
 
+# Create required directories and set permissions
 RUN mkdir -p /var/www/var/cache/prod /var/www/var/log \
   && mkdir -p /var/log/nginx /run/nginx \
   && chown -R www-data:www-data /var/www/var
+
+# Warm up cache manually (skip if it fails - will warm up on first request)
+RUN APP_ENV=prod bin/console cache:clear --no-warmup || true \
+  && APP_ENV=prod bin/console cache:warmup || true
 
 # Install Shoutrrr
 ARG TARGETARCH
