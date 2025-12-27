@@ -39,14 +39,14 @@ security:
             pattern: ^/admin
             lazy: true
             http_basic:
-                realm: "QT's Running Dashboard"
+                realm: "QT.run"
             provider: in_memory
 
         # Dashboard and other protected routes
         main:
             lazy: true
             http_basic:
-                realm: "QT's Running Dashboard"
+                realm: "QT.run"
             provider: in_memory
 
     # Access control

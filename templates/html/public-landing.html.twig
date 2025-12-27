@@ -39,9 +39,11 @@
         
         <!-- Logo -->
         <div class="flex justify-center">
-            <a href="/" class="block hover:opacity-90 transition-opacity">
-                <img src="/assets/images/logo.jpg" alt="QT" class="w-24 h-24 rounded-full object-cover shadow-sm">
-            </a>
+            <div class="block transition-transform duration-500 hover:scale-105 active:scale-95 cursor-pointer select-none" 
+                 title="QT.run"
+                 ondblclick="window.location.href='/admin'">
+                <img src="/assets/images/logo.jpg" alt="QT" class="w-24 h-24 rounded-full object-cover shadow-sm pointer-events-none">
+            </div>
         </div>
 
         {% if latestLetter and latestActivity %}
@@ -108,10 +110,6 @@
             </div>
         {% endif %}
         
-        <!-- Admin Link -->
-        <div class="fixed bottom-6 right-6">
-            <a href="/admin" class="text-[10px] text-gray-200 hover:text-gray-400 transition-colors uppercase tracking-widest">Login</a>
-        </div>
     </div>
 
 </body>

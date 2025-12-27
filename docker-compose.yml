@@ -20,6 +20,7 @@ services:
             dockerfile: docker/app/Dockerfile
         container_name: 'statistics-for-strava-app'
         volumes:
+            - './:/var/www/'
             - ./config/app:/var/www/config/app
             - ./build:/var/www/build
             - ./storage/database:/var/www/storage/database
@@ -42,6 +43,7 @@ services:
       container_name: 'statistics-for-strava-daemon'
       restart: unless-stopped
       volumes:
+        - './:/var/www/'
         - ./config/app:/var/www/config/app
         - ./build:/var/www/build
         - ./storage/database:/var/www/storage/database
