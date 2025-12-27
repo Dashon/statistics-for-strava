@@ -35,7 +35,8 @@ RUN set -eux; \
         pcntl;
 
 COPY docker/app/config/php.ini ${PHP_INI_DIR}/php.ini
-COPY docker/app/config/Caddyfile /etc/frankenphp/Caddyfile
+# Use deployment-specific Caddyfile without worker mode
+COPY Caddyfile.deploy /etc/frankenphp/Caddyfile
 COPY docker/app/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
@@ -64,4 +65,5 @@ RUN chmod +x shoutrrr
 RUN mv shoutrrr /usr/bin/shoutrrr && rm shoutrrr.tar.gz
 
 ENTRYPOINT ["docker-entrypoint.sh"]
+# Run FrankenPHP with Caddy configuration (no worker mode for deployment compatibility)
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
