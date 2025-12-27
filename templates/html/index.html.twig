@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{{ "Statistics for Strava"|trans }} | {{ athlete.getName() }}</title>
+    <title>QT.run</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <meta name="theme-color" content="#F26822">
-    <meta name="mobile-web-app-title" content="{{ "Statistics for Strava"|trans }} | {{ athlete.getName() }}">
+    <meta name="theme-color" content="#1F2937">
+    <meta name="mobile-web-app-title" content="QT">
     <meta name="mobile-web-app-capable" content="yes">
     <link href="{{ relativeUrl(asset('manifest.json')) }}" rel="manifest" crossorigin="">
-    <link rel="icon" type="image/x-icon" href="{{ relativeUrl('assets/images/logo.svg') }}">
+    <link rel="icon" type="image/jpeg" href="{{ relativeUrl('assets/images/logo.jpg') }}">
     <link href="{{ relativeUrl(asset('css/dist/tailwind.min.css')) }}" rel="stylesheet"/>
     <link rel="preload" href="{{ relativeUrl(asset('libraries/leaflet/leaflet.css')) }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="{{ relativeUrl(asset('libraries/clusterize/clusterize.min.css')) }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -84,6 +84,18 @@
                             </g>
                         </svg>
                         <span class="flex-1 whitespace-nowrap">{{ "Segments"|trans|ellipses(23) }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ relativeUrl('run-letters') }}" data-router-navigate="{{ relativeUrl('run-letters') }}" {{ isSymfonyRouter ? 'data-router-disabled' : '' }}
+                       class="{{ menuLinkClasses }} {{ collapsedMenuLinkClasses }}">
+                        <svg class="{{ menulinkSvgIconClasses }}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.03v13m0-13c-2.819-.831-4.715-1.076-8.029-1.023A.99.99 0 0 0 3 6v11c0 .563.466 1.014 1.03 1.007 3.122-.043 5.018.212 7.97 1.023m0-13c2.819-.831 4.715-1.076 8.029-1.023A.99.99 0 0 1 21 6v11c0 .563-.466 1.014-1.03 1.007-3.122-.043-5.018.212-7.97 1.023"/>
+                        </svg>
+                        <span class="flex-1 whitespace-nowrap">{{ "Run Letters"|trans|ellipses(19) }}</span>
+                        {% if totalRunLetters > 0 %}
+                            <span class="group-[.sidebar-is-collapsed]:hidden bg-orange-400/40 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{{ totalRunLetters }}</span>
+                        {% endif %}
                     </a>
                 </li>
             </ul>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>QT.run</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        
+        .serif {
+            font-family: 'Crimson Pro', serif;
+        }
+        
+        /* Smooth fade in */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex items-center justify-center p-6">
+
+    <div class="max-w-2xl w-full text-center space-y-12 fade-in">
+        
+        <!-- Logo -->
+        <div class="flex justify-center">
+            <div class="block transition-transform duration-500 hover:scale-105 active:scale-95 cursor-pointer select-none" 
+                 title="QT.run"
+                 ondblclick="window.location.href='/admin'">
+                <img src="/assets/images/logo.jpg" alt="QT" class="w-24 h-24 rounded-full object-cover shadow-sm pointer-events-none">
+            </div>
+        </div>
+
+        {% if latestLetter and latestActivity %}
+            <!-- Latest Generated Letter -->
+            <div class="space-y-8">
+                <div class="space-y-2">
+                    <p class="text-xs font-medium tracking-[0.2em] text-gray-400 uppercase">Latest Dispatch</p>
+                    <h1 class="text-4xl sm:text-5xl font-light text-gray-900 serif italic">
+                        {{ latestActivity.getStartDate().formatLocalized('%B %e, %Y') }}
+                    </h1>
+                </div>
+
+                <div class="prose prose-lg mx-auto text-gray-600 leading-relaxed serif">
+                    <p>{{ latestLetter.getLetterText() }}</p>
+                </div>
+
+                <!-- Minimal Stats -->
+                <div class="flex items-center justify-center gap-8 pt-8 border-t border-gray-100 max-w-xs mx-auto">
+                    <div class="text-center">
+                        <span class="block text-xl font-light text-gray-900">{{ latestActivity.getDistanceInKilometer().getFormatted() }}</span>
+                        <span class="text-[10px] tracking-widest text-gray-400 uppercase">Km</span>
+                    </div>
+                    <div class="w-px h-8 bg-gray-100"></div>
+                    <div class="text-center">
+                        <span class="block text-xl font-light text-gray-900">{{ latestActivity.getFormattedMovingTime() }}</span>
+                        <span class="text-[10px] tracking-widest text-gray-400 uppercase">Time</span>
+                    </div>
+                    {% if currentStreak > 0 %}
+                    <div class="w-px h-8 bg-gray-100"></div>
+                    <div class="text-center">
+                        <span class="block text-xl font-light text-gray-900">{{ currentStreak }}</span>
+                        <span class="text-[10px] tracking-widest text-gray-400 uppercase">Streak</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if totalPublicLetters > 1 %}
+            <div class="pt-8">
+                <a href="/letters" class="inline-flex items-center text-sm text-gray-400 hover:text-gray-900 transition-colors duration-300">
+                    <span class="mr-2">View Archive</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+            </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="space-y-6">
+                <h1 class="text-3xl sm:text-4xl font-light text-gray-900 serif italic">
+                    Every step is a choice<br>to show up.
+                </h1>
+                
+                <p class="text-sm text-gray-400 font-light tracking-wide max-w-sm mx-auto">
+                    Running journal is initializing. Completed runs will appear here as public letters.
+                </p>
+
+                {% if currentStreak > 0 %}
+                <div class="pt-8">
+                    <span class="text-4xl font-light text-gray-900 block">{{ currentStreak }}</span>
+                    <span class="text-[10px] tracking-widest text-gray-400 uppercase mt-2 block">Day Streak</span>
+                </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+    </div>
+
+</body>
+</html>

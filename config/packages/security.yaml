@@ -1,0 +1,66 @@
+security:
+    # Simple password hasher for basic auth
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: 'plaintext'
+
+    # Define providers
+    providers:
+        in_memory:
+            memory:
+                users:
+                    # Username: admin, Password: set via APP_ADMIN_PASSWORD env var
+                    admin:
+                        password: '%env(APP_ADMIN_PASSWORD)%'
+                        roles: ['ROLE_ADMIN']
+
+    # Define firewalls
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # Public areas - NO authentication required
+        public:
+            pattern: ^/(letter/|letters|assets/)
+            security: false
+
+        # Landing page - public
+        landing:
+            pattern: ^/$
+            security: false
+
+        # Strava OAuth callbacks - NO authentication required
+        strava_auth:
+            pattern: ^/strava-(oauth|webhook)
+            security: false
+
+        # Admin area - HTTP Basic Auth required
+        admin:
+            pattern: ^/admin
+            lazy: true
+            http_basic:
+                realm: "QT.run"
+            provider: in_memory
+
+        # Dashboard and other protected routes
+        main:
+            lazy: true
+            http_basic:
+                realm: "QT.run"
+            provider: in_memory
+
+    # Access control
+    access_control:
+        # Public landing page
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        # Public letter URLs
+        - { path: ^/letter/, roles: PUBLIC_ACCESS }
+        - { path: ^/letters, roles: PUBLIC_ACCESS }
+        # Assets
+        - { path: ^/assets/, roles: PUBLIC_ACCESS }
+        # Strava OAuth/webhook endpoints
+        - { path: ^/strava-(oauth|webhook), roles: PUBLIC_ACCESS }
+        # Admin area requires authentication
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        # Everything else requires authentication
+        - { path: ^/, roles: ROLE_ADMIN }
