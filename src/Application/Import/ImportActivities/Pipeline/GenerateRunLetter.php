@@ -31,7 +31,7 @@ final readonly class GenerateRunLetter implements ActivityImportStep
         }
 
         // Only generate letters for running activities
-        $sportType = strtolower((string) $activity->getSportType());
+        $sportType = strtolower($activity->getSportType()->value);
         if (!in_array($sportType, ['run', 'walk', 'hike', 'trailrun', 'virtualrun'], true)) {
             return $context;
         }
