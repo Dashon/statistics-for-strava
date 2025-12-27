@@ -44,23 +44,38 @@ final readonly class ActivityImportContext
 
     public function withActivity(Activity $activity): self
     {
-        return clone ($this, [
-            'activity' => $activity,
-        ]);
+        return new self(
+            activityId: $this->activityId,
+            rawStravaData: $this->rawStravaData,
+            isNewActivity: $this->isNewActivity,
+            activity: $activity,
+            streams: $this->streams,
+            streamsWereImported: $this->streamsWereImported,
+        );
     }
 
     public function withStreams(ActivityStreams $streams): self
     {
-        return clone ($this, [
-            'streams' => $streams,
-        ]);
+        return new self(
+            activityId: $this->activityId,
+            rawStravaData: $this->rawStravaData,
+            isNewActivity: $this->isNewActivity,
+            activity: $this->activity,
+            streams: $streams,
+            streamsWereImported: $this->streamsWereImported,
+        );
     }
 
     public function withStreamsWereImported(): self
     {
-        return clone ($this, [
-            'streamsWereImported' => true,
-        ]);
+        return new self(
+            activityId: $this->activityId,
+            rawStravaData: $this->rawStravaData,
+            isNewActivity: $this->isNewActivity,
+            activity: $this->activity,
+            streams: $this->streams,
+            streamsWereImported: true,
+        );
     }
 
     /**
