@@ -48,8 +48,9 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY . /var/www/
 RUN touch /var/www/.env
 RUN rm -Rf docker
-RUN mkdir -p /var/www/var/cache/prod /var/www/var/log
-RUN chown -R www-data:www-data /var/www/var
+RUN mkdir -p /var/www/var/cache/prod /var/www/var/log \
+  && mkdir -p /var/log/nginx /run/nginx \
+  && chown -R www-data:www-data /var/www/var
 
 # Install Shoutrrr
 ARG TARGETARCH
