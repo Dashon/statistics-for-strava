@@ -5,11 +5,22 @@ services:
     plan: free
     dockerfilePath: ./docker/app/Dockerfile
     dockerContext: ./
+    buildCommand: bash scripts/generate-config.sh
     envVars:
       - key: TZ
         value: Europe/Brussels
       - key: APP_ENV
         value: prod
+      - key: APP_URL
+        sync: false
+      - key: ATHLETE_BIRTHDAY
+        sync: false
+      - key: MAX_HEART_RATE_FORMULA
+        value: fox
+      - key: APP_LOCALE
+        value: en_US
+      - key: UNIT_SYSTEM
+        value: metric
     healthCheckPath: /
 
   - type: worker
@@ -19,8 +30,19 @@ services:
     dockerfilePath: ./docker/app/Dockerfile
     dockerContext: ./
     dockerCommand: bin/console app:daemon:run
+    buildCommand: bash scripts/generate-config.sh
     envVars:
       - key: TZ
         value: Europe/Brussels
       - key: APP_ENV
         value: prod
+      - key: APP_URL
+        sync: false
+      - key: ATHLETE_BIRTHDAY
+        sync: false
+      - key: MAX_HEART_RATE_FORMULA
+        value: fox
+      - key: APP_LOCALE
+        value: en_US
+      - key: UNIT_SYSTEM
+        value: metric
