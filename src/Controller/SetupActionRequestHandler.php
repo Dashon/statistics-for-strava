@@ -1,0 +1,93 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller;
+
+use App\Application\RunBuild\RunBuild;
+use App\Application\RunImport\RunImport;
+use App\Infrastructure\CQRS\Command\Bus\CommandBus;
+use App\Infrastructure\Daemon\Mutex\Mutex;
+use App\Infrastructure\Doctrine\Migrations\MigrationRunner;
+use App\Infrastructure\Logging\LoggableConsoleOutput;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[AsController]
+final readonly class SetupActionRequestHandler
+{
+    public function __construct(
+        private CommandBus $commandBus,
+        private Mutex $mutex,
+        private MigrationRunner $migrationRunner,
+        private LoggerInterface $logger,
+    ) {
+    }
+
+    #[Route(path: '/api/setup/import', methods: ['POST'])]
+    public function importData(): JsonResponse
+    {
+        try {
+            $bufferedOutput = new BufferedOutput();
+            $output = new SymfonyStyle(
+                input: new \Symfony\Component\Console\Input\ArrayInput([]),
+                output: new LoggableConsoleOutput($bufferedOutput, $this->logger)
+            );
+
+            $this->migrationRunner->run($output);
+            $this->mutex->acquireLock('ImportStravaDataConsoleCommand');
+
+            $this->commandBus->dispatch(new RunImport(
+                output: $output,
+                restrictToActivityIds: null,
+            ));
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Data import completed successfully',
+                'output' => $bufferedOutput->fetch(),
+            ], Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Import failed: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route(path: '/api/setup/build', methods: ['POST'])]
+    public function buildFiles(): JsonResponse
+    {
+        try {
+            $bufferedOutput = new BufferedOutput();
+            $output = new SymfonyStyle(
+                input: new \Symfony\Component\Console\Input\ArrayInput([]),
+                output: new LoggableConsoleOutput($bufferedOutput, $this->logger)
+            );
+
+            $this->mutex->acquireLock('BuildAppConsoleCommand');
+
+            $this->commandBus->dispatch(new RunBuild(
+                output: $output,
+            ));
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Build completed successfully',
+                'output' => $bufferedOutput->fetch(),
+            ], Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Build failed: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}
