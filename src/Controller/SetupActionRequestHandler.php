@@ -28,6 +28,43 @@ final readonly class SetupActionRequestHandler
     ) {
     }
 
+    #[Route(path: '/api/setup/clear-cache', methods: ['POST'])]
+    public function clearCache(): JsonResponse
+    {
+        try {
+            $cacheDir = __DIR__ . '/../../var/cache';
+
+            // Remove cache directories
+            $this->removeDirectory($cacheDir . '/prod');
+            $this->removeDirectory($cacheDir . '/dev');
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Cache cleared successfully. Please refresh the page.',
+            ], Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Failed to clear cache: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . '/' . $file;
+            is_dir($path) ? $this->removeDirectory($path) : unlink($path);
+        }
+        rmdir($dir);
+    }
+
     #[Route(path: '/api/setup/import', methods: ['POST'])]
     public function importData(): JsonResponse
     {

@@ -14,7 +14,13 @@
 <body class="bg-gray-50 h-screen flex justify-center items-center">
 {% include 'html/navigation/top-nav-bar.html.twig' %}
 <div class="max-w-3xl mx-auto px-4">
-    <p class="text-2xl font-semibold pb-5">Looks like you still need to import your Strava data</p>
+    <div class="flex justify-between items-center pb-5">
+        <p class="text-2xl font-semibold">Looks like you still need to import your Strava data</p>
+        <button id="clear-cache-btn"
+                class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors">
+            Clear Cache
+        </button>
+    </div>
 
     <dl class="text-gray-900 divide-y divide-gray-200">
         <div class="flex flex-col pb-6">
@@ -113,6 +119,36 @@
 
         document.getElementById('build-btn').addEventListener('click', () => {
             runCommand('/api/setup/build', 'build-btn', 'build-status', 'build-output');
+        });
+
+        document.getElementById('clear-cache-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('clear-cache-btn');
+            btn.disabled = true;
+            btn.textContent = 'Clearing...';
+
+            try {
+                const response = await fetch('/api/setup/clear-cache', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.success) {
+                    btn.textContent = 'Cache Cleared!';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    btn.textContent = 'Failed';
+                    setTimeout(() => {
+                        btn.textContent = 'Clear Cache';
+                        btn.disabled = false;
+                    }, 2000);
+                }
+            } catch (error) {
+                btn.textContent = 'Error';
+                setTimeout(() => {
+                    btn.textContent = 'Clear Cache';
+                    btn.disabled = false;
+                }, 2000);
+            }
         });
     </script>
 </div>
