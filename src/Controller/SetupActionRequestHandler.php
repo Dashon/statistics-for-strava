@@ -4,27 +4,18 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Application\RunBuild\RunBuild;
-use App\Application\RunImport\RunImport;
-use App\Infrastructure\CQRS\Command\Bus\CommandBus;
-use App\Infrastructure\Doctrine\Migrations\MigrationRunner;
-use App\Infrastructure\Logging\LoggableConsoleOutput;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
 final readonly class SetupActionRequestHandler
 {
     public function __construct(
-        private CommandBus $commandBus,
-        private MigrationRunner $migrationRunner,
-        private LoggerInterface $logger,
+        private KernelInterface $kernel,
     ) {
     }
 
@@ -32,11 +23,18 @@ final readonly class SetupActionRequestHandler
     public function clearCache(): JsonResponse
     {
         try {
-            $cacheDir = __DIR__ . '/../../var/cache';
+            $cacheDir = $this->kernel->getProjectDir() . '/var/cache';
 
-            // Remove cache directories
-            $this->removeDirectory($cacheDir . '/prod');
-            $this->removeDirectory($cacheDir . '/dev');
+            // Get all cache directories
+            if (is_dir($cacheDir)) {
+                $dirs = array_diff(scandir($cacheDir), ['.', '..', '.gitkeep']);
+                foreach ($dirs as $dir) {
+                    $fullPath = $cacheDir . '/' . $dir;
+                    if (is_dir($fullPath)) {
+                        $this->removeDirectory($fullPath);
+                    }
+                }
+            }
 
             return new JsonResponse([
                 'success' => true,
@@ -69,24 +67,28 @@ final readonly class SetupActionRequestHandler
     public function importData(): JsonResponse
     {
         try {
-            $bufferedOutput = new BufferedOutput();
-            $output = new SymfonyStyle(
-                input: new ArrayInput([]),
-                output: new LoggableConsoleOutput($bufferedOutput, $this->logger)
+            $process = new Process(
+                command: ['php', 'bin/console', 'app:strava:import-data'],
+                cwd: $this->kernel->getProjectDir(),
+                timeout: 600
             );
 
-            $this->migrationRunner->run($output);
+            $process->run();
 
-            $this->commandBus->dispatch(new RunImport(
-                output: $output,
-                restrictToActivityIds: null,
-            ));
+            if ($process->isSuccessful()) {
+                return new JsonResponse([
+                    'success' => true,
+                    'message' => 'Data import completed successfully',
+                    'output' => $process->getOutput(),
+                ], Response::HTTP_OK);
+            }
 
             return new JsonResponse([
-                'success' => true,
-                'message' => 'Data import completed successfully',
-                'output' => $bufferedOutput->fetch(),
-            ], Response::HTTP_OK);
+                'success' => false,
+                'message' => 'Import failed',
+                'output' => $process->getErrorOutput(),
+                'error' => $process->getErrorOutput(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Throwable $e) {
             return new JsonResponse([
                 'success' => false,
@@ -100,21 +102,28 @@ final readonly class SetupActionRequestHandler
     public function buildFiles(): JsonResponse
     {
         try {
-            $bufferedOutput = new BufferedOutput();
-            $output = new SymfonyStyle(
-                input: new ArrayInput([]),
-                output: new LoggableConsoleOutput($bufferedOutput, $this->logger)
+            $process = new Process(
+                command: ['php', 'bin/console', 'app:strava:build-files'],
+                cwd: $this->kernel->getProjectDir(),
+                timeout: 600
             );
 
-            $this->commandBus->dispatch(new RunBuild(
-                output: $output,
-            ));
+            $process->run();
+
+            if ($process->isSuccessful()) {
+                return new JsonResponse([
+                    'success' => true,
+                    'message' => 'Build completed successfully',
+                    'output' => $process->getOutput(),
+                ], Response::HTTP_OK);
+            }
 
             return new JsonResponse([
-                'success' => true,
-                'message' => 'Build completed successfully',
-                'output' => $bufferedOutput->fetch(),
-            ], Response::HTTP_OK);
+                'success' => false,
+                'message' => 'Build failed',
+                'output' => $process->getErrorOutput(),
+                'error' => $process->getErrorOutput(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Throwable $e) {
             return new JsonResponse([
                 'success' => false,

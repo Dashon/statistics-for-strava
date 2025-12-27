@@ -17,7 +17,7 @@
     <div class="flex justify-between items-center pb-5">
         <p class="text-2xl font-semibold">Looks like you still need to import your Strava data</p>
         <button id="clear-cache-btn"
-                class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors">
+                class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-green text-sm font-medium rounded-lg transition-colors">
             Clear Cache
         </button>
     </div>
@@ -28,8 +28,8 @@
             <dd class="mb-3 font-semibold text-sm text-gray-600"><code>docker compose exec app bin/console app:strava:import-data</code></dd>
             <div class="flex items-center gap-3">
                 <button id="import-btn"
-                        class="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                    Run Import
+                        class="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-green font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    Run Imports
                 </button>
                 <div id="import-status" class="text-sm font-medium"></div>
             </div>
@@ -40,7 +40,7 @@
             <dd class="mb-3 font-semibold text-sm text-gray-600"><code>docker compose exec app bin/console app:strava:build-files</code></dd>
             <div class="flex items-center gap-3">
                 <button id="build-btn"
-                        class="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-green font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     Run Build
                 </button>
                 <div id="build-status" class="text-sm font-medium"></div>
