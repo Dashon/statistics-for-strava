@@ -19,9 +19,14 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        # Public letter sharing - NO authentication required
-        public_letters:
-            pattern: ^/letter/
+        # Public areas - NO authentication required
+        public:
+            pattern: ^/(letter/|letters|assets/)
+            security: false
+
+        # Landing page - public
+        landing:
+            pattern: ^/$
             security: false
 
         # Strava OAuth callbacks - NO authentication required
@@ -29,7 +34,15 @@ security:
             pattern: ^/strava-(oauth|webhook)
             security: false
 
-        # Main app - HTTP Basic Auth required
+        # Admin area - HTTP Basic Auth required
+        admin:
+            pattern: ^/admin
+            lazy: true
+            http_basic:
+                realm: "QT's Running Dashboard"
+            provider: in_memory
+
+        # Dashboard and other protected routes
         main:
             lazy: true
             http_basic:
@@ -38,9 +51,16 @@ security:
 
     # Access control
     access_control:
-        # Public letter URLs are accessible to everyone
+        # Public landing page
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        # Public letter URLs
         - { path: ^/letter/, roles: PUBLIC_ACCESS }
-        # Strava OAuth/webhook endpoints are public
+        - { path: ^/letters, roles: PUBLIC_ACCESS }
+        # Assets
+        - { path: ^/assets/, roles: PUBLIC_ACCESS }
+        # Strava OAuth/webhook endpoints
         - { path: ^/strava-(oauth|webhook), roles: PUBLIC_ACCESS }
+        # Admin area requires authentication
+        - { path: ^/admin, roles: ROLE_ADMIN }
         # Everything else requires authentication
         - { path: ^/, roles: ROLE_ADMIN }

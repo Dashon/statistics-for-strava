@@ -17,7 +17,7 @@ final readonly class StreakCalculator
      */
     public function getCurrentStreakDay(?SerializableDateTime $upToDate = null): int
     {
-        $upToDate ??= SerializableDateTime::now();
+        $upToDate ??= new SerializableDateTime('now');
 
         // Get all activity days ordered desc
         $days = $this->connection->executeQuery(
