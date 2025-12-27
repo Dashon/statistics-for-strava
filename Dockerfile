@@ -1,44 +1,45 @@
-FROM dunglas/frankenphp:1-php8.5-alpine
+FROM php:8.3-fpm-alpine
 
 WORKDIR /var/www
 
-# hadolint ignore=DL3018
+# Install dependencies
 RUN apk add --no-cache \
   bash \
   curl \
-  file \
+  nginx \
+  supervisor \
   tzdata \
-  geos
+  geos \
+  postgresql-dev \
+  freetype-dev \
+  libjpeg-turbo-dev \
+  libpng-dev \
+  libzip-dev \
+  icu-dev \
+  oniguruma-dev
 
-RUN set -eux; \
-	install-php-extensions \
-        bcmath \
-        ctype \
-        curl \
-        dom \
-        fileinfo \
-        gd \
-        intl \
-        mbstring \
-        opcache \
-        pdo \
-        pdo_pgsql \
-        pdo_sqlite \
-        pgsql \
-        phar \
-        session \
-        simplexml \
-        tokenizer \
-        xml \
-        xmlreader \
-        xmlwriter \
-        pcntl;
+# Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-install -j$(nproc) \
+    bcmath \
+    gd \
+    intl \
+    mbstring \
+    opcache \
+    pdo \
+    pdo_pgsql \
+    pdo_mysql \
+    pcntl \
+    zip
 
-COPY docker/app/config/php.ini ${PHP_INI_DIR}/php.ini
-# Use deployment-specific Caddyfile without worker mode
-COPY Caddyfile.deploy /etc/frankenphp/Caddyfile
-COPY docker/app/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# Copy PHP configuration
+COPY docker/app/config/php.ini ${PHP_INI_DIR}/conf.d/custom.ini
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy supervisor configuration
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -47,23 +48,24 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY . /var/www/
 RUN touch /var/www/.env
 RUN rm -Rf docker
-RUN mkdir -p /var/www/var/cache/dev
-RUN mkdir -p /var/www/var/log
+RUN mkdir -p /var/www/var/cache/prod /var/www/var/log
+RUN chown -R www-data:www-data /var/www/var
 
-# Install Shoutrrr.
+# Install Shoutrrr
 ARG TARGETARCH
-ENV TARGETARCH=${TARGETARCH}
+ENV TARGETARCH=${TARGETARCH:-amd64}
 ARG SHOUTRRR_VERSION="0.13.1"
 
 RUN if [ "${TARGETARCH}" = "arm64" ]; then \
       curl -L -o shoutrrr.tar.gz "https://github.com/nicholas-fedor/shoutrrr/releases/download/v$SHOUTRRR_VERSION/shoutrrr_linux_arm64v8_${SHOUTRRR_VERSION}.tar.gz"; \
-    elif [ "${TARGETARCH}" = "amd64" ]; then \
+    else \
       curl -L -o shoutrrr.tar.gz "https://github.com/nicholas-fedor/shoutrrr/releases/download/v$SHOUTRRR_VERSION/shoutrrr_linux_amd64_${SHOUTRRR_VERSION}.tar.gz"; \
-    fi
-RUN tar -xzf shoutrrr.tar.gz
-RUN chmod +x shoutrrr
-RUN mv shoutrrr /usr/bin/shoutrrr && rm shoutrrr.tar.gz
+    fi \
+  && tar -xzf shoutrrr.tar.gz \
+  && chmod +x shoutrrr \
+  && mv shoutrrr /usr/bin/shoutrrr \
+  && rm shoutrrr.tar.gz
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-# Run FrankenPHP with Caddy configuration (no worker mode for deployment compatibility)
-CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
+EXPOSE 8080
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
