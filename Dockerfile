@@ -76,9 +76,9 @@ RUN mkdir -p /var/www/var/cache/prod /var/www/var/log \
   && chown -R www-data:www-data /var/www/var /var/www/build /var/www/storage /var/www/cron \
   && chmod -R 775 /var/www/var /var/www/build /var/www/storage /var/www/cron
 
-# Warm up cache manually (skip if it fails - will warm up on first request)
-RUN APP_ENV=prod bin/console cache:clear --no-warmup || true \
-  && APP_ENV=prod bin/console cache:warmup || true
+# Warm up cache manually as www-data user (skip if it fails - will warm up on first request)
+RUN su -s /bin/sh www-data -c "APP_ENV=prod bin/console cache:clear --no-warmup" || true \
+  && su -s /bin/sh www-data -c "APP_ENV=prod bin/console cache:warmup" || true
 
 # Install Shoutrrr
 ARG TARGETARCH
