@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9a27add353decfd90aad8d41704d81a9",
+    "content-hash": "a3b366b47bca90d96cf8e0c68897f47c",
     "packages": [
         {
             "name": "adrenalinkin/doctrine-naming-strategy",
@@ -11169,16 +11169,15 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.5",
+        "php": ">=8.4",
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-dom": "*",
         "ext-iconv": "*",
         "ext-intl": "*",
         "ext-libxml": "*",
-        "ext-simplexml": "*",
-        "ext-uri": "*"
+        "ext-simplexml": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
