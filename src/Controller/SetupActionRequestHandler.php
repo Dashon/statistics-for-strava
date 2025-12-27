@@ -7,10 +7,10 @@ namespace App\Controller;
 use App\Application\RunBuild\RunBuild;
 use App\Application\RunImport\RunImport;
 use App\Infrastructure\CQRS\Command\Bus\CommandBus;
-use App\Infrastructure\Daemon\Mutex\Mutex;
 use App\Infrastructure\Doctrine\Migrations\MigrationRunner;
 use App\Infrastructure\Logging\LoggableConsoleOutput;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,7 +23,6 @@ final readonly class SetupActionRequestHandler
 {
     public function __construct(
         private CommandBus $commandBus,
-        private Mutex $mutex,
         private MigrationRunner $migrationRunner,
         private LoggerInterface $logger,
     ) {
@@ -35,12 +34,11 @@ final readonly class SetupActionRequestHandler
         try {
             $bufferedOutput = new BufferedOutput();
             $output = new SymfonyStyle(
-                input: new \Symfony\Component\Console\Input\ArrayInput([]),
+                input: new ArrayInput([]),
                 output: new LoggableConsoleOutput($bufferedOutput, $this->logger)
             );
 
             $this->migrationRunner->run($output);
-            $this->mutex->acquireLock('ImportStravaDataConsoleCommand');
 
             $this->commandBus->dispatch(new RunImport(
                 output: $output,
@@ -67,11 +65,9 @@ final readonly class SetupActionRequestHandler
         try {
             $bufferedOutput = new BufferedOutput();
             $output = new SymfonyStyle(
-                input: new \Symfony\Component\Console\Input\ArrayInput([]),
+                input: new ArrayInput([]),
                 output: new LoggableConsoleOutput($bufferedOutput, $this->logger)
             );
-
-            $this->mutex->acquireLock('BuildAppConsoleCommand');
 
             $this->commandBus->dispatch(new RunBuild(
                 output: $output,
