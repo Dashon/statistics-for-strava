@@ -82,14 +82,59 @@ export default class RunLetters {
 
     togglePublic(activityId) {
         const button = document.querySelector('.public-toggle-' + activityId);
+        const originalText = button.innerHTML;
         button.disabled = true;
 
         fetch('/api/run-letter/' + activityId + '/toggle-public', {method: 'POST'})
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                // Reload page to update UI
-                window.location.reload();
+                // Update button text
+                const isPublic = data.isPublic;
+                const newText = isPublic ? 'Make Private' : 'Make Public';
+                button.innerHTML = originalText.replace(/(Make Private|Make Public)/, newText);
+                button.disabled = false;
+
+                // Find the letter item container
+                const letterItem = button.closest('li');
+
+                // Update or add/remove the "Public" badge
+                const headerDiv = letterItem.querySelector('.flex.items-center.justify-between');
+                let publicBadge = headerDiv.querySelector('.bg-green-100');
+
+                if (isPublic && !publicBadge) {
+                    // Add public badge
+                    const badge = document.createElement('span');
+                    badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800';
+                    badge.textContent = 'Public';
+                    headerDiv.appendChild(badge);
+                } else if (!isPublic && publicBadge) {
+                    // Remove public badge
+                    publicBadge.remove();
+                }
+
+                // Update or add/remove the "Copy Link" button
+                const actionsDiv = button.parentElement;
+                // Look for the copy link button by class (works for both server-rendered and JS-created buttons)
+                let copyLinkButton = actionsDiv.querySelector('.copy-link-button');
+
+                if (isPublic && data.shareUrl && !copyLinkButton) {
+                    // Add copy link button
+                    const shareToken = data.shareUrl.replace('/letter/', '');
+                    const copyButton = document.createElement('button');
+                    copyButton.onclick = () => this.copyShareLink(shareToken);
+                    copyButton.className = 'copy-link-button inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-strava-orange border border-transparent rounded-md hover:bg-orange-600';
+                    copyButton.innerHTML = `
+                        <svg class="w-3 h-3 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/>
+                        </svg>
+                        Copy Link
+                    `;
+                    actionsDiv.appendChild(copyButton);
+                } else if (!isPublic && copyLinkButton) {
+                    // Remove copy link button
+                    copyLinkButton.remove();
+                }
             }
         })
         .catch(e => {
