@@ -1,6 +1,6 @@
 doctrine:
   dbal:
-    url: '%env(resolve:DATABASE_URL)%'
+    url: '%env(DATABASE_URL)%'
     server_version: '15.0'
     profiling_collect_backtrace: false
   orm:
@@ -25,5 +25,4 @@ when@test:
     dbal:
       # "TEST_TOKEN" is typically set by ParaTest
       dbname_suffix: '_test%env(default::TEST_TOKEN)%'
-      url: '%env(resolve:DATABASE_URL)%'
-      #url: 'sqlite:///%kernel.project_dir%/tests/strava.db?charset=utf8mb4'
+      url: 'sqlite:///%kernel.project_dir%/tests/strava.db?charset=utf8mb4'
