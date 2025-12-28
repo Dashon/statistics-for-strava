@@ -19,6 +19,11 @@ final class Version20250108110543 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // Skip SQLite-specific data migration on PostgreSQL
+        if (!($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SqlitePlatform)) {
+            return;
+        }
+
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('UPDATE Segment SET data = JSON_SET(Segment.data, "$.device_name",  (SELECT JSON_EXTRACT(Activity.data, "$.device_name") 
 FROM Segment child

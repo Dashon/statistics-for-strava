@@ -28,6 +28,11 @@ final class Version20250118164026 extends AbstractMigration implements CommandBu
 
     public function up(Schema $schema): void
     {
+        // Skip SQLite-specific data migration on PostgreSQL
+        if (!($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SqlitePlatform)) {
+            return;
+        }
+
         // Migrate Activity table.
         $this->addSql('CREATE TEMPORARY TABLE __temp__Activity AS SELECT activityId, startDateTime, data, gearId, weather, location, sportType FROM Activity');
         $this->addSql('DROP TABLE Activity');

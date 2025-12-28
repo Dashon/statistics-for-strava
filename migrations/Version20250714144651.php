@@ -19,6 +19,11 @@ final class Version20250714144651 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // Skip SQLite-specific data migration on PostgreSQL
+        if (!($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SqlitePlatform)) {
+            return;
+        }
+
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE Segment ADD COLUMN countryCode VARCHAR(255) DEFAULT NULL');
 

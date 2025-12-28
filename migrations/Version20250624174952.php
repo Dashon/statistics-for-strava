@@ -19,6 +19,11 @@ final class Version20250624174952 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // Skip SQLite-specific schema migration on PostgreSQL
+        if (!($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SqlitePlatform)) {
+            return;
+        }
+
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
             ALTER TABLE ActivityStream ADD COLUMN normalizedPower INTEGER DEFAULT NULL

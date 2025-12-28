@@ -19,6 +19,11 @@ final class Version20251113122908 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // Skip SQLite-specific schema migration on PostgreSQL
+        if (!($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SqlitePlatform)) {
+            return;
+        }
+
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE ActivityStream ADD COLUMN valueDistribution TEXT DEFAULT NULL');
         $this->addSql('CREATE TEMPORARY TABLE __temp__ActivityStream AS SELECT activityId, streamType, createdOn, data, bestAverages, normalizedPower, valueDistribution FROM ActivityStream');

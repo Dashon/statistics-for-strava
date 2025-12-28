@@ -19,6 +19,11 @@ final class Version20250704073735 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // Skip SQLite-specific schema migration on PostgreSQL
+        if (!($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SqlitePlatform)) {
+            return;
+        }
+
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TEMPORARY TABLE __temp__Activity AS SELECT activityId, startDateTime, data, gearId, weather, location, sportType, name, description, distance, elevation, calories, averagePower, maxPower, averageSpeed, maxSpeed, averageHeartRate, maxHeartRate, averageCadence, movingTimeInSeconds, kudoCount, deviceName, totalImageCount, localImagePaths, polyline, gearName, startingCoordinateLatitude, startingCoordinateLongitude, isCommute, streamsAreImported, workoutType FROM Activity');
         $this->addSql('DROP TABLE Activity');

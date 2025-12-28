@@ -28,7 +28,15 @@
       "Bash(do)",
       "Bash(perl -i -pe:*)",
       "Bash(done)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(sqlite3:*)",
+      "Bash(php reset_pg_database.php:*)",
+      "Bash(for file in migrations/Version20250624174952.php migrations/Version20250704073735.php migrations/Version20251113122908.php migrations/Version20251116105419.php)",
+      "Bash(if [ -f \"$file\" ])",
+      "Bash(! grep -q \"SqlitePlatform\" \"$file\")",
+      "Bash(then)",
+      "Bash(perl -i -0777 -pe:*)",
+      "Bash(fi)"
     ]
   }
 }
