@@ -21,7 +21,7 @@ final class Version20251216180124 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS markedForDeletion BOOLEAN DEFAULT NULL');
-        $this->addSql('UPDATE Activity SET markedForDeletion = 0');
+        $this->addSql('UPDATE Activity SET markedForDeletion = FALSE');
     }
 
     public function down(Schema $schema): void
