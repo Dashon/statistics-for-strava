@@ -26,7 +26,7 @@ final class Version20250714071904 extends AbstractMigration
         $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS activityType VARCHAR(255) DEFAULT NULL');
         foreach (ActivityType::cases() as $activityType) {
             $this->addSql(
-                'UPDATE Activity SET activityType = :activityType WHERE sportType IN (:sportTypes)',
+                'UPDATE Activity SET activityType = :activityType WHERE sporttype IN (:sportTypes)',
                 [
                     'activityType' => $activityType->value,
                     'sportTypes' => $activityType->getSportTypes()->map(fn (SportType $sportType) => $sportType->value),
