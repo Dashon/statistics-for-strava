@@ -21,7 +21,7 @@ final class Version20251103151328 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('UPDATE Activity set worldType = :worldType WHERE LOWER(deviceName) = :deviceName', [
+        $this->addSql('UPDATE Activity set worldType = :worldType WHERE LOWER(devicename) = :deviceName', [
             'worldType' => WorldType::MY_WHOOSH->value,
             'deviceName' => 'mywhoosh',
         ]);

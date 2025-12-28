@@ -20,7 +20,7 @@ final class Version20250620070919 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('DELETE FROM ActivityBestEffort WHERE activityId NOT IN (SELECT activityId FROM Activity)');
+        $this->addSql('DELETE FROM ActivityBestEffort WHERE activityid NOT IN (SELECT activityid FROM Activity)');
     }
 
     public function down(Schema $schema): void

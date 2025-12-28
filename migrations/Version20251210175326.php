@@ -19,10 +19,16 @@ final class Version20251210175326 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('UPDATE Activity SET location = JSON_SET(location, "$.is_reverse_geocoded", true) WHERE location IS NOT NULL');
-        $this->addSql('ALTER TABLE Activity RENAME COLUMN location TO routeGeography');
-        $this->addSql('ALTER TABLE Activity DROP COLUMN gearName');
+        // Skip SQLite-specific JSON_SET function on PostgreSQL
+        if ($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SqlitePlatform) {
+            $this->addSql('UPDATE Activity SET location = JSON_SET(location, "$.is_reverse_geocoded", true) WHERE location IS NOT NULL');
+        } else {
+            // PostgreSQL: Use jsonb_set
+            $this->addSql("UPDATE Activity SET location = jsonb_set(location::jsonb, '{is_reverse_geocoded}', 'true'::jsonb) WHERE location IS NOT NULL");
+        }
+
+        $this->addSql('ALTER TABLE Activity RENAME COLUMN location TO routegeography');
+        $this->addSql('ALTER TABLE Activity DROP COLUMN IF EXISTS gearname');
     }
 
     public function down(Schema $schema): void

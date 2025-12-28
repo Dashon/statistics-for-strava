@@ -21,7 +21,7 @@ final class Version20250101171812 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('DELETE FROM Segment WHERE NOT EXISTS(
-            SELECT 1 FROM SegmentEffort WHERE SegmentEffort.segmentId = Segment.segmentId
+            SELECT 1 FROM SegmentEffort WHERE SegmentEffort.segmentid = Segment.segmentid
         )');
     }
 

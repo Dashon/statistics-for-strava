@@ -24,7 +24,7 @@ final class Version20251205074138 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $activityIds = $this->connection->fetchFirstColumn(
             <<<'SQL'
-                SELECT activityId FROM Activity WHERE activityType = :activityType
+                SELECT activityid FROM Activity WHERE activitytype = :activityType
             SQL,
             [
                 'activityType' => ActivityType::RUN->value,
@@ -37,7 +37,7 @@ final class Version20251205074138 extends AbstractMigration
 
         $this->addSql(<<<'SQL'
             DELETE FROM ActivityBestEffort
-            WHERE activityId IN(:activityIds)
+            WHERE activityid IN(:activityIds)
         SQL,
             [
                 'activityIds' => $activityIds,

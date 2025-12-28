@@ -27,18 +27,18 @@ final class Version20251012151344 extends AbstractMigration
         $this->addSql('UPDATE Activity set worldType = :worldType', [
             'worldType' => WorldType::REAL_WORLD->value,
         ]);
-        $this->addSql('UPDATE Activity set worldType = :worldType WHERE LOWER(deviceName) = :deviceName', [
+        $this->addSql('UPDATE Activity set worldType = :worldType WHERE LOWER(devicename) = :deviceName', [
             'worldType' => WorldType::ZWIFT->value,
             'deviceName' => 'zwift',
         ]);
-        $this->addSql('UPDATE Activity set worldType = :worldType WHERE LOWER(deviceName) = :deviceName', [
+        $this->addSql('UPDATE Activity set worldType = :worldType WHERE LOWER(devicename) = :deviceName', [
             'worldType' => WorldType::ROUVY->value,
             'deviceName' => 'rouvy',
         ]);
 
         $activityIds = $this->connection->fetchFirstColumn(
             <<<'SQL'
-                SELECT activityId FROM Activity WHERE activityType = :activityType
+                SELECT activityid FROM Activity WHERE activitytype = :activityType
             SQL,
             [
                 'activityType' => ActivityType::RUN->value,
@@ -51,7 +51,7 @@ final class Version20251012151344 extends AbstractMigration
 
         $this->addSql(<<<'SQL'
             DELETE FROM CombinedActivityStream
-            WHERE activityId IN(:activityIds)
+            WHERE activityid IN(:activityIds)
         SQL,
             [
                 'activityIds' => $activityIds,

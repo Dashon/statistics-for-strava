@@ -42,7 +42,9 @@
       "Bash(if ! grep -q \"storage/database\" .gitignore)",
       "Bash(else)",
       "Bash(php bin/console dbal:run-sql:*)",
-      "Bash(php bin/console:*)"
+      "Bash(php bin/console:*)",
+      "Bash(chmod:*)",
+      "Bash(./check_migrations.sh:*)"
     ]
   }
 }

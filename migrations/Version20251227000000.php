@@ -26,8 +26,8 @@ final class Version20251227000000 extends AbstractMigration
             generated_at INTEGER NOT NULL,
             edited_at INTEGER DEFAULT NULL,
             share_token VARCHAR(32) UNIQUE,
-            is_public INTEGER DEFAULT 0,
-            FOREIGN KEY (activity_id) REFERENCES Activity(id) ON DELETE CASCADE
+            is_public BOOLEAN DEFAULT FALSE,
+            FOREIGN KEY (activity_id) REFERENCES Activity(activityid) ON DELETE CASCADE
         )');
 
         $this->addSql('CREATE INDEX idx_run_letters_generated_at ON run_letters(generated_at)');
