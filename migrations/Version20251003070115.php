@@ -26,8 +26,8 @@ final class Version20251003070115 extends AbstractMigration
         $this->addSql(<<<'SQL'
             DELETE FROM ActivityLap
         SQL);
-        $this->addSql('ALTER TABLE ActivityLap ADD COLUMN minAverageSpeed DOUBLE PRECISION NOT NULL');
-        $this->addSql('ALTER TABLE ActivityLap ADD COLUMN maxAverageSpeed DOUBLE PRECISION NOT NULL');
+        $this->addSql('ALTER TABLE ActivityLap ADD COLUMN IF NOT EXISTS minAverageSpeed DOUBLE PRECISION NOT NULL');
+        $this->addSql('ALTER TABLE ActivityLap ADD COLUMN IF NOT EXISTS maxAverageSpeed DOUBLE PRECISION NOT NULL');
     }
 
     public function down(Schema $schema): void

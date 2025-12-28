@@ -21,7 +21,7 @@ final class Version20250530153227 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE Gear ADD COLUMN type VARCHAR(255) DEFAULT 'imported' NOT NULL
+            ALTER TABLE Gear ADD COLUMN IF NOT EXISTS type VARCHAR(255) DEFAULT 'imported' NOT NULL
         SQL);
     }
 

@@ -27,7 +27,7 @@ final class Version20250506071421 extends AbstractMigration
 
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE Segment ADD COLUMN climbCategory INTEGER DEFAULT NULL
+            ALTER TABLE Segment ADD COLUMN IF NOT EXISTS climbCategory INTEGER DEFAULT NULL
         SQL);
 
         $climbCategories = $this->connection->executeQuery(

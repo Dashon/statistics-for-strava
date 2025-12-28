@@ -26,8 +26,8 @@ final class Version20250806173723 extends AbstractMigration
         }
 
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE SegmentEffort ADD COLUMN averageHeartRate INTEGER DEFAULT NULL');
-        $this->addSql('ALTER TABLE SegmentEffort ADD COLUMN maxHeartRate INTEGER DEFAULT NULL');
+        $this->addSql('ALTER TABLE SegmentEffort ADD COLUMN IF NOT EXISTS averageHeartRate INTEGER DEFAULT NULL');
+        $this->addSql('ALTER TABLE SegmentEffort ADD COLUMN IF NOT EXISTS maxHeartRate INTEGER DEFAULT NULL');
 
         $results = $this->connection->executeQuery("
          SELECT 

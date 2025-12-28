@@ -23,7 +23,7 @@ final class Version20250714071904 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE Activity ADD COLUMN activityType VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS activityType VARCHAR(255) DEFAULT NULL');
         foreach (ActivityType::cases() as $activityType) {
             $this->addSql(
                 'UPDATE Activity SET activityType = :activityType WHERE sportType IN (:sportTypes)',

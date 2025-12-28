@@ -25,7 +25,7 @@ final class Version20250714144651 extends AbstractMigration
         }
 
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE Segment ADD COLUMN countryCode VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS countryCode VARCHAR(255) DEFAULT NULL');
 
         $this->addSql(
             <<<SQL

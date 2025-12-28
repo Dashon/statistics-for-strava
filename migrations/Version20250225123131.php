@@ -20,7 +20,7 @@ final class Version20250225123131 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE Activity ADD COLUMN streamsAreImported BOOLEAN DEFAULT NULL');
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS streamsAreImported BOOLEAN DEFAULT NULL');
         $this->addSql('UPDATE Activity SET streamsAreImported = FALSE');
         $this->addSql('DELETE FROM ActivityStream WHERE streamType = \'hack\'');
     }

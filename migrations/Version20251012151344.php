@@ -23,7 +23,7 @@ final class Version20251012151344 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs.
-        $this->addSql('ALTER TABLE Activity ADD COLUMN worldType VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS worldType VARCHAR(255) DEFAULT NULL');
         $this->addSql('UPDATE Activity set worldType = :worldType', [
             'worldType' => WorldType::REAL_WORLD->value,
         ]);

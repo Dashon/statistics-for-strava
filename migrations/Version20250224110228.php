@@ -25,7 +25,7 @@ final class Version20250224110228 extends AbstractMigration
         }
 
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE Activity ADD COLUMN isCommute BOOLEAN DEFAULT NULL');
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS isCommute BOOLEAN DEFAULT NULL');
         $this->addSql('UPDATE Activity SET isCommute = JSON_EXTRACT(data, "$.commute")');
     }
 

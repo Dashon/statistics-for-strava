@@ -25,7 +25,7 @@ final class Version20251113122908 extends AbstractMigration
         }
 
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE ActivityStream ADD COLUMN valueDistribution TEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ActivityStream ADD COLUMN IF NOT EXISTS valueDistribution TEXT DEFAULT NULL');
         $this->addSql('CREATE TEMPORARY TABLE __temp__ActivityStream AS SELECT activityId, streamType, createdOn, data, bestAverages, normalizedPower, valueDistribution FROM ActivityStream');
         $this->addSql('DROP TABLE ActivityStream');
         $this->addSql('CREATE TABLE ActivityStream (activityId VARCHAR(255) NOT NULL, streamType VARCHAR(255) NOT NULL, createdOn TIMESTAMP NOT NULL --(DC2Type:datetime_immutable)

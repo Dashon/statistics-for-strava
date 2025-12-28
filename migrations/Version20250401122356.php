@@ -26,7 +26,7 @@ final class Version20250401122356 extends AbstractMigration
 
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE Activity ADD COLUMN workoutType VARCHAR(255) DEFAULT NULL
+            ALTER TABLE Activity ADD COLUMN IF NOT EXISTS workoutType VARCHAR(255) DEFAULT NULL
         SQL);
 
         $this->addSql(<<<'SQL'

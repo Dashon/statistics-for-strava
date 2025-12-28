@@ -26,7 +26,7 @@ final class Version20250624174952 extends AbstractMigration
 
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE ActivityStream ADD COLUMN normalizedPower INTEGER DEFAULT NULL
+            ALTER TABLE ActivityStream ADD COLUMN IF NOT EXISTS normalizedPower INTEGER DEFAULT NULL
         SQL);
     }
 
