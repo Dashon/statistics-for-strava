@@ -31,11 +31,11 @@ final class Version20250118164026 extends AbstractMigration implements CommandBu
         // Migrate Activity table.
         $this->addSql('CREATE TEMPORARY TABLE __temp__Activity AS SELECT activityId, startDateTime, data, gearId, weather, location, sportType FROM Activity');
         $this->addSql('DROP TABLE Activity');
-        $this->addSql('CREATE TABLE Activity (activityId VARCHAR(255) NOT NULL, startDateTime DATETIME NOT NULL --(DC2Type:datetime_immutable)
-        , data CLOB DEFAULT NULL --(DC2Type:json)
-        , gearId VARCHAR(255) DEFAULT NULL, weather CLOB DEFAULT NULL --(DC2Type:json)
-        , location CLOB DEFAULT NULL --(DC2Type:json)
-        , sportType VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(255) DEFAULT NULL, distance INTEGER NOT NULL, elevation INTEGER NOT NULL, calories INTEGER DEFAULT NULL, averagePower INTEGER DEFAULT NULL, maxPower INTEGER DEFAULT NULL, averageSpeed DOUBLE PRECISION NOT NULL, maxSpeed DOUBLE PRECISION NOT NULL, averageHeartRate INTEGER DEFAULT NULL, maxHeartRate INTEGER DEFAULT NULL, averageCadence INTEGER DEFAULT NULL, movingTimeInSeconds INTEGER NOT NULL, kudoCount INTEGER NOT NULL, deviceName VARCHAR(255) DEFAULT NULL, totalImageCount INTEGER NOT NULL, localImagePaths CLOB DEFAULT NULL, polyline CLOB DEFAULT NULL, gearName VARCHAR(255) DEFAULT NULL, startingCoordinateLatitude DOUBLE PRECISION DEFAULT NULL, startingCoordinateLongitude DOUBLE PRECISION DEFAULT NULL, PRIMARY KEY(activityId))');
+        $this->addSql('CREATE TABLE Activity (activityId VARCHAR(255) NOT NULL, startDateTime TIMESTAMP NOT NULL --(DC2Type:datetime_immutable)
+        , data TEXT DEFAULT NULL --(DC2Type:json)
+        , gearId VARCHAR(255) DEFAULT NULL, weather TEXT DEFAULT NULL --(DC2Type:json)
+        , location TEXT DEFAULT NULL --(DC2Type:json)
+        , sportType VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(255) DEFAULT NULL, distance INTEGER NOT NULL, elevation INTEGER NOT NULL, calories INTEGER DEFAULT NULL, averagePower INTEGER DEFAULT NULL, maxPower INTEGER DEFAULT NULL, averageSpeed DOUBLE PRECISION NOT NULL, maxSpeed DOUBLE PRECISION NOT NULL, averageHeartRate INTEGER DEFAULT NULL, maxHeartRate INTEGER DEFAULT NULL, averageCadence INTEGER DEFAULT NULL, movingTimeInSeconds INTEGER NOT NULL, kudoCount INTEGER NOT NULL, deviceName VARCHAR(255) DEFAULT NULL, totalImageCount INTEGER NOT NULL, localImagePaths TEXT DEFAULT NULL, polyline TEXT DEFAULT NULL, gearName VARCHAR(255) DEFAULT NULL, startingCoordinateLatitude DOUBLE PRECISION DEFAULT NULL, startingCoordinateLongitude DOUBLE PRECISION DEFAULT NULL, PRIMARY KEY(activityId))');
 
         $this->addSql('INSERT INTO Activity (activityId, startDateTime, data, gearId, weather, location, sportType, name, description, distance, elevation, startingCoordinateLatitude, startingCoordinateLongitude, calories,
                         averagePower, maxPower, averageSpeed, maxSpeed, averageHeartRate, maxHeartRate,
@@ -55,7 +55,7 @@ final class Version20250118164026 extends AbstractMigration implements CommandBu
         // Migrate SegmentEffort table.
         $this->addSql('CREATE TEMPORARY TABLE __temp__SegmentEffort AS SELECT segmentEffortId, segmentId, activityId, startDateTime, data FROM SegmentEffort');
         $this->addSql('DROP TABLE SegmentEffort');
-        $this->addSql('CREATE TABLE SegmentEffort (segmentEffortId VARCHAR(255) NOT NULL, segmentId VARCHAR(255) NOT NULL, activityId VARCHAR(255) NOT NULL, startDateTime DATETIME NOT NULL --(DC2Type:datetime_immutable)
+        $this->addSql('CREATE TABLE SegmentEffort (segmentEffortId VARCHAR(255) NOT NULL, segmentId VARCHAR(255) NOT NULL, activityId VARCHAR(255) NOT NULL, startDateTime TIMESTAMP NOT NULL --(DC2Type:datetime_immutable)
         , name VARCHAR(255) NOT NULL, elapsedTimeInSeconds DOUBLE PRECISION NOT NULL, distance INTEGER NOT NULL, averageWatts DOUBLE PRECISION DEFAULT NULL, PRIMARY KEY(segmentEffortId))');
         $this->addSql('INSERT INTO SegmentEffort (segmentEffortId, segmentId, activityId, startDateTime, name, elapsedTimeInSeconds, distance, averageWatts) SELECT segmentEffortId, segmentId, activityId, startDateTime, JSON_EXTRACT(data, "$.name"), JSON_EXTRACT(data, "$.elapsed_time"), CAST(JSON_EXTRACT(data, "$.distance") AS INTEGER), JSON_EXTRACT(data, "$.average_watts") FROM __temp__SegmentEffort');
         $this->addSql('DROP TABLE __temp__SegmentEffort');
@@ -65,7 +65,7 @@ final class Version20250118164026 extends AbstractMigration implements CommandBu
         // Migrate Gear table.
         $this->addSql('CREATE TEMPORARY TABLE __temp__Gear AS SELECT gearId, createdOn, distanceInMeter, data FROM Gear');
         $this->addSql('DROP TABLE Gear');
-        $this->addSql('CREATE TABLE Gear (gearId VARCHAR(255) NOT NULL, createdOn DATETIME NOT NULL --(DC2Type:datetime_immutable)
+        $this->addSql('CREATE TABLE Gear (gearId VARCHAR(255) NOT NULL, createdOn TIMESTAMP NOT NULL --(DC2Type:datetime_immutable)
         , distanceInMeter INTEGER NOT NULL, name VARCHAR(255) NOT NULL, isRetired BOOLEAN NOT NULL, PRIMARY KEY(gearId))');
         $this->addSql('INSERT INTO Gear (gearId, createdOn, distanceInMeter, name, isRetired) SELECT gearId, createdOn, distanceInMeter, JSON_EXTRACT(data, "$.name"), JSON_EXTRACT(data, "$.retired") FROM __temp__Gear');
         $this->addSql('DROP TABLE __temp__Gear');
@@ -73,7 +73,7 @@ final class Version20250118164026 extends AbstractMigration implements CommandBu
         // Migrate Challenge table.
         $this->addSql('CREATE TEMPORARY TABLE __temp__Challenge AS SELECT challengeId, createdOn, data FROM Challenge');
         $this->addSql('DROP TABLE Challenge');
-        $this->addSql('CREATE TABLE Challenge (challengeId VARCHAR(255) NOT NULL, createdOn DATETIME NOT NULL --(DC2Type:datetime_immutable)
+        $this->addSql('CREATE TABLE Challenge (challengeId VARCHAR(255) NOT NULL, createdOn TIMESTAMP NOT NULL --(DC2Type:datetime_immutable)
         , name VARCHAR(255) NOT NULL, logoUrl VARCHAR(255) DEFAULT NULL, localLogoUrl VARCHAR(255) DEFAULT NULL, slug VARCHAR(255) NOT NULL, PRIMARY KEY(challengeId))');
         $this->addSql('INSERT INTO Challenge (challengeId, createdOn, name, logoUrl, localLogoUrl, slug) SELECT challengeId, createdOn, JSON_EXTRACT(data, "$.name"), JSON_EXTRACT(data, "$.logo_url"), JSON_EXTRACT(data, "$.localLogo"), JSON_EXTRACT(data, "$.url") FROM __temp__Challenge');
         $this->addSql('DROP TABLE __temp__Challenge');
@@ -82,9 +82,9 @@ final class Version20250118164026 extends AbstractMigration implements CommandBu
         // Migrate ActivityStream table.
         $this->addSql('CREATE TEMPORARY TABLE __temp__ActivityStream AS SELECT activityId, streamType, createdOn, data, bestAverages FROM ActivityStream');
         $this->addSql('DROP TABLE ActivityStream');
-        $this->addSql('CREATE TABLE ActivityStream (activityId VARCHAR(255) NOT NULL, streamType VARCHAR(255) NOT NULL, createdOn DATETIME NOT NULL --(DC2Type:datetime_immutable)
-        , data CLOB NOT NULL --(DC2Type:json)
-        , bestAverages CLOB DEFAULT NULL --(DC2Type:json)
+        $this->addSql('CREATE TABLE ActivityStream (activityId VARCHAR(255) NOT NULL, streamType VARCHAR(255) NOT NULL, createdOn TIMESTAMP NOT NULL --(DC2Type:datetime_immutable)
+        , data TEXT NOT NULL --(DC2Type:json)
+        , bestAverages TEXT DEFAULT NULL --(DC2Type:json)
         , PRIMARY KEY(activityId, streamType))');
         $this->addSql('INSERT INTO ActivityStream (activityId, streamType, createdOn, data, bestAverages) SELECT activityId, streamType, createdOn, data, bestAverages FROM __temp__ActivityStream');
         $this->addSql('DROP TABLE __temp__ActivityStream');

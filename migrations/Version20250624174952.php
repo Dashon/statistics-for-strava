@@ -35,9 +35,9 @@ final class Version20250624174952 extends AbstractMigration
             DROP TABLE ActivityStream
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE ActivityStream (activityId VARCHAR(255) NOT NULL, streamType VARCHAR(255) NOT NULL, createdOn DATETIME NOT NULL --(DC2Type:datetime_immutable)
-            , data CLOB NOT NULL --(DC2Type:json)
-            , bestAverages CLOB DEFAULT NULL --(DC2Type:json)
+            CREATE TABLE ActivityStream (activityId VARCHAR(255) NOT NULL, streamType VARCHAR(255) NOT NULL, createdOn TIMESTAMP NOT NULL --(DC2Type:datetime_immutable)
+            , data TEXT NOT NULL --(DC2Type:json)
+            , bestAverages TEXT DEFAULT NULL --(DC2Type:json)
             , PRIMARY KEY(activityId, streamType))
         SQL);
         $this->addSql(<<<'SQL'

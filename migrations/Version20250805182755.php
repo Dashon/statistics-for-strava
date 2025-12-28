@@ -22,7 +22,7 @@ final class Version20250805182755 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE Segment ADD COLUMN detailsHaveBeenImported BOOLEAN DEFAULT NULL');
         $this->addSql('UPDATE segment SET detailsHaveBeenImported = 0');
-        $this->addSql('ALTER TABLE Segment ADD COLUMN polyline CLOB DEFAULT NULL');
+        $this->addSql('ALTER TABLE Segment ADD COLUMN polyline TEXT DEFAULT NULL');
         $this->addSql('ALTER TABLE Segment ADD COLUMN startingCoordinateLatitude DOUBLE PRECISION DEFAULT NULL');
         $this->addSql('ALTER TABLE Segment ADD COLUMN startingCoordinateLongitude DOUBLE PRECISION DEFAULT NULL');
     }

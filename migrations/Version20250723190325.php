@@ -20,7 +20,7 @@ final class Version20250723190325 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE ChatMessage (messageId VARCHAR(255) NOT NULL, message CLOB NOT NULL, messageRole VARCHAR(255) NOT NULL, "on" DATETIME NOT NULL --(DC2Type:datetime_immutable)
+        $this->addSql('CREATE TABLE ChatMessage (messageId VARCHAR(255) NOT NULL, message TEXT NOT NULL, messageRole VARCHAR(255) NOT NULL, "on" TIMESTAMP NOT NULL --(DC2Type:datetime_immutable)
         , PRIMARY KEY(messageId))');
     }
 

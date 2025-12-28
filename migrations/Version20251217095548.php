@@ -20,7 +20,7 @@ final class Version20251217095548 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE WebhookEvent (objectId VARCHAR(255) NOT NULL, objectType VARCHAR(255) NOT NULL, aspectType VARCHAR(255) NOT NULL, payload CLOB NOT NULL, PRIMARY KEY (objectId))');
+        $this->addSql('CREATE TABLE WebhookEvent (objectId VARCHAR(255) NOT NULL, objectType VARCHAR(255) NOT NULL, aspectType VARCHAR(255) NOT NULL, payload TEXT NOT NULL, PRIMARY KEY (objectId))');
     }
 
     public function down(Schema $schema): void

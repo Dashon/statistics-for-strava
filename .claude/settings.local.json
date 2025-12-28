@@ -23,7 +23,12 @@
       "Bash(xargs ls:*)",
       "Bash(cat:*)",
       "Bash(make app-build-assets:*)",
-      "Bash(npx webpack)"
+      "Bash(npx webpack)",
+      "Bash(for file in *.php)",
+      "Bash(do)",
+      "Bash(perl -i -pe:*)",
+      "Bash(done)",
+      "Bash(grep:*)"
     ]
   }
 }
