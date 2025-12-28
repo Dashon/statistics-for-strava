@@ -39,3 +39,7 @@ phpstan.neon
 /public/js/dist/
 /public/css/tailwind.output.css
 ###> app-build ###
+
+# SQLite databases (not used - PostgreSQL only)
+storage/database/*.db
+tests/*.db
