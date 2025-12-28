@@ -31,14 +31,15 @@ final class Mutex
         $this->connection->beginTransaction();
 
         $row = $this->connection->fetchOne(
-            'SELECT `value` FROM KeyValue WHERE `key` = :key',
+            'SELECT "value" FROM KeyValue WHERE "key" = :key',
             ['key' => $this->lockName->key()]
         );
 
         if (false === $row) {
             $this->updateLockRow(
                 timestamp: $now,
-                lockAcquiredBy: $lockAcquiredBy)
+                lockAcquiredBy: $lockAcquiredBy
+            )
             ;
             $this->connection->commit();
 
@@ -71,7 +72,7 @@ final class Mutex
     public function heartbeat(): void
     {
         $row = $this->connection->fetchOne(
-            'SELECT `value` FROM KeyValue WHERE `key` = :key',
+            'SELECT "value" FROM KeyValue WHERE "key" = :key',
             ['key' => $this->lockName->key()]
         );
 
@@ -89,7 +90,7 @@ final class Mutex
     public function releaseLock(): void
     {
         $this->connection->executeStatement(
-            'DELETE FROM KeyValue WHERE `key` = :key',
+            'DELETE FROM KeyValue WHERE "key" = :key',
             ['key' => $this->lockName->key()]
         );
     }
@@ -102,8 +103,8 @@ final class Mutex
         ]);
 
         $this->connection->executeStatement(
-            'INSERT INTO KeyValue (`key`, `value`) VALUES (:key, :value)
-             ON CONFLICT(key) DO UPDATE SET value = :value',
+            'INSERT INTO KeyValue ("key", "value") VALUES (:key, :value)
+             ON CONFLICT ("key") DO UPDATE SET "value" = EXCLUDED."value"',
             ['key' => $this->lockName->key(), 'value' => $value]
         );
     }
@@ -118,6 +119,6 @@ final class Mutex
         if ('test' === $_ENV['APP_ENV']) {
             return;
         }
-        register_shutdown_function(fn () => $this->releaseLock()); // @codeCoverageIgnore
+        register_shutdown_function(fn() => $this->releaseLock()); // @codeCoverageIgnore
     }
 }

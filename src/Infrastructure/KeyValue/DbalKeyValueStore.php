@@ -11,8 +11,9 @@ final readonly class DbalKeyValueStore extends DbalRepository implements KeyValu
 {
     public function save(KeyValue $keyValue): void
     {
-        $sql = 'REPLACE INTO KeyValue (`key`, `value`)
-        VALUES (:key, :value)';
+        $sql = 'INSERT INTO KeyValue ("key", "value")
+        VALUES (:key, :value)
+        ON CONFLICT ("key") DO UPDATE SET "value" = EXCLUDED."value"';
 
         $this->connection->executeStatement($sql, [
             'key' => $keyValue->getKey()->value,
@@ -22,7 +23,7 @@ final readonly class DbalKeyValueStore extends DbalRepository implements KeyValu
 
     public function clear(Key $key): void
     {
-        $sql = 'DELETE FROM KeyValue WHERE `key` = :key';
+        $sql = 'DELETE FROM KeyValue WHERE "key" = :key';
 
         $this->connection->executeStatement($sql, [
             'key' => $key->value,
@@ -34,7 +35,7 @@ final readonly class DbalKeyValueStore extends DbalRepository implements KeyValu
         $queryBuilder = $this->connection->createQueryBuilder();
         $queryBuilder->select('*')
             ->from('KeyValue')
-            ->andWhere('`key` = :key')
+            ->andWhere('"key" = :key')
             ->setParameter('key', $key->value);
 
         if (!$result = $queryBuilder->executeQuery()->fetchAssociative()) {
