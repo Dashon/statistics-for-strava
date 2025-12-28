@@ -22,7 +22,7 @@ final readonly class LetterGenerator
 
     private function buildContext(Activity $activity, int $streakDay, UnitSystem $unitSystem): array
     {
-        $distance = $activity->getDistanceInKilometer();
+        $distance = $activity->getDistance();
         $distanceValue = match ($unitSystem) {
             UnitSystem::METRIC => round($distance->toFloat(), 2),
             UnitSystem::IMPERIAL => round($distance->toFloat() * 0.621371, 2),
@@ -33,7 +33,7 @@ final readonly class LetterGenerator
         };
 
         // Calculate pace
-        $movingTimeSeconds = $activity->getMovingTime();
+        $movingTimeSeconds = $activity->getMovingTimeInSeconds();
         $paceSecPerKm = $movingTimeSeconds / max($distance->toFloat(), 0.1);
         $paceSecPerMile = $paceSecPerKm * 1.60934;
 
@@ -56,11 +56,11 @@ final readonly class LetterGenerator
             'paceUnit' => $paceUnit,
             'time' => $this->formatDuration($movingTimeSeconds),
             'heartRate' => $activity->getAverageHeartRate(),
-            'elevationGain' => $activity->getElevationGain(),
+            'elevationGain' => $activity->getElevation()->toFloat(),
             'streakDay' => $streakDay,
             'splitPattern' => $splits,
             'name' => $activity->getName(),
-            'sportType' => (string) $activity->getSportType(),
+            'sportType' => $activity->getSportType()->value,
         ];
     }
 
@@ -140,7 +140,7 @@ PROMPT;
         $url = 'https://api.anthropic.com/v1/messages';
 
         $data = [
-            'model' => 'claude-3-5-sonnet-20241022',
+            'model' => 'claude-haiku-4-5-20251001',
             'max_tokens' => 150,
             'messages' => [
                 [
@@ -152,7 +152,7 @@ PROMPT;
 
         $headers = [
             'Content-Type: application/json',
-            'x-api-key: '.$this->claudeApiKey,
+            'x-api-key: ' . $this->claudeApiKey,
             'anthropic-version: 2023-06-01',
         ];
 

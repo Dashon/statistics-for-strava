@@ -45,7 +45,7 @@ final class BackfillRunLettersCommand extends Command
 
         // Filter for running activities only
         $runningActivities = array_filter($allActivities->getIterator()->getArrayCopy(), function ($activity) {
-            $sportType = strtolower((string) $activity->getSportType());
+            $sportType = strtolower($activity->getSportType()->value);
             return in_array($sportType, ['run', 'walk', 'hike', 'trailrun', 'virtualrun'], true);
         });
 

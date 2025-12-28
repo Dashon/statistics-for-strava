@@ -7,6 +7,7 @@ namespace App\Application\Build\BuildIndexHtml;
 use App\Application\Router;
 use App\Infrastructure\CQRS\Command\Command;
 use App\Infrastructure\CQRS\Command\CommandHandler;
+use App\Infrastructure\ValueObject\Identifier\UuidFactory;
 use League\Flysystem\FilesystemOperator;
 use Twig\Environment;
 
@@ -16,6 +17,7 @@ final readonly class BuildIndexHtmlCommandHandler implements CommandHandler
         private IndexHtml $indexHtml,
         private Environment $twig,
         private FilesystemOperator $buildStorage,
+        private UuidFactory $uuidFactory,
     ) {
     }
 
@@ -27,6 +29,7 @@ final readonly class BuildIndexHtmlCommandHandler implements CommandHandler
             'index.html',
             $this->twig->load('html/index.html.twig')->render([
                 'router' => Router::SINGLE_PAGE,
+                'assetVersion' => $this->uuidFactory->random(),
                 ...$this->indexHtml->getContext($command->getCurrentDateTime()),
             ]),
         );

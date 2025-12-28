@@ -11,6 +11,7 @@ import MapManager from "./ui/maps";
 import TabsManager from "./ui/tabs";
 import LazyLoad from "../libraries/lazyload.min";
 import DataTableManager from "./ui/data-tables";
+import RunLetters from "./ui/run-letters";
 
 const $main = document.querySelector("main");
 const dataTableStorage = new DataTableStorage();
@@ -68,6 +69,9 @@ document.addEventListener('pageWasLoaded.heatmap', () => {
 document.addEventListener('pageWasLoaded.photos', () => {
     const $photoWallWrapper = document.querySelector('.photo-wall-wrapper');
     new PhotoWall($photoWallWrapper, dataTableStorage).render();
+});
+document.addEventListener('pageWasLoaded.run-letters', () => {
+    new RunLetters().init();
 });
 document.addEventListener('navigationLinkHasBeenClicked', (e) => {
     if (!e.detail || !e.detail.link) {

@@ -47,7 +47,12 @@ export default class Router {
 
         this.showLoader();
 
-        const response = await fetch(`${page}.html`, { cache: 'no-store' });
+        // Strip base path from page to get the correct HTML file path
+        const htmlFilePath = page
+            .replace(window.statisticsForStrava.appUrl.basePath, '')
+            .replace(/^\/+/, '');
+
+        const response = await fetch(`${htmlFilePath}.html`, { cache: 'no-store' });
         this.appContent.innerHTML = await response.text();
         window.scrollTo(0, 0);
 

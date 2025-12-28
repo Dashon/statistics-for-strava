@@ -13,6 +13,11 @@ class SerializableDateTime extends \DateTimeImmutable implements \JsonSerializab
         return self::fromString($date->format('Y-m-d H:i:s'));
     }
 
+    public static function now(): self
+    {
+        return self::fromString('now');
+    }
+
     /**
      * @throws \DateMalformedStringException
      */

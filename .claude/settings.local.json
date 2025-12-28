@@ -17,7 +17,13 @@
       "Bash(docker compose exec:*)",
       "Bash(php bin/console app:build:*)",
       "Bash(php bin/console app:strava:build-files:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(xargs ls:*)",
+      "Bash(cat:*)",
+      "Bash(make app-build-assets:*)",
+      "Bash(npx webpack)"
     ]
   }
 }

@@ -30,6 +30,7 @@
 	# Serve static .html and .json from build/html
 	@staticBuildFiles {
 		path *.html *.json
+		not path /admin/*
 	}
 	handle @staticBuildFiles {
 		handle /manifest.json {

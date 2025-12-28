@@ -138,32 +138,41 @@ final readonly class SetupActionRequestHandler
     {
         try {
             $process = new Process(
-                command: ['php', 'bin/console', 'app:backfill:run-letters'],
+                command: ['php', 'bin/console', 'app:backfill:run-letters', '--no-interaction'],
                 cwd: $this->kernel->getProjectDir(),
                 timeout: 600
             );
 
+            // Run the process and capture output in real-time if needed
             $process->run();
 
             if ($process->isSuccessful()) {
+                $output = trim($process->getOutput());
+
                 return new JsonResponse([
                     'success' => true,
                     'message' => 'Run letters generated successfully',
-                    'output' => $process->getOutput(),
+                    'output' => $output,
                 ], Response::HTTP_OK);
             }
 
+            // Process failed - return detailed error
+            $errorOutput = trim($process->getErrorOutput());
+            $output = trim($process->getOutput());
+            $exitCode = $process->getExitCode();
+
             return new JsonResponse([
                 'success' => false,
-                'message' => 'Failed to generate run letters',
-                'output' => $process->getErrorOutput(),
-                'error' => $process->getErrorOutput(),
+                'message' => 'Failed to generate run letters (exit code: ' . $exitCode . ')',
+                'error' => $errorOutput ?: $output,
+                'exitCode' => $exitCode,
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Throwable $e) {
             return new JsonResponse([
                 'success' => false,
-                'message' => 'Failed to generate run letters: ' . $e->getMessage(),
+                'message' => 'Exception occurred while generating run letters',
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

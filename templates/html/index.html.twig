@@ -7,12 +7,12 @@
     <meta name="theme-color" content="#1F2937">
     <meta name="mobile-web-app-title" content="QT">
     <meta name="mobile-web-app-capable" content="yes">
-    <link href="{{ relativeUrl(asset('manifest.json')) }}" rel="manifest" crossorigin="">
-    <link rel="icon" type="image/jpeg" href="{{ relativeUrl('assets/images/logo.jpg') }}">
-    <link href="{{ relativeUrl(asset('css/dist/tailwind.min.css')) }}" rel="stylesheet"/>
-    <link rel="preload" href="{{ relativeUrl(asset('libraries/leaflet/leaflet.css')) }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="{{ relativeUrl(asset('libraries/clusterize/clusterize.min.css')) }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="{{ relativeUrl(asset('libraries/lightgallery/lightgallery-bundle.min.css')) }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link href="/manifest.json?{{ assetVersion }}" rel="manifest" crossorigin="">
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link href="/css/dist/tailwind.min.css?{{ assetVersion }}" rel="stylesheet"/>
+    <link rel="preload" href="/libraries/leaflet/leaflet.css?{{ assetVersion }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/libraries/clusterize/clusterize.min.css?{{ assetVersion }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/libraries/lightgallery/lightgallery-bundle.min.css?{{ assetVersion }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
 </head>
 <body>
 <div class="antialiased bg-gray-50">
@@ -374,14 +374,102 @@
         }
     };
 </script>
-<script src="{{ relativeUrl(asset('libraries/flowbite.min.js')) }}"></script>
-<script src="{{ relativeUrl(asset('libraries/echarts/echarts.min.js')) }}"></script>
-<script src="{{ relativeUrl(asset('libraries/echarts/echarts.world.min.js')) }}"></script>
-<script src="{{ relativeUrl(asset('libraries/leaflet/leaflet.js')) }}"></script>
-<script src="{{ relativeUrl(asset('libraries/leaflet/leaflet.polyline.encoded.js')) }}"></script>
-<script src="{{ relativeUrl(asset('js/dist/leaflet.fly.to.places.min.js')) }}"></script>
-<script src="{{ relativeUrl(asset('js/dist/app.min.js')) }}" type="module"></script>
+<script src="/libraries/flowbite.min.js?{{ assetVersion }}"></script>
+<script src="/libraries/echarts/echarts.min.js?{{ assetVersion }}"></script>
+<script src="/libraries/echarts/echarts.world.min.js?{{ assetVersion }}"></script>
+<script src="/libraries/leaflet/leaflet.js?{{ assetVersion }}"></script>
+<script src="/libraries/leaflet/leaflet.polyline.encoded.js?{{ assetVersion }}"></script>
+<script src="/js/dist/leaflet.fly.to.places.min.js?{{ assetVersion }}"></script>
+<script src="/js/dist/app.min.js?{{ assetVersion }}" type="module"></script>
 {% block customScripts %}
 {% endblock customScripts %}
+<script>
+// Global handler for run letters generation
+(function() {
+    if (window._runLettersHandlerAttached) return;
+    window._runLettersHandlerAttached = true;
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md ${
+            type === 'error' ? 'bg-red-500' :
+            type === 'success' ? 'bg-green-500' :
+            'bg-blue-500'
+        } text-white`;
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <span>${message}</span>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+    }
+
+    document.addEventListener('click', function(e) {
+        const button = e.target.closest('[data-action="generate-run-letters"]');
+        if (!button) return;
+
+        e.preventDefault();
+        if (button.disabled) return;
+
+        const originalContent = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = `
+            <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating...
+        `;
+
+        showNotification('Generating run letters... This may take a moment.', 'info');
+
+        fetch('/api/run-letters/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showNotification('Letters generated! Rebuilding page...', 'success');
+                return fetch('/api/setup/build', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'same-origin'
+                });
+            } else {
+                throw new Error(data.message || 'Failed to generate run letters');
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showNotification('Build complete! Reloading...', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                throw new Error(data.message || 'Build failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification(`Error: ${error.message}`, 'error');
+            button.disabled = false;
+            button.innerHTML = originalContent;
+        });
+    });
+})();
+</script>
 </body>
 </html>
