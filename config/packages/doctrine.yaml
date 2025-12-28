@@ -1,8 +1,17 @@
 doctrine:
   dbal:
-    url: '%env(DATABASE_URL)%'
+    # Component-based configuration to avoid IPv6 issues on Render.com
+    # When DATABASE_URL is set, it will override these individual settings
+    driver: 'pdo_pgsql'
+    host: '%env(default::DB_HOST)%'
+    port: '%env(default::DB_PORT)%'
+    dbname: '%env(default::DB_NAME)%'
+    user: '%env(default::DB_USER)%'
+    password: '%env(default::DB_PASSWORD)%'
     server_version: '15.0'
     profiling_collect_backtrace: false
+    # Use IPv4 pooler from Supabase - AWS IPv4-only endpoint
+    # Check Supabase dashboard > Project Settings > Database for IPv4 pooler
   orm:
     enable_native_lazy_objects: true
     validate_xml_mapping: true
