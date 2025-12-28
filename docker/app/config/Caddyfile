@@ -31,6 +31,8 @@
 	@staticBuildFiles {
 		path *.html *.json
 		not path /admin/*
+		not path /letters
+		not path /letter/*
 	}
 	handle @staticBuildFiles {
 		handle /manifest.json {
