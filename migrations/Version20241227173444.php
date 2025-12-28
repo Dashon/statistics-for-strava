@@ -36,7 +36,7 @@ final class Version20241227173444 extends AbstractMigration
             $this->addSql('UPDATE Activity SET activityType = JSON_EXTRACT(data, "$.type")');
         } else {
             // PostgreSQL: Just add the column (no data to migrate on fresh DB)
-            $this->addSql('ALTER TABLE Activity ADD COLUMN activityType VARCHAR(255) DEFAULT NULL');
+            $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS activityType VARCHAR(255) DEFAULT NULL');
             // If there was data, we'd use: UPDATE Activity SET activityType = data->>\'type\'
         }
     }
