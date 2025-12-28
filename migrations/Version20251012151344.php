@@ -24,6 +24,10 @@ final class Version20251012151344 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs.
         $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS worldType VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS devicename VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS activitytype VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS gearname VARCHAR(255) DEFAULT NULL');
         $this->addSql('UPDATE Activity set worldType = :worldType', [
             'worldType' => WorldType::REAL_WORLD->value,
         ]);

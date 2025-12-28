@@ -21,11 +21,13 @@ final class Version20251103151328 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS gearname VARCHAR(255) DEFAULT NULL');
         $this->addSql('UPDATE Activity set worldType = :worldType WHERE LOWER(devicename) = :deviceName', [
             'worldType' => WorldType::MY_WHOOSH->value,
             'deviceName' => 'mywhoosh',
         ]);
-        $this->addSql('UPDATE Activity set worldType = :worldType WHERE LOWER(name) LIKE "%mywhoosh%"', [
+        $this->addSql("UPDATE Activity set worldType = :worldType WHERE LOWER(name) LIKE '%mywhoosh%'", [
             'worldType' => WorldType::MY_WHOOSH->value,
         ]);
     }

@@ -55,6 +55,11 @@ final class Version20251228180000 extends AbstractMigration
         $this->addSql('ALTER TABLE Activity ADD COLUMN IF NOT EXISTS streamsareimported BOOLEAN DEFAULT NULL');
 
         // Segment Table Columns
+        $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS sporttype VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS distance INTEGER DEFAULT NULL');
+        $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS maxgradient DOUBLE PRECISION DEFAULT NULL');
+        $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS isfavourite BOOLEAN DEFAULT NULL');
         $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS climbcategory INTEGER DEFAULT NULL');
         $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS devicename VARCHAR(255) DEFAULT NULL');
         $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS countrycode VARCHAR(255) DEFAULT NULL');
@@ -62,6 +67,28 @@ final class Version20251228180000 extends AbstractMigration
         $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS polyline TEXT DEFAULT NULL');
         $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS startingcoordinatelatitude DOUBLE PRECISION DEFAULT NULL');
         $this->addSql('ALTER TABLE Segment ADD COLUMN IF NOT EXISTS startingcoordinatelongitude DOUBLE PRECISION DEFAULT NULL');
+
+        // SegmentEffort Table Columns
+        $this->addSql('ALTER TABLE SegmentEffort ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE SegmentEffort ADD COLUMN IF NOT EXISTS elapsedtimeinseconds DOUBLE PRECISION DEFAULT NULL');
+        $this->addSql('ALTER TABLE SegmentEffort ADD COLUMN IF NOT EXISTS distance INTEGER DEFAULT NULL');
+        $this->addSql('ALTER TABLE SegmentEffort ADD COLUMN IF NOT EXISTS averagewatts DOUBLE PRECISION DEFAULT NULL');
+
+        // Gear Table Columns
+        $this->addSql('ALTER TABLE Gear ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Gear ADD COLUMN IF NOT EXISTS isretired BOOLEAN DEFAULT NULL');
+        $this->addSql('ALTER TABLE Gear ADD COLUMN IF NOT EXISTS type VARCHAR(255) DEFAULT \'imported\'');
+
+        // Challenge Table Columns
+        $this->addSql('ALTER TABLE Challenge ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Challenge ADD COLUMN IF NOT EXISTS logourl VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Challenge ADD COLUMN IF NOT EXISTS locallogourl VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE Challenge ADD COLUMN IF NOT EXISTS slug VARCHAR(255) DEFAULT NULL');
+
+        // ActivityBestEffort Table Columns (already has most, but ensuring)
+        $this->addSql('ALTER TABLE ActivityBestEffort ADD COLUMN IF NOT EXISTS distanceinmeter INTEGER DEFAULT NULL');
+        $this->addSql('ALTER TABLE ActivityBestEffort ADD COLUMN IF NOT EXISTS sporttype VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE ActivityBestEffort ADD COLUMN IF NOT EXISTS timeinseconds INTEGER DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
