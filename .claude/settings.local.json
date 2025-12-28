@@ -40,7 +40,9 @@
       "Bash(bin/console doctrine:schema:update:*)",
       "Bash(if [ -f .gitignore ])",
       "Bash(if ! grep -q \"storage/database\" .gitignore)",
-      "Bash(else)"
+      "Bash(else)",
+      "Bash(php bin/console dbal:run-sql:*)",
+      "Bash(php bin/console:*)"
     ]
   }
 }
