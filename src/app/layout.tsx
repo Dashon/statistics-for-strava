@@ -4,6 +4,8 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
+import { QueryProvider } from "@/providers/QueryProvider";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -28,9 +30,13 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={outfit.className}>
         <ErrorBoundary>
-          <ToastProvider>
-            {children}
-          </ToastProvider>
+          <NuqsAdapter>
+            <QueryProvider>
+              <ToastProvider>
+                {children}
+              </ToastProvider>
+            </QueryProvider>
+          </NuqsAdapter>
         </ErrorBoundary>
       </body>
     </html>

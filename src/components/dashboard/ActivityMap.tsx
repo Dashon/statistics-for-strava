@@ -35,22 +35,25 @@ export default function ActivityMap({ activities }: ActivityMapProps) {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted) return <div className="w-full h-[300px] bg-zinc-900 animate-pulse rounded-lg" />;
+  if (!isMounted) return <div className="w-full h-full bg-zinc-900 animate-pulse rounded-lg" />;
 
-  const center: [number, number] = activities.length > 0 
+  const hasActivities = activities.length > 0;
+  const center: [number, number] = hasActivities 
     ? [activities[0].lat, activities[0].lng] 
-    : [0, 0];
+    : [20, 0];
+  const zoom = hasActivities ? 4 : 1.5;
 
   return (
-    <div className="w-full h-[400px] bg-zinc-900/50 rounded-lg overflow-hidden relative border border-zinc-800">
+    <div className="w-full h-full min-h-[400px] bg-zinc-900/50 rounded-lg overflow-hidden relative border border-zinc-800">
         <div className="absolute top-4 left-4 z-[1000] bg-zinc-900/80 p-2 rounded text-xs font-bold uppercase tracking-wider text-white border border-zinc-700">
             Activities on map
         </div>
       <MapContainer 
         center={center} 
-        zoom={2} 
+        zoom={zoom} 
         style={{ height: "100%", width: "100%", background: "#18181b" }}
         attributionControl={false}
+        scrollWheelZoom={false}
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"

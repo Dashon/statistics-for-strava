@@ -34,13 +34,15 @@ export default function ActivityMap({ latlng, summaryPolyline }: ActivityMapProp
     positions = polyline.decode(summaryPolyline) as [number, number][];
   }
 
-  const defaultCenter: [number, number] = positions.length > 0 ? positions[0] : [0, 0];
+  const hasPositions = positions.length > 0;
+  const defaultCenter: [number, number] = hasPositions ? positions[0] : [20, 0];
+  const zoom = hasPositions ? 13 : 1.5;
 
   return (
-    <div className="w-100 h-100 grayscale hover:grayscale-0 transition-all duration-700">
+    <div className="w-full h-full grayscale hover:grayscale-0 transition-all duration-700 relative">
       <MapContainer
         center={defaultCenter}
-        zoom={13}
+        zoom={zoom}
         scrollWheelZoom={false}
         style={{ height: "100%", width: "100%", background: "#09090b" }}
         zoomControl={false}
