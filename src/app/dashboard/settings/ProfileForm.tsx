@@ -1,22 +1,32 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { updateAthleteProfile, type AthleteProfileData } from '@/app/actions/profile';
 import { getEffectiveDisplayName, getEffectiveProfilePicture, getEffectiveBio, getEffectiveLocation } from '@/app/actions/profile-utils';
 import { uploadProfilePicture } from '@/app/actions/upload';
 import { useToast } from '@/components/Toast';
 import Image from 'next/image';
-import { Camera, MapPin, Upload } from 'lucide-react';
+import { Camera, MapPin, Upload, Sparkles, X } from 'lucide-react';
 
 interface ProfileFormProps {
   initialData: AthleteProfileData | null;
 }
 
+interface ReferenceImage {
+  imageId: string;
+  imageUrl: string;
+  imageType: string;
+  isDefault: boolean;
+}
+
 export default function ProfileForm({ initialData }: ProfileFormProps) {
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const referenceImageInputRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingReference, setUploadingReference] = useState(false);
+  const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
   const [formData, setFormData] = useState<AthleteProfileData>({
     displayName: initialData?.displayName,
     customProfilePicture: initialData?.customProfilePicture,
@@ -82,6 +92,67 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
   const handleDateChange = (value: string) => {
     setFormData((prev) => ({ ...prev, dateOfBirth: value || undefined }));
+  };
+
+  // Load reference images on mount
+  useEffect(() => {
+    loadReferenceImages();
+  }, []);
+
+  const loadReferenceImages = async () => {
+    try {
+      const res = await fetch('/api/reference-image');
+      const data = await res.json();
+      if (data.images) {
+        setReferenceImages(data.images);
+      }
+    } catch (error) {
+      console.error('Failed to load reference images:', error);
+    }
+  };
+
+  const handleReferenceImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, imageType: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingReference(true);
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+    uploadData.append('imageType', imageType);
+    uploadData.append('isDefault', referenceImages.length === 0 ? 'true' : 'false');
+
+    try {
+      const res = await fetch('/api/reference-image', {
+        method: 'POST',
+        body: uploadData,
+      });
+
+      if (!res.ok) throw new Error('Upload failed');
+
+      showToast('Reference image uploaded successfully!', 'success');
+      await loadReferenceImages();
+    } catch (error) {
+      console.error('Upload failed:', error);
+      showToast('Upload failed. Please try again.', 'error');
+    } finally {
+      setUploadingReference(false);
+    }
+  };
+
+  const handleDeleteReferenceImage = async (imageId: string) => {
+    try {
+      const res = await fetch(`/api/reference-image?imageId=${imageId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Delete failed');
+
+      showToast('Reference image deleted', 'success');
+      await loadReferenceImages();
+    } catch (error) {
+      console.error('Delete failed:', error);
+      showToast('Delete failed. Please try again.', 'error');
+    }
   };
 
   return (
@@ -286,6 +357,97 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               <option value="imperial">Imperial (MI)</option>
             </select>
           </div>
+        </div>
+      </div>
+
+      <div className="h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
+
+      {/* AI Thumbnail Reference Images Section */}
+      <div className="space-y-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="w-5 h-5 text-orange-500" />
+            <h3 className="text-xl font-bold text-white italic uppercase tracking-tight">AI THUMBNAILS</h3>
+          </div>
+          <p className="text-sm text-zinc-500">Upload reference photos for AI-generated run thumbnails.</p>
+        </div>
+
+        {referenceImages.length === 0 ? (
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 text-center">
+            <Sparkles className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
+            <p className="text-zinc-400 mb-4">No reference images uploaded yet.</p>
+            <p className="text-sm text-zinc-600 mb-6">
+              Upload a photo of yourself running or cycling. The AI will use this to generate
+              custom thumbnails showing you at your activity locations.
+            </p>
+            <button
+              type="button"
+              onClick={() => referenceImageInputRef.current?.click()}
+              disabled={uploadingReference}
+              className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-all inline-flex items-center gap-2"
+            >
+              <Upload className="w-5 h-5" />
+              {uploadingReference ? 'UPLOADING...' : 'UPLOAD REFERENCE IMAGE'}
+            </button>
+          </div>
+        ) : (
+          <div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              {referenceImages.map((img) => (
+                <div key={img.imageId} className="relative group">
+                  <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 border-2 border-zinc-800 group-hover:border-orange-500/50 transition-all">
+                    <Image
+                      src={img.imageUrl}
+                      alt={`Reference ${img.imageType}`}
+                      width={200}
+                      height={200}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteReferenceImage(img.imageId)}
+                    className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 p-1.5 rounded-full text-white shadow-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="text-xs font-bold text-zinc-500 uppercase">{img.imageType}</span>
+                    {img.isDefault && (
+                      <span className="text-xs bg-orange-600 text-white px-2 py-0.5 rounded-full font-bold">
+                        DEFAULT
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => referenceImageInputRef.current?.click()}
+              disabled={uploadingReference}
+              className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-all inline-flex items-center gap-2"
+            >
+              <Upload className="w-5 h-5" />
+              {uploadingReference ? 'UPLOADING...' : 'ADD ANOTHER IMAGE'}
+            </button>
+          </div>
+        )}
+
+        <input
+          type="file"
+          ref={referenceImageInputRef}
+          onChange={(e) => handleReferenceImageUpload(e, 'running')}
+          className="hidden"
+          accept="image/*"
+        />
+
+        <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4">
+          <p className="text-xs text-zinc-500 leading-relaxed">
+            <strong className="text-orange-500">Tip:</strong> Upload clear photos of yourself in athletic gear.
+            The AI will use these to generate realistic thumbnails of you running at your activity locations,
+            using lat/long data from your Strava activities.
+          </p>
         </div>
       </div>
 

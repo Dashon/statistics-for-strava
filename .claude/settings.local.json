@@ -61,7 +61,9 @@
       "Bash(lsof:*)",
       "Bash(node:*)",
       "Bash(DATABASE_URL=\"postgres://postgres.ncnpxfbffnooxtahxrox:MpOvV8voqAbdQiNyIDR7%232xD%5Ewl2%5Erge@aws-1-ap-south-1.pooler.supabase.com:6543/postgres\" npx tsx:*)",
-      "Bash(export DATABASE_URL=\"postgres://postgres.ncnpxfbffnooxtahxrox:MpOvV8voqAbdQiNyIDR7%232xD%5Ewl2%5Erge@aws-1-ap-south-1.pooler.supabase.com:6543/postgres\")"
+      "Bash(export DATABASE_URL=\"postgres://postgres.ncnpxfbffnooxtahxrox:MpOvV8voqAbdQiNyIDR7%232xD%5Ewl2%5Erge@aws-1-ap-south-1.pooler.supabase.com:6543/postgres\")",
+      "Bash(echo:*)",
+      "Bash(source .env)"
     ]
   }
 }

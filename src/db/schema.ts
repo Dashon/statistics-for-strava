@@ -70,6 +70,9 @@ export const activity = pgTable("activity", {
   routeGeography: text("routegeography"),
   localImagePaths: text("localimagepaths"),
   workoutType: varchar("workouttype", { length: 255 }),
+  aiThumbnailUrl: varchar("ai_thumbnail_url", { length: 512 }),
+  aiThumbnailPrompt: text("ai_thumbnail_prompt"),
+  aiThumbnailGeneratedAt: timestamp("ai_thumbnail_generated_at", { mode: "string" }),
 }, (table) => {
     return {
         sportTypeIdx: index("activity_sporttype").on(table.sportType),
@@ -218,8 +221,25 @@ export const generationStatus = pgTable("generation_status", {
     activityId: varchar("activity_id", { length: 255 }).primaryKey(),
     letterStatus: varchar("letter_status", { length: 50 }).notNull().default('pending'), // pending, generating, completed, failed
     coachingStatus: varchar("coaching_status", { length: 50 }).notNull().default('pending'),
+    thumbnailStatus: varchar("thumbnail_status", { length: 50 }).default('pending'),
     letterError: text("letter_error"),
     coachingError: text("coaching_error"),
+    thumbnailError: text("thumbnail_error"),
     startedAt: integer("started_at"),
     completedAt: integer("completed_at"),
+});
+
+// User Reference Images - Store user photos for AI thumbnail generation
+export const userReferenceImages = pgTable("user_reference_images", {
+    imageId: varchar("image_id", { length: 255 }).primaryKey(),
+    userId: varchar("user_id", { length: 255 }).notNull(),
+    imageUrl: varchar("image_url", { length: 512 }).notNull(),
+    imageType: varchar("image_type", { length: 50 }).notNull(), // 'running', 'cycling', 'general'
+    isDefault: boolean("is_default").default(false),
+    uploadedAt: timestamp("uploaded_at", { mode: "string" }).notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("user_reference_images_user_id").on(table.userId),
+    }
 });
