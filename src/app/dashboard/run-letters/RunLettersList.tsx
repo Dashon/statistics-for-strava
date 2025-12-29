@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Heart, TrendingUp, Zap, Loader2 } from "lucide-react";
-import { getGenerationStatuses } from "@/app/actions/generation-queue";
+import { getGenerationStatuses } from "@/app/actions/trigger-jobs";
 
 type Activity = {
   activityId: string;

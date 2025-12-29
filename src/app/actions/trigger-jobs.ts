@@ -1,7 +1,7 @@
 'use server';
 
 import { auth } from '@/auth';
-import { tasks } from '@trigger.dev/sdk';
+import { tasks } from '@trigger.dev/sdk/v3';
 import { db } from '@/db';
 import { generationStatus } from '@/db/schema';
 
@@ -115,6 +115,12 @@ export async function triggerHistoryIngestion(tier: "free" | "premium" = "free",
 }
 
 /**
- * Get generation statuses (reuse from existing)
+ * Get generation statuses for activities
  */
-export { getGenerationStatuses } from './generation-queue';
+export async function getGenerationStatuses(activityIds: string[]) {
+  const statuses = await db.query.generationStatus.findMany({
+    where: (status, { inArray }) => inArray(status.activityId, activityIds),
+  });
+
+  return statuses;
+}
