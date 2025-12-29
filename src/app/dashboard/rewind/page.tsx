@@ -11,7 +11,7 @@ export default async function RewindPage({ searchParams }: { searchParams: Promi
 
   const { year } = await searchParams;
   const availableYears = await db.execute(sql`
-    SELECT DISTINCT to_char(to_timestamp("startdatetime", 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), 'YYYY') as yr
+    SELECT DISTINCT to_char("startdatetime", 'YYYY') as yr
     FROM activity
     ORDER BY yr DESC
   `);
@@ -19,15 +19,15 @@ export default async function RewindPage({ searchParams }: { searchParams: Promi
   const activeYear = year || (availableYears[0] as any)?.yr || new Date().getFullYear().toString();
 
   const stats = await db.execute(sql`
-    SELECT 
+    SELECT
         count(*) as activity_count,
         sum(CAST(CAST(data AS JSONB)->>'distance' AS NUMERIC) / 1000) as total_distance,
         sum(CAST(CAST(data AS JSONB)->>'total_elevation_gain' AS NUMERIC)) as total_elevation,
         sum(CAST(CAST(data AS JSONB)->>'moving_time' AS NUMERIC) / 3600) as total_hours,
         sum(CAST(CAST(data AS JSONB)->>'calories' AS NUMERIC)) as total_calories,
-        count(DISTINCT to_char(to_timestamp("startdatetime", 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), 'YYYY-MM-DD')) as active_days
+        count(DISTINCT to_char("startdatetime", 'YYYY-MM-DD')) as active_days
     FROM activity
-    WHERE to_char(to_timestamp("startdatetime", 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), 'YYYY') = ${activeYear}
+    WHERE to_char("startdatetime", 'YYYY') = ${activeYear}
   `);
 
   const s = (stats[0] as any) || {};

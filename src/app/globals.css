@@ -16,3 +16,42 @@ body {
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* Prose styles for long-form content */
+.prose {
+    color: #e4e4e7;
+    max-width: 65ch;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    color: #fafafa;
+    font-weight: 700;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.prose p {
+    margin-bottom: 1em;
+    line-height: 1.75;
+}
+
+.prose ul, .prose ol {
+    padding-left: 1.5em;
+    margin-bottom: 1em;
+}
+
+.prose li {
+    margin-bottom: 0.5em;
+}
+
+.prose strong {
+    color: #fafafa;
+    font-weight: 600;
+}
+
+.prose code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}

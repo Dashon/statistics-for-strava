@@ -10,8 +10,8 @@ export default async function MonthlyStatsPage() {
   if (!session) redirect("/");
 
   const monthlyStats = await db.execute(sql`
-    SELECT 
-        to_char(to_timestamp("startdatetime", 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), 'YYYY-MM') as month,
+    SELECT
+        to_char("startdatetime", 'YYYY-MM') as month,
         count(*) as count,
         sum(CAST(CAST(data AS JSONB)->>'distance' AS NUMERIC) / 1000) as total_distance
     FROM activity

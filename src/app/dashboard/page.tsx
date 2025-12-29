@@ -5,6 +5,12 @@ import { activity } from "@/db/schema";
 import { redirect } from "next/navigation";
 import SyncButton from "./SyncButton";
 import { MoveRight, Zap, Target, History, Map as MapIcon, Calendar } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard | QT Statistics for Strava",
+  description: "View your activity statistics, recent workouts, and performance insights.",
+};
 
 export default async function DashboardPage() {
   const session = (await auth()) as any;

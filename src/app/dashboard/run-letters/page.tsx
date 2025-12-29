@@ -5,6 +5,12 @@ import { activity, runLetters } from "@/db/schema";
 import { desc, eq, isNull } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import GenerateLettersButton from "./GenerateLettersButton";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Run Letters | QT Statistics for Strava",
+  description: "AI-generated personalized letters for your running activities.",
+};
 
 export default async function RunLettersPage() {
   const session = await auth();

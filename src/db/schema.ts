@@ -141,3 +141,14 @@ export const user = pgTable("User", {
     updatedAt: timestamp("updatedat", { mode: "string" }).notNull(),
     roles: json("roles").notNull(),
 });
+
+export const athleteProfile = pgTable("athlete_profile", {
+    userId: varchar("user_id", { length: 255 }).primaryKey(),
+    maxHeartRate: integer("max_heart_rate"),
+    restingHeartRate: integer("resting_heart_rate"),
+    functionalThresholdPower: integer("functional_threshold_power"),
+    weight: doublePrecision("weight"),
+    heightInCm: integer("height_in_cm"),
+    dateOfBirth: date("date_of_birth", { mode: "string" }),
+    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
+});

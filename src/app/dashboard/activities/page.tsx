@@ -2,16 +2,39 @@
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { activity } from "@/db/schema";
-import { desc } from "drizzle-orm";
+import { desc, count } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import Pagination from "./Pagination";
 
-export default async function ActivitiesPage() {
+export const metadata: Metadata = {
+  title: "Activities | QT Statistics for Strava",
+  description: "Browse all your synced Strava activities with detailed metrics and insights.",
+};
+
+const ITEMS_PER_PAGE = 50;
+
+export default async function ActivitiesPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
   const session = await auth();
   if (!session) redirect("/");
 
-  const allActivities = await db.query.activity.findMany({
-    orderBy: [desc(activity.startDateTime)],
-  });
+  const currentPage = parseInt(searchParams.page || "1", 10);
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  const [allActivities, [{ value: totalCount }]] = await Promise.all([
+    db.query.activity.findMany({
+      orderBy: [desc(activity.startDateTime)],
+      limit: ITEMS_PER_PAGE,
+      offset,
+    }),
+    db.select({ value: count() }).from(activity),
+  ]);
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   return (
     <div className="p-8 space-y-8">
@@ -50,6 +73,8 @@ export default async function ActivitiesPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination currentPage={currentPage} totalPages={totalPages} />
     </div>
   );
 }

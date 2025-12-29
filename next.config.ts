@@ -18,6 +18,21 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+
+  // Enable React strict mode for better development experience
+  reactStrictMode: true,
+
+  // Optimize production builds
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+
+  // Experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@anthropic-ai/sdk'],
+  },
 };
 
 export default nextConfig;

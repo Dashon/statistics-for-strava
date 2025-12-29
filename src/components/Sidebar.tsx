@@ -4,17 +4,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { 
-  LayoutDashboard, 
-  List, 
-  Map, 
-  BookOpen, 
-  Calendar, 
-  TrendingUp, 
-  MapPin, 
+import { useState } from "react";
+import {
+  LayoutDashboard,
+  List,
+  Map,
+  BookOpen,
+  Calendar,
+  TrendingUp,
+  MapPin,
   History,
   Trophy,
-  Zap
+  Zap,
+  Settings,
+  Menu,
+  X
 } from "lucide-react";
 
 const navigation = [
@@ -28,13 +32,37 @@ const navigation = [
   { name: "Challenges", href: "/dashboard/challenges", icon: Trophy },
   { name: "Gear", href: "/dashboard/gear", icon: Zap },
   { name: "Rewind", href: "/dashboard/rewind", icon: History },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex flex-col w-64 border-r border-zinc-800 bg-zinc-950 min-h-screen">
+    <>
+      {/* Mobile menu button */}
+      <button
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-zinc-900 rounded-lg text-white"
+      >
+        {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={clsx(
+        "flex flex-col w-64 border-r border-zinc-800 bg-zinc-950 min-h-screen",
+        "fixed lg:static inset-y-0 left-0 z-40 transition-transform duration-300",
+        mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
       <div className="p-6">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent italic">
             QT.run
@@ -64,5 +92,6 @@ export function Sidebar() {
          <div className="text-xs text-zinc-600 uppercase tracking-widest font-bold">QT.run v2.0</div>
       </div>
     </div>
+    </>
   );
 }

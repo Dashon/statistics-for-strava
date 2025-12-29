@@ -53,7 +53,9 @@
       "Bash(PGPASSWORD='MpOvV8voqAbdQiNyIDR7#2xD^wl2^rge' psql:*)",
       "Bash(npx tsx:*)",
       "Bash(npm run build:*)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(npm install:*)",
+      "Bash(PGPASSWORD='MpOvV8voqAbdQiNyIDR7#2xD^wl2^rge' psql -h aws-1-ap-south-1.pooler.supabase.com -p 6543 -U postgres.ncnpxfbffnooxtahxrox -d postgres -c \"\\\\d activity\")"
     ]
   }
 }

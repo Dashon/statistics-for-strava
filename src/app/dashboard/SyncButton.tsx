@@ -5,18 +5,21 @@ import { useState } from "react";
 import { syncActivities } from "@/app/actions/sync";
 import { RefreshCw } from "lucide-react";
 import { clsx } from "clsx";
+import { useToast } from "@/components/Toast";
 
 export default function SyncButton() {
   const [syncing, setSyncing] = useState(false);
+  const { showToast } = useToast();
 
   const handleSync = async () => {
     setSyncing(true);
     try {
       await syncActivities();
+      showToast("Activities synced successfully!", "success");
       window.location.reload();
     } catch (err) {
       console.error(err);
-      alert("Sync failed");
+      showToast("Sync failed. Please try again.", "error");
     } finally {
       setSyncing(false);
     }
