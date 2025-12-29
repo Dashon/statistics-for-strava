@@ -1,0 +1,45 @@
+
+import { auth } from "@/auth";
+import { db } from "@/db";
+import { gear } from "@/db/schema";
+import { redirect } from "next/navigation";
+
+export default async function GearPage() {
+  const session = await auth();
+  if (!session) redirect("/");
+
+  const allGear = await db.query.gear.findMany();
+
+  return (
+    <div className="p-8 space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent italic">
+          GEAR
+        </h1>
+        <p className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-1">Tools of the Trade</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {allGear.map((g) => (
+              <div key={g.gearId} className="bg-zinc-950 border border-zinc-900 p-8 rounded-[2.5rem] flex flex-col gap-6 group hover:border-zinc-800 transition-colors">
+                  <div className="flex justify-between items-start">
+                    <span className="bg-zinc-900 text-zinc-500 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{g.type}</span>
+                    {g.isRetired && <span className="bg-red-500/10 text-red-500 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Retired</span>}
+                  </div>
+                  <div>
+                      <h3 className="text-white font-black text-2xl uppercase tracking-tighter italic">{g.name}</h3>
+                      <p className="text-zinc-600 text-xs font-bold uppercase tracking-widest mt-1">Brand Identity</p>
+                  </div>
+                  <div className="pt-6 border-t border-zinc-900 flex justify-between items-end">
+                      <div>
+                        <span className="text-white font-black text-3xl leading-none">{(g.distanceInMeter / 1000).toFixed(0)}</span>
+                        <span className="text-zinc-600 font-bold ml-2 uppercase text-xs">km</span>
+                      </div>
+                      <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest italic group-hover:text-orange-500 transition-colors">Usage Stats &rarr;</span>
+                  </div>
+              </div>
+          ))}
+      </div>
+    </div>
+  );
+}

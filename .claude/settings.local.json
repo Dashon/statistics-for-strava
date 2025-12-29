@@ -44,7 +44,16 @@
       "Bash(php bin/console dbal:run-sql:*)",
       "Bash(php bin/console:*)",
       "Bash(chmod:*)",
-      "Bash(./check_migrations.sh:*)"
+      "Bash(./check_migrations.sh:*)",
+      "Bash(tree:*)",
+      "Bash(npx drizzle-kit generate)",
+      "Bash(npx drizzle-kit:*)",
+      "Bash(psql:*)",
+      "Bash(DATABASE_URL='postgres://postgres.ncnpxfbffnooxtahxrox:MpOvV8voqAbdQiNyIDR7%232xD^wl2^rge@aws-1-ap-south-1.pooler.supabase.com:6543/postgres' psql:*)",
+      "Bash(PGPASSWORD='MpOvV8voqAbdQiNyIDR7#2xD^wl2^rge' psql:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm ls:*)"
     ]
   }
 }
