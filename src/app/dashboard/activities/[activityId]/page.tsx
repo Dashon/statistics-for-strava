@@ -158,18 +158,54 @@ export default async function ActivityDetailPage({
       </div>
 
       {/* Row 2: Nested Sub-Metrics */}
-      <div className="grid grid-cols-12 gap-1 h-[80px]">
-          <div className="col-span-12 lg:col-span-7 grid grid-cols-4 gap-1">
-                <StatPanel label="Elapsed time" value={elapsedFormatted} size="sm" />
-                <StatPanel label="Elevation" value={unitPreference === 'imperial' 
-                        ? (activityData.elevation ? activityData.elevation * 3.28084 : 0).toFixed(1)
-                        : activityData.elevation?.toFixed(1) || "0"} unit={unitPreference === 'imperial' ? 'ft' : 'm'} size="sm" />
-                <StatPanel label="Heart Rate" value={activityData.averageHeartRate || "—"} variant="zinc" size="sm" />
-                <StatPanel label="Calories" value={activityData.calories || "—"} size="sm" />
+      <div className="grid grid-cols-12 gap-1 h-auto lg:h-[80px]">
+          <div className="col-span-12 lg:col-span-9 grid grid-cols-3 lg:grid-cols-6 gap-1">
+                <StatPanel label="Elapsed" value={elapsedFormatted} size="sm" />
+                
+                <StatPanel 
+                    label="Elevation" 
+                    value={unitPreference === 'imperial' 
+                        ? (activityData.elevation ? activityData.elevation * 3.28084 : 0).toFixed(0)
+                        : activityData.elevation?.toFixed(0) || "0"} 
+                    unit={unitPreference === 'imperial' ? 'ft' : 'm'} 
+                    subValue={activityData.elevHigh && activityData.elevLow 
+                        ? `${unitPreference === 'imperial' ? (activityData.elevLow * 3.28084).toFixed(0) : activityData.elevLow.toFixed(0)} - ${unitPreference === 'imperial' ? (activityData.elevHigh * 3.28084).toFixed(0) : activityData.elevHigh.toFixed(0)}`
+                        : undefined}
+                    size="sm" 
+                />
+                
+                <StatPanel label="Heart Rate" value={activityData.averageHeartRate || "—"} unit="bpm" variant="zinc" size="sm" />
+                
+                {activityData.averagePower ? (
+                    <StatPanel 
+                        label="Power" 
+                        value={activityData.averagePower} 
+                        unit="w" 
+                        subValue={activityData.weightedAveragePower ? `NP ${activityData.weightedAveragePower}w` : undefined}
+                        size="sm" 
+                    />
+                ) : (
+                    <StatPanel label="Calories" value={activityData.calories || "—"} size="sm" />
+                )}
+
+                {/* New Metrics Conditional Render */}
+                {activityData.kilojoules ? (
+                    <StatPanel label="Work" value={activityData.kilojoules.toFixed(0)} unit="kJ" size="sm" />
+                ) : (
+                     <StatPanel label={activityData.averagePower ? "Calories" : "Temp"} value={activityData.averagePower ? (activityData.calories || "—") : (activityData.averageTemp ? `${activityData.averageTemp}°` : "—")} size="sm" />
+                )}
+
+                <StatPanel label="Suffer Score" value={activityData.sufferScore || "—"} variant={activityData.sufferScore && activityData.sufferScore > 100 ? "red" : "zinc"} size="sm" />
           </div>
-          <div className="col-span-12 lg:col-span-5 bg-zinc-900/50 border border-zinc-900 rounded-sm flex items-center justify-between px-6">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Activity Date</span>
-                <span className="text-xs font-black text-zinc-400">{new Date(activityData.startDateTime || "").toLocaleString()}</span>
+          <div className="col-span-12 lg:col-span-3 bg-zinc-900/50 border border-zinc-900 rounded-sm flex items-center justify-between px-6">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Date</span>
+                <span className="text-xs font-black text-zinc-400">{new Date(activityData.startDateTime || "").toLocaleDateString(undefined, {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                })}</span>
           </div>
       </div>
 

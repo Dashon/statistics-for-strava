@@ -1,11 +1,12 @@
 import { task, logger, tasks } from "@trigger.dev/sdk";
 import { db } from "@/db";
-import { user, activity, activityStream } from "@/db/schema";
+import { user, activity, activityStream, athleteProfile } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { 
     fetchStravaActivities, 
     fetchStravaActivityDetail, 
-    fetchStravaActivityStreams 
+    fetchStravaActivityStreams,
+    fetchStravaAthlete
 } from "@/lib/strava";
 
 /**
@@ -90,6 +91,14 @@ export const deepSyncActivity = task({
         totalImageCount: detail.total_photo_count,
         workoutType: detail.workout_type?.toString(),
         
+        // New Expansion Fields
+        kilojoules: detail.kilojoules,
+        weightedAveragePower: detail.weighted_average_watts,
+        elevHigh: detail.elev_high,
+        elevLow: detail.elev_low,
+        averageTemp: detail.average_temp,
+        sufferScore: detail.suffer_score,
+        
         // Full raw data
         data: detail,
         
@@ -153,6 +162,9 @@ export const syncStravaHistory = task({
         maxHeartRate: act.max_heartrate,
         startingLatitude: act.start_latlng?.[0],
         startingLongitude: act.start_latlng?.[1],
+        
+        // Basic expansion metrics from summary if available
+        sufferScore: act.suffer_score,
       };
 
       await db.insert(activity).values(activityData).onConflictDoUpdate({
@@ -161,7 +173,27 @@ export const syncStravaHistory = task({
       });
     }
 
-    // 2. Identify which activities actually need deep sync
+    // 2. Update Athlete Profile with latest Strava info
+    logger.info("Updating athlete profile with latest Strava metadata...");
+    const detailedAthlete = await fetchStravaAthlete(athlete.stravaAccessToken);
+    if (detailedAthlete) {
+      const profileData = {
+        stravaFtp: detailedAthlete.ftp,
+        stravaFriendCount: detailedAthlete.friend_count,
+        stravaFollowerCount: detailedAthlete.follower_count,
+        stravaWeight: detailedAthlete.weight,
+        stravaCity: detailedAthlete.city,
+        stravaState: detailedAthlete.state,
+        stravaCountry: detailedAthlete.country,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await db.update(athleteProfile)
+        .set(profileData)
+        .where(eq(athleteProfile.userId, payload.userId));
+    }
+
+    // 3. Identify which activities actually need deep sync
     // We only deep sync if streamsAreImported is not true
     const existingActivities = await db.query.activity.findMany({
       where: eq(activity.userId, payload.userId),

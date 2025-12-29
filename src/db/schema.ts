@@ -73,6 +73,14 @@ export const activity = pgTable("activity", {
   aiThumbnailUrl: varchar("ai_thumbnail_url", { length: 512 }),
   aiThumbnailPrompt: text("ai_thumbnail_prompt"),
   aiThumbnailGeneratedAt: timestamp("ai_thumbnail_generated_at", { mode: "string" }),
+  
+  // New expansion fields
+  kilojoules: doublePrecision("kilojoules"),
+  weightedAveragePower: integer("weighted_average_power"),
+  elevHigh: doublePrecision("elev_high"),
+  elevLow: doublePrecision("elev_low"),
+  averageTemp: integer("average_temp"),
+  sufferScore: integer("suffer_score"),
 }, (table) => {
     return {
         sportTypeIdx: index("activity_sporttype").on(table.sportType),
@@ -172,6 +180,12 @@ export const athleteProfile = pgTable("athlete_profile", {
     heightInCm: integer("height_in_cm"),
     dateOfBirth: date("date_of_birth", { mode: "string" }),
     measurementUnit: varchar("measurement_unit", { length: 20 }).default("metric"),
+    
+    // New expansion fields
+    stravaFtp: integer("strava_ftp"),
+    stravaFriendCount: integer("strava_friend_count"),
+    stravaFollowerCount: integer("strava_follower_count"),
+    
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
 });
 
