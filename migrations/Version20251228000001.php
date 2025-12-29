@@ -11,7 +11,7 @@ use Doctrine\Migrations\AbstractMigration;
  * Catch-all migration to ensure all required columns exist on PostgreSQL.
  * Some columns were added in SQLite-specific migrations and might be missing.
  */
-final class Version20251228180000 extends AbstractMigration
+final class Version20251228000001 extends AbstractMigration
 {
     public function getDescription(): string
     {

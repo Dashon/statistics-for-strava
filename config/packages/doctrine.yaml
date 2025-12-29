@@ -15,8 +15,13 @@ doctrine:
     types:
       kilometer: App\Infrastructure\Doctrine\Type\KilometerType
       meter: App\Infrastructure\Doctrine\Type\MeterType
-      code_challenge_method: Doctrine\DBAL\Types\TextType
-      # Mapping unknown types to string/text to avoid diff errors
+    mapping_types:
+      code_challenge_method: string
+      factor_type: string
+      factor_status: string
+      aal_level: string
+      key_status: string
+      key_type: string
   orm:
     enable_native_lazy_objects: true
     validate_xml_mapping: true
