@@ -77,9 +77,9 @@ final class Activity implements SupportsAITooling
         private string $name,
         #[ORM\Column(type: 'string', nullable: true)]
         private readonly ?string $description,
-        #[ORM\Column(type: 'integer')]
+        #[ORM\Column(type: 'kilometer')]
         private Kilometer $distance,
-        #[ORM\Column(type: 'integer')]
+        #[ORM\Column(type: 'meter')]
         private Meter $elevation,
         #[ORM\Embedded(class: Coordinate::class)]
         private ?Coordinate $startingCoordinate,
@@ -343,7 +343,7 @@ final class Activity implements SupportsAITooling
             return null;
         }
 
-        return $this->bestPowerOutputs->find(fn (PowerOutput $bestPowerOutput): bool => $bestPowerOutput->getTimeIntervalInSeconds() === $timeInterval);
+        return $this->bestPowerOutputs->find(fn(PowerOutput $bestPowerOutput): bool => $bestPowerOutput->getTimeIntervalInSeconds() === $timeInterval);
     }
 
     public function enrichWithBestPowerOutputs(PowerOutputs $bestPowerOutputs): void
@@ -374,7 +374,7 @@ final class Activity implements SupportsAITooling
     public function getLocalImagePaths(): array
     {
         return array_map(
-            fn (string $path): string => str_starts_with($path, '/') ? $path : '/'.$path,
+            fn(string $path): string => str_starts_with($path, '/') ? $path : '/' . $path,
             $this->localImagePaths
         );
     }
@@ -546,7 +546,7 @@ final class Activity implements SupportsAITooling
 
     public function getUrl(): string
     {
-        return 'https://www.strava.com/activities/'.$this->getId()->toUnprefixedString();
+        return 'https://www.strava.com/activities/' . $this->getId()->toUnprefixedString();
     }
 
     public function getPolyline(): ?string

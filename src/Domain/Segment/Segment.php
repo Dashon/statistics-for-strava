@@ -32,7 +32,7 @@ final class Segment implements SupportsAITooling
         private readonly Name $name,
         #[ORM\Column(type: 'string')]
         private readonly SportType $sportType,
-        #[ORM\Column(type: 'integer')]
+        #[ORM\Column(type: 'kilometer')]
         private readonly Kilometer $distance,
         #[ORM\Column(type: 'float')]
         private readonly float $maxGradient,
@@ -247,7 +247,7 @@ final class Segment implements SupportsAITooling
 
     public function getUrl(): string
     {
-        return 'https://www.strava.com/segments/'.$this->getId()->toUnprefixedString();
+        return 'https://www.strava.com/segments/' . $this->getId()->toUnprefixedString();
     }
 
     public function getLeafletMap(): ?LeafletMap
