@@ -2,9 +2,9 @@
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { user, activity, gear } from "@/db/schema";
+import { user, activity, gear, activityStream } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { fetchStravaActivities, fetchStravaAthlete, fetchStravaActivityDetail } from "@/lib/strava";
+import { fetchStravaActivities, fetchStravaAthlete, fetchStravaActivityDetail, fetchStravaActivityStreams } from "@/lib/strava";
 
 export async function syncActivities() {
   const session = (await auth()) as any;
@@ -55,8 +55,33 @@ export async function syncActivities() {
       try {
         const detail = await fetchStravaActivityDetail(athlete.stravaAccessToken, act.id.toString());
         act = { ...act, ...detail };
+
+        // Fetch Streams
+        const streams = await fetchStravaActivityStreams(athlete.stravaAccessToken, act.id.toString());
+        if (streams) {
+          const streamData = {
+            activityId: act.id.toString(),
+            time: streams.time?.data || null,
+            distance: streams.distance?.data || null,
+            latlng: streams.latlng?.data || null,
+            altitude: streams.altitude?.data || null,
+            velocitySmooth: streams.velocity_smooth?.data || null,
+            heartrate: streams.heartrate?.data || null,
+            cadence: streams.cadence?.data || null,
+            watts: streams.watts?.data || null,
+            temp: streams.temp?.data || null,
+            moving: streams.moving?.data || null,
+            gradeSmooth: streams.grade_smooth?.data || null,
+            updatedAt: new Date().toISOString(),
+          };
+
+          await db.insert(activityStream).values(streamData).onConflictDoUpdate({
+            target: activityStream.activityId,
+            set: streamData
+          });
+        }
       } catch (err) {
-        console.error(`Failed to fetch detail for activity ${act.id}:`, err);
+        console.error(`Failed to fetch detail/streams for activity ${act.id}:`, err);
       }
     }
 
@@ -73,6 +98,7 @@ export async function syncActivities() {
       movingTimeInSeconds: act.moving_time,
       isCommute: !!act.commute,
       polyline: act.map?.summary_polyline,
+      streamsAreImported: i < 5, // Mark as imported for the ones we just synced
       
       // Performance Metrics
       averageSpeed: act.average_speed,
@@ -108,4 +134,53 @@ export async function syncActivities() {
   }
 
   return { success: true, count: activities.length };
+}
+
+export async function syncActivityStreams(activityId: string) {
+  const session = (await auth()) as any;
+  if (!session) throw new Error("Unauthorized");
+
+  const athlete = await db.query.user.findFirst({
+    where: eq(user.userId, session.userId),
+  });
+
+  if (!athlete) throw new Error("User not found");
+
+  try {
+    const streams = await fetchStravaActivityStreams(athlete.stravaAccessToken, activityId);
+    if (streams) {
+      const streamData = {
+        activityId,
+        time: streams.time?.data || null,
+        distance: streams.distance?.data || null,
+        latlng: streams.latlng?.data || null,
+        altitude: streams.altitude?.data || null,
+        velocitySmooth: streams.velocity_smooth?.data || null,
+        heartrate: streams.heartrate?.data || null,
+        cadence: streams.cadence?.data || null,
+        watts: streams.watts?.data || null,
+        temp: streams.temp?.data || null,
+        moving: streams.moving?.data || null,
+        gradeSmooth: streams.grade_smooth?.data || null,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await db.insert(activityStream).values(streamData).onConflictDoUpdate({
+        target: activityStream.activityId,
+        set: streamData
+      });
+
+      // Also update the flag in the activity table
+      await db.update(activity)
+        .set({ streamsAreImported: true })
+        .where(eq(activity.activityId, activityId));
+
+      return { success: true };
+    }
+  } catch (err) {
+    console.error(`Failed to sync streams for ${activityId}:`, err);
+    return { success: false, error: (err as Error).message };
+  }
+
+  return { success: false, error: "No streams found" };
 }

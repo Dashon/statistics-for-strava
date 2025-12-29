@@ -1,13 +1,12 @@
-
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { syncActivities } from "@/app/actions/sync";
 import { RefreshCw } from "lucide-react";
 import { clsx } from "clsx";
 import { useToast } from "@/components/Toast";
 
-export default function SyncButton() {
+export default function SyncButton(): React.JSX.Element {
   const [syncing, setSyncing] = useState(false);
   const { showToast } = useToast();
 

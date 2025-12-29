@@ -168,6 +168,7 @@ export const athleteProfile = pgTable("athlete_profile", {
     weight: doublePrecision("weight"),
     heightInCm: integer("height_in_cm"),
     dateOfBirth: date("date_of_birth", { mode: "string" }),
+    measurementUnit: varchar("measurement_unit", { length: 20 }).default("metric"),
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
 });
 
@@ -191,6 +192,25 @@ export const coachingInsights = pgTable("coaching_insights", {
     editedAt: integer("edited_at"),
     shareToken: varchar("share_token", { length: 255 }),
     isPublic: boolean("is_public").default(false),
+});
+
+// Activity Streams Table - Time-series data for charts and maps
+export const activityStream = pgTable("activity_stream", {
+    activityId: varchar("activity_id", { length: 255 }).primaryKey(),
+    // We store all stream types as JSON arrays to maintain high performance in a relational DB 
+    // without needing a dedicated time-series DB like Prometheus/Influx
+    time: json("time"), // Seconds from start
+    distance: json("distance"), // Meters
+    latlng: json("latlng"), // [ [lat, lng], ... ]
+    altitude: json("altitude"), // Meters
+    velocitySmooth: json("velocity_smooth"), // Meters per second
+    heartrate: json("heartrate"), // BPM
+    cadence: json("cadence"), // RPM
+    watts: json("watts"), // Watts
+    temp: json("temp"), // Celsius
+    moving: json("moving"), // Boolean array
+    gradeSmooth: json("grade_smooth"), // Percentage
+    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
 });
 
 // Generation Status Table - Track background AI generation jobs

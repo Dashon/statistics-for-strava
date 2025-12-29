@@ -3,9 +3,21 @@ import { db } from "@/db";
 import { activity, coachingInsights, runLetters } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { redirect, notFound } from "next/navigation";
-import { Zap, MapPin, Trophy, Heart, TrendingUp, Clock } from "lucide-react";
+import { Zap, MapPin, Trophy, Heart, TrendingUp, Clock, Activity, Footprints, Flame, Timer, Mountain, Dumbbell } from "lucide-react";
 import type { Metadata } from "next";
 import { generateCoachingInsight, getCoachingInsight } from "@/app/actions/coaching";
+import { getAthleteProfile } from "@/app/actions/profile";
+import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
+import { activityStream } from "@/db/schema";
+import ActivityCharts from "./ActivityCharts";
+import StatPanel from "./StatPanel";
+import { syncActivityStreams } from "@/app/actions/sync";
+import dynamic from "next/dynamic";
+
+const ActivityMap = dynamic(() => import("./ActivityMap"), { 
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-zinc-900 animate-pulse" />
+}) as any;
 
 export const metadata: Metadata = {
   title: "Activity Detail | QT Statistics for Strava",
@@ -19,6 +31,9 @@ export default async function ActivityDetailPage({
 }) {
   const session = await auth() as any;
   if (!session?.userId) redirect("/");
+
+  const profile = await getAthleteProfile();
+  const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
 
   const { activityId } = await params;
 
@@ -48,20 +63,38 @@ export default async function ActivityDetailPage({
     }
   }
 
+  // Fetch stream data
+  let stream = await db.query.activityStream.findFirst({
+    where: eq(activityStream.activityId, activityId),
+  });
+
+  // Auto-sync streams if missing
+  if (!stream && activityData.userId === session.userId) {
+    try {
+      await syncActivityStreams(activityId);
+      stream = await db.query.activityStream.findFirst({
+        where: eq(activityStream.activityId, activityId),
+      });
+    } catch (error) {
+      console.error("Failed to auto-sync streams:", error);
+    }
+  }
+
   // Fetch run letter if exists
   const letter = await db.query.runLetters.findFirst({
     where: eq(runLetters.activityId, activityId),
   });
 
-  const distanceMi = activityData.distance ? (activityData.distance / 1609.34).toFixed(2) : "0";
-  const distanceKm = activityData.distance ? (activityData.distance / 1000).toFixed(2) : "0";
+  const distance = activityData.distance ? convertDistance(activityData.distance, unitPreference).toFixed(2) : "0.00";
   const durationFormatted = formatDuration(activityData.movingTimeInSeconds || 0);
-  const paceMinPerMi = activityData.distance && activityData.movingTimeInSeconds
-    ? formatPace((activityData.movingTimeInSeconds / 60) / (activityData.distance / 1609.34))
+  const elapsedFormatted = formatDuration(Number((activityData.data as any)?.elapsed_time || 0));
+  
+  const pace = activityData.distance && activityData.movingTimeInSeconds
+    ? formatPace((activityData.movingTimeInSeconds / 60) / convertDistance(activityData.distance, unitPreference))
     : "0:00";
 
   return (
-    <div className="p-8 space-y-6 max-w-[1800px] mx-auto">
+    <div className="p-8 space-y-6 max-w-[1800px] mx-auto min-h-screen bg-black text-zinc-300">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="space-y-2">
@@ -97,167 +130,220 @@ export default async function ActivityDetailPage({
         </div>
       </div>
 
-      {/* Key Metrics - Grafana Style */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* Moving Time */}
-        <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20 rounded-2xl p-6">
-          <div className="flex items-center gap-2 text-orange-400 mb-2">
-            <Clock className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-widest">Moving time</span>
-          </div>
-          <div className="text-4xl font-black text-white">{durationFormatted}</div>
-        </div>
-
-        {/* Distance */}
-        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
-          <span className="text-zinc-500 text-xs font-black uppercase tracking-widest block mb-2">
-            Distance
-          </span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-black text-white">{distanceMi}</span>
-            <span className="text-lg text-zinc-600 font-bold">mi</span>
-          </div>
-        </div>
-
-        {/* Pace */}
-        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
-          <span className="text-zinc-500 text-xs font-black uppercase tracking-widest block mb-2">
-            Pace
-          </span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-black text-white">{paceMinPerMi}</span>
-            <span className="text-lg text-zinc-600 font-bold">/mi</span>
-          </div>
-        </div>
-
-        {/* Heart Rate */}
-        <div className="bg-gradient-to-br from-red-500/10 to-pink-600/5 border border-red-500/20 rounded-2xl p-6">
-          <div className="flex items-center gap-2 text-red-400 mb-2">
-            <Heart className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-widest">Heart Rate</span>
-          </div>
-          <div className="text-4xl font-black text-white">
-            {activityData.averageHeartRate || "—"}
-          </div>
-        </div>
-
-        {/* Elevation */}
-        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
-          <span className="text-zinc-500 text-xs font-black uppercase tracking-widest block mb-2">
-            Elevation
-          </span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-black text-white">
-              {activityData.elevation?.toFixed(0) || "0"}
-            </span>
-            <span className="text-lg text-zinc-600 font-bold">ft</span>
-          </div>
-        </div>
-
-        {/* Calories */}
-        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
-          <span className="text-zinc-500 text-xs font-black uppercase tracking-widest block mb-2">
-            Calories
-          </span>
-          <div className="text-4xl font-black text-white">
-            {activityData.calories || "—"}
-          </div>
-        </div>
-
-        {/* Power (if available) */}
-        {activityData.averagePower && (
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
-            <span className="text-zinc-500 text-xs font-black uppercase tracking-widest block mb-2">
-              Avg Power
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black text-white">{activityData.averagePower}</span>
-              <span className="text-lg text-zinc-600 font-bold">W</span>
+      {/* Key Metrics - Grafana Inspired Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        <div className="xl:col-span-3 space-y-6">
+            {/* Top Bar Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatPanel 
+                    label="Moving Time" 
+                    value={durationFormatted} 
+                    icon={Timer} 
+                    variant="orange"
+                    subValue={`Elapsed: ${elapsedFormatted}`}
+                />
+                <StatPanel 
+                    label="Distance" 
+                    value={distance} 
+                    unit={getDistanceUnit(unitPreference)} 
+                    icon={Activity}
+                />
+                <StatPanel 
+                    label="Pace" 
+                    value={pace} 
+                    unit={`/${getDistanceUnit(unitPreference)}`} 
+                    icon={Timer}
+                />
+                <StatPanel 
+                    label="Avg Heart Rate" 
+                    value={activityData.averageHeartRate || "—"} 
+                    unit="bpm"
+                    icon={Heart}
+                    variant="red"
+                />
             </div>
-          </div>
+
+            {/* Middle Row Stats */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+               <StatPanel 
+                    label="Elevation" 
+                    value={unitPreference === 'imperial' 
+                        ? (activityData.elevation ? activityData.elevation * 3.28084 : 0).toFixed(0)
+                        : activityData.elevation?.toFixed(0) || "0"} 
+                    unit={unitPreference === 'imperial' ? 'ft' : 'm'}
+                    icon={Mountain}
+                />
+                <StatPanel 
+                    label="Calories" 
+                    value={activityData.calories || "—"} 
+                    icon={Flame}
+                />
+                <StatPanel 
+                    label="Cadence" 
+                    value={activityData.averageCadence || "—"} 
+                    unit="rpm"
+                    icon={Footprints}
+                />
+                <StatPanel 
+                    label="Avg Power" 
+                    value={activityData.averagePower || "—"} 
+                    unit="w"
+                    icon={Zap}
+                />
+            </div>
+
+            {/* Charts Section */}
+            <ActivityCharts stream={stream} unit={unitPreference} />
+        </div>
+
+        {/* Map & Meta Section */}
+        <div className="xl:col-span-1 space-y-6">
+            <div className="bg-zinc-950 border border-zinc-900 rounded-[2rem] overflow-hidden h-[500px] relative">
+                <ActivityMap 
+                  latlng={stream?.latlng as [number, number][]} 
+                  summaryPolyline={activityData.polyline}
+                />
+            </div>
+            
+            <div className="bg-zinc-950 border border-zinc-900 rounded-2xl p-6">
+                <div className="flex items-center gap-2 text-zinc-500 mb-4">
+                    <Trophy className="w-4 h-4 text-yellow-500" />
+                    <span className="text-xs font-black uppercase tracking-widest">Achievements & Kudos</span>
+                </div>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <span className="text-3xl font-black text-white">{activityData.kudoCount || 0}</span>
+                        <span className="text-xs text-zinc-600 font-bold ml-2 uppercase">Kudos</span>
+                    </div>
+                </div>
+            </div>
+
+            {activityData.deviceName && (
+                <div className="bg-zinc-950 border border-zinc-900 rounded-2xl p-6">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600 block mb-2">Device</span>
+                    <span className="text-white font-bold">{activityData.deviceName}</span>
+                </div>
+            )}
+        </div>
+      </div>
+
+      {/* AI Coaching & Insights Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {insight && (
+            <div className="bg-gradient-to-br from-purple-500/10 to-blue-600/5 border border-purple-500/20 rounded-[2rem] p-8 shadow-2xl shadow-purple-500/5">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+                        AI Coach Analysis
+                    </h2>
+                    <p className="text-purple-400 text-[10px] font-black uppercase tracking-widest">
+                        Powered by Claude Sonnet 4.5
+                    </p>
+                    </div>
+                </div>
+
+                {insight.runClassification && (
+                    <div className="bg-zinc-900/50 border border-purple-500/20 rounded-xl px-4 py-2 inline-block mb-6">
+                    <span className="text-purple-400 font-black uppercase text-xs tracking-widest">
+                        {insight.runClassification}
+                    </span>
+                    </div>
+                )}
+
+                <div className="prose prose-invert max-w-none">
+                    <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap font-medium">
+                    {insight.editedText || insight.insightText}
+                    </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-zinc-800/50 text-[10px] text-zinc-600 font-bold uppercase tracking-widest flex justify-between items-center">
+                    <span>Generated {new Date(insight.generatedAt).toLocaleDateString()}</span>
+                    <span className="italic">Insight ID: {activityId.slice(-6)}</span>
+                </div>
+            </div>
         )}
 
-        {/* Kudos */}
-        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
-          <div className="flex items-center gap-2 text-yellow-500 mb-2">
-            <Trophy className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-widest">Kudos</span>
-          </div>
-          <div className="text-4xl font-black text-white">
-            {activityData.kudoCount || 0}
-          </div>
-        </div>
+        {letter && (
+            <div className="bg-zinc-950 border border-zinc-900 rounded-[2rem] p-8">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center">
+                        <Dumbbell className="w-5 h-5 text-zinc-400" />
+                    </div>
+                    <h2 className="text-xl font-black text-white uppercase tracking-tight">
+                        Run Letter
+                    </h2>
+                </div>
+                <div className="text-zinc-500 leading-relaxed italic font-serif text-lg">
+                    "{letter.editedText || letter.letterText}"
+                </div>
+            </div>
+        )}
       </div>
 
-      {/* AI Coaching Insights */}
-      {insight && (
-        <div className="bg-gradient-to-br from-purple-500/10 to-blue-600/5 border border-purple-500/20 rounded-[2rem] p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-white" />
+      {/* Segments Table - Grafana Style */}
+      {(activityData.data as any)?.segment_efforts && (activityData.data as any).segment_efforts.length > 0 && (
+        <div className="bg-zinc-950 border border-zinc-900 rounded-[2rem] overflow-hidden">
+            <div className="px-8 py-6 border-b border-zinc-900 flex justify-between items-center">
+                <h3 className="text-sm font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                    <MapPin className="w-4 h-4" /> Segments
+                </h3>
+                <span className="text-[10px] font-black text-zinc-700 uppercase tracking-widest">
+                    {(activityData.data as any).segment_efforts.length} efforts detected
+                </span>
             </div>
-            <div>
-              <h2 className="text-2xl font-black text-white uppercase tracking-tight">
-                AI Coach Analysis
-              </h2>
-              <p className="text-purple-400 text-xs font-bold uppercase tracking-widest">
-                Powered by Claude Sonnet 4.5
-              </p>
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-zinc-900/50">
+                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Name</th>
+                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Time</th>
+                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Distance</th>
+                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Avg Heart Rate</th>
+                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest text-right">PR</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-900">
+                        {(activityData.data as any).segment_efforts.map((effort: any) => (
+                            <tr key={effort.id} className="hover:bg-zinc-900/30 transition-colors group">
+                                <td className="px-8 py-4">
+                                    <div className="text-white font-bold group-hover:text-orange-500 transition-colors cursor-default">
+                                        {effort.name}
+                                    </div>
+                                    <div className="text-[10px] text-zinc-600 font-black uppercase tracking-widest mt-0.5 font-mono">
+                                        ID: {effort.id}
+                                    </div>
+                                </td>
+                                <td className="px-8 py-4 font-mono text-white">
+                                    {formatDuration(effort.moving_time)}
+                                </td>
+                                <td className="px-8 py-4 font-mono text-zinc-400">
+                                    {convertDistance(effort.distance, unitPreference).toFixed(2)} {getDistanceUnit(unitPreference)}
+                                </td>
+                                <td className="px-8 py-4">
+                                    {effort.average_heartrate ? (
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                                            <span className="font-mono text-white">{effort.average_heartrate.toFixed(0)}</span>
+                                        </div>
+                                    ) : "—"}
+                                </td>
+                                <td className="px-8 py-4 text-right">
+                                    {effort.pr_rank === 1 ? (
+                                        <span className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Personal Record</span>
+                                    ) : effort.pr_rank ? (
+                                        <span className="text-zinc-600 text-[10px] font-black uppercase tracking-widest">#{effort.pr_rank} overall</span>
+                                    ) : "—"}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
-          </div>
-
-          {insight.runClassification && (
-            <div className="bg-zinc-900/50 rounded-xl px-4 py-2 inline-block mb-4">
-              <span className="text-purple-400 font-black uppercase text-sm tracking-widest">
-                {insight.runClassification}
-              </span>
-            </div>
-          )}
-
-          <div className="prose prose-invert max-w-none">
-            <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
-              {insight.editedText || insight.insightText}
-            </div>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-zinc-800 text-xs text-zinc-500 italic">
-            Generated {new Date(insight.generatedAt).toLocaleString()}
-          </div>
         </div>
       )}
-
-      {/* Run Letter (if exists) */}
-      {letter && (
-        <div className="bg-zinc-950 border border-zinc-900 rounded-[2rem] p-8">
-          <h2 className="text-xl font-black text-white uppercase tracking-tight mb-6">
-            Run Letter
-          </h2>
-          <div className="text-zinc-400 leading-relaxed italic">
-            {letter.editedText || letter.letterText}
-          </div>
-        </div>
-      )}
-
-      {/* Placeholder for charts - Will be enhanced with Chart.js */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-zinc-950 border border-zinc-900 rounded-2xl p-6">
-          <h3 className="text-sm font-black text-zinc-500 uppercase tracking-widest mb-4">
-            Heart Rate / Speed
-          </h3>
-          <div className="h-64 flex items-center justify-center text-zinc-700">
-            Chart placeholder - Will integrate Chart.js
-          </div>
-        </div>
-
-        <div className="bg-zinc-950 border border-zinc-900 rounded-2xl p-6">
-          <h3 className="text-sm font-black text-zinc-500 uppercase tracking-widest mb-4">
-            Heart Rate Distribution
-          </h3>
-          <div className="h-64 flex items-center justify-center text-zinc-700">
-            Chart placeholder - Will integrate Chart.js
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

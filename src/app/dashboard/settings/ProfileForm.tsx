@@ -27,6 +27,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     weight: initialData?.weight,
     heightInCm: initialData?.heightInCm,
     dateOfBirth: initialData?.dateOfBirth,
+    measurementUnit: initialData?.measurementUnit || 'metric',
   });
 
   const stravaName = `${initialData?.stravaFirstName || ''} ${initialData?.stravaLastName || ''}`.trim() || 'Not synced';
@@ -270,6 +271,20 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               onChange={(e) => handleDateChange(e.target.value)}
               className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
             />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest">
+              Units
+            </label>
+            <select
+              value={formData.measurementUnit ?? 'metric'}
+              onChange={(e) => handleStringChange('measurementUnit', e.target.value)}
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 appearance-none cursor-pointer"
+            >
+              <option value="metric">Metric (KM)</option>
+              <option value="imperial">Imperial (MI)</option>
+            </select>
           </div>
         </div>
       </div>

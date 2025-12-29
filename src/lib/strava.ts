@@ -77,3 +77,40 @@ export async function fetchStravaActivityDetail(accessToken: string, activityId:
 
   return response.json();
 }
+
+/**
+ * Fetch activity streams (time-series data)
+ * This includes metrics like heart rate, speed, cadence, and GPS trace over time.
+ */
+export async function fetchStravaActivityStreams(accessToken: string, activityId: string) {
+  const keys = [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "temp",
+    "moving",
+    "grade_smooth"
+  ].join(",");
+
+  const response = await fetch(
+    `https://www.strava.com/api/v3/activities/${activityId}/streams?keys=${keys}&key_by_type=true`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    if (response.status === 404) return null; // Some activities might not have streams
+    throw new Error(`Failed to fetch activity streams for ${activityId}: ${response.statusText}`);
+  }
+
+  const streams = await response.json();
+  return streams;
+}

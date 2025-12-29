@@ -28,6 +28,7 @@ export interface AthleteProfileData {
   weight?: number | null;
   heightInCm?: number | null;
   dateOfBirth?: string | null;
+  measurementUnit?: string | null;
 }
 
 export async function getAthleteProfile() {

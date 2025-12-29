@@ -4,20 +4,28 @@ import { db } from "@/db";
 import { activity } from "@/db/schema";
 import { redirect } from "next/navigation";
 import { calculateEddington } from "@/lib/eddington";
+import { getAthleteProfile } from "@/app/actions/profile";
+import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
+import { eq } from "drizzle-orm";
 
 export default async function EddingtonPage() {
-  const session = await auth();
-  if (!session) redirect("/");
+  const session = (await auth()) as any;
+  if (!session?.userId) redirect("/");
 
-  const allActivities = await db.query.activity.findMany();
+  const profile = await getAthleteProfile();
+  const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
+
+  const allActivities = await db.query.activity.findMany({
+    where: eq(activity.userId, session.userId),
+  });
   
   const cyclingDistances = allActivities
     .filter((a) => a.sportType === "Ride" || a.sportType === "VirtualRide")
-    .map((a) => (a.distance || 0) / 1000);
+    .map((a) => convertDistance(a.distance || 0, unitPreference));
 
   const runningDistances = allActivities
     .filter((a) => a.sportType === "Run" || a.sportType === "TrailRun")
-    .map((a) => (a.distance || 0) / 1000);
+    .map((a) => convertDistance(a.distance || 0, unitPreference));
 
   const cyclingEddington = calculateEddington(cyclingDistances);
   const runningEddington = calculateEddington(runningDistances);
@@ -43,8 +51,8 @@ export default async function EddingtonPage() {
                     <span className="text-9xl font-black text-white italic">{cyclingEddington.eddington}</span>
                 </div>
                 <div className="space-y-2">
-                    <p className="text-zinc-400 text-sm font-medium">You have ridden <span className="text-white font-bold">{cyclingEddington.eddington} km</span> at least <span className="text-white font-bold">{cyclingEddington.eddington} times</span>.</p>
-                    <p className="text-zinc-600 text-sm italic">Next milestone: {cyclingEddington.next} km ({cyclingEddington.neededForNext} more rides needed)</p>
+                    <p className="text-zinc-400 text-sm font-medium">You have ridden <span className="text-white font-bold">{cyclingEddington.eddington} {getDistanceUnit(unitPreference)}</span> at least <span className="text-white font-bold">{cyclingEddington.eddington} times</span>.</p>
+                    <p className="text-zinc-600 text-sm italic">Next milestone: {cyclingEddington.next} {getDistanceUnit(unitPreference)} ({cyclingEddington.neededForNext} more rides needed)</p>
                 </div>
               </div>
           </div>
@@ -60,8 +68,8 @@ export default async function EddingtonPage() {
                     <span className="text-9xl font-black text-white italic">{runningEddington.eddington}</span>
                 </div>
                 <div className="space-y-2">
-                    <p className="text-zinc-400 text-sm font-medium">You have run <span className="text-white font-bold">{runningEddington.eddington} km</span> at least <span className="text-white font-bold">{runningEddington.eddington} times</span>.</p>
-                    <p className="text-zinc-600 text-sm italic">Next milestone: {runningEddington.next} km ({runningEddington.neededForNext} more runs needed)</p>
+                    <p className="text-zinc-400 text-sm font-medium">You have run <span className="text-white font-bold">{runningEddington.eddington} {getDistanceUnit(unitPreference)}</span> at least <span className="text-white font-bold">{runningEddington.eddington} times</span>.</p>
+                    <p className="text-zinc-600 text-sm italic">Next milestone: {runningEddington.next} {getDistanceUnit(unitPreference)} ({runningEddington.neededForNext} more runs needed)</p>
                 </div>
               </div>
           </div>

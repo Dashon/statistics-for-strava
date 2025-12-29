@@ -6,6 +6,8 @@ import { desc, count, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Pagination from "./Pagination";
+import { getAthleteProfile } from "@/app/actions/profile";
+import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
 
 export const metadata: Metadata = {
   title: "Activities | QT Statistics for Strava",
@@ -21,6 +23,9 @@ export default async function ActivitiesPage({
 }) {
   const session = await auth() as any;
   if (!session?.userId) redirect("/");
+
+  const profile = await getAthleteProfile();
+  const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
 
   const params = await searchParams;
   const currentPage = parseInt(params.page || "1", 10);
@@ -65,8 +70,8 @@ export default async function ActivitiesPage({
                 <td className="px-8 py-5 text-zinc-500 text-sm whitespace-nowrap">{new Date(a.startDateTime).toLocaleDateString()}</td>
                 <td className="px-8 py-5 font-bold text-white uppercase tracking-tight">{a.name}</td>
                 <td className="px-8 py-5 text-zinc-400 text-xs font-black uppercase tracking-widest italic">{a.sportType}</td>
-                <td className="px-8 py-5 text-right font-mono text-white text-lg">
-                    {((a.distance || 0) / 1000).toFixed(1)} <span className="text-xs text-zinc-600 uppercase font-bold">km</span>
+                <td className="px-8 py-5 text-right font-mono text-white text-lg whitespace-nowrap">
+                    {convertDistance(a.distance || 0, unitPreference).toFixed(1)} <span className="text-xs text-zinc-600 uppercase font-bold">{getDistanceUnit(unitPreference)}</span>
                 </td>
                 <td className="px-8 py-5 text-right text-zinc-400 font-mono text-sm italic">
                     {Math.floor((a.movingTimeInSeconds || 0) / 3600)}h {Math.floor(((a.movingTimeInSeconds || 0) % 3600) / 60)}m

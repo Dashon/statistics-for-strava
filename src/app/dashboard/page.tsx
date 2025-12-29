@@ -8,6 +8,8 @@ import Link from "next/link";
 import SyncButton from "./SyncButton";
 import { MoveRight, Zap, Target, History, Map as MapIcon, Calendar, TrendingUp, Brain } from "lucide-react";
 import type { Metadata } from "next";
+import { getAthleteProfile } from "@/app/actions/profile";
+import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
 
 export const metadata: Metadata = {
   title: "Dashboard | QT Statistics for Strava",
@@ -17,6 +19,9 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   const session = (await auth()) as any;
   if (!session?.userId) redirect("/");
+
+  const profile = await getAthleteProfile();
+  const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
 
   // SECURITY FIX: Filter activities by userId
   const totalActivities = await db.query.activity.findMany({
@@ -67,9 +72,9 @@ export default async function DashboardPage() {
               <span className="text-orange-200 text-xs font-black uppercase tracking-[0.2em]">Total Distance</span>
               <div className="flex items-baseline gap-2">
                   <span className="text-6xl font-black leading-none">
-                    {(totalActivities.reduce((acc, a) => acc + (a.distance || 0), 0) / 1000).toFixed(0)}
+                    {convertDistance(totalActivities.reduce((acc, a) => acc + (a.distance || 0), 0), unitPreference).toFixed(0)}
                   </span>
-                  <span className="text-xl font-bold italic uppercase">km</span>
+                  <span className="text-xl font-bold italic uppercase">{getDistanceUnit(unitPreference)}</span>
               </div>
           </div>
           <div className="bg-zinc-900/50 border border-zinc-800 p-8 rounded-[2rem] flex flex-col gap-4">
@@ -108,7 +113,9 @@ export default async function DashboardPage() {
                       </div>
                       <div className="flex items-center gap-12">
                           <div className="text-right">
-                               <span className="text-white font-black text-xl block leading-none">{((a.distance || 0) / 1000).toFixed(1)} <span className="text-xs text-zinc-600 font-bold uppercase">km</span></span>
+                               <span className="text-white font-black text-xl block leading-none">
+                                {convertDistance(a.distance || 0, unitPreference).toFixed(1)} <span className="text-xs text-zinc-600 font-bold uppercase">{getDistanceUnit(unitPreference)}</span>
+                               </span>
                           </div>
                       </div>
                   </div>

@@ -3,10 +3,15 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { gear } from "@/db/schema";
 import { redirect } from "next/navigation";
+import { getAthleteProfile } from "@/app/actions/profile";
+import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
 
 export default async function GearPage() {
-  const session = await auth();
-  if (!session) redirect("/");
+  const session = (await auth()) as any;
+  if (!session?.userId) redirect("/");
+
+  const profile = await getAthleteProfile();
+  const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
 
   const allGear = await db.query.gear.findMany();
 
@@ -45,8 +50,10 @@ export default async function GearPage() {
                     </div>
                     <div className="pt-6 border-t border-zinc-900 flex justify-between items-end">
                         <div>
-                          <span className="text-white font-black text-3xl leading-none">{(g.distanceInMeter / 1000).toFixed(0)}</span>
-                          <span className="text-zinc-600 font-bold ml-2 uppercase text-xs">km</span>
+                          <span className="text-white font-black text-3xl leading-none">
+                            {convertDistance(g.distanceInMeter, unitPreference).toFixed(0)}
+                          </span>
+                          <span className="text-zinc-600 font-bold ml-2 uppercase text-xs">{getDistanceUnit(unitPreference)}</span>
                         </div>
                         <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest italic group-hover:text-orange-500 transition-colors">Usage Stats &rarr;</span>
                     </div>

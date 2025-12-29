@@ -4,17 +4,23 @@ import { db } from "@/db";
 import { sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Calendar } from "lucide-react";
+import { getAthleteProfile } from "@/app/actions/profile";
+import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
 
 export default async function MonthlyStatsPage() {
-  const session = await auth();
+  const session = (await auth()) as any;
   if (!session) redirect("/");
+
+  const profile = await getAthleteProfile();
+  const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
 
   const monthlyStats = await db.execute(sql`
     SELECT
         to_char("startdatetime", 'YYYY-MM') as month,
         count(*) as count,
-        sum(CAST(CAST(data AS JSONB)->>'distance' AS NUMERIC) / 1000) as total_distance
+        sum(distance) as total_distance
     FROM activity
+    WHERE user_id = ${session.userId}
     GROUP BY month
     ORDER BY month DESC
   `);
@@ -38,8 +44,8 @@ export default async function MonthlyStatsPage() {
                 <div className="flex justify-between items-end">
                     <div>
                         <span className="text-4xl font-black text-white block">
-                            {Number(row.total_distance).toFixed(0)}
-                            <span className="text-lg text-zinc-600 font-bold ml-2 uppercase">km</span>
+                            {convertDistance(Number(row.total_distance), unitPreference).toFixed(0)}
+                            <span className="text-lg text-zinc-600 font-bold ml-2 uppercase">{getDistanceUnit(unitPreference)}</span>
                         </span>
                     </div>
                      <div className="text-right">

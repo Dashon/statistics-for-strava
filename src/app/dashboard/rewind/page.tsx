@@ -4,15 +4,21 @@ import { db } from "@/db";
 import { sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Trophy, Zap, Fuel, TreeDeciduous, CalendarDays } from "lucide-react";
+import { getAthleteProfile } from "@/app/actions/profile";
+import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
 
 export default async function RewindPage({ searchParams }: { searchParams: Promise<{ year?: string }> }) {
-  const session = await auth();
-  if (!session) redirect("/");
+  const session = (await auth()) as any;
+  if (!session?.userId) redirect("/");
+
+  const profile = await getAthleteProfile();
+  const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
 
   const { year } = await searchParams;
   const availableYears = await db.execute(sql`
     SELECT DISTINCT to_char("startdatetime", 'YYYY') as yr
     FROM activity
+    WHERE user_id = ${session.userId}
     ORDER BY yr DESC
   `);
 
@@ -21,17 +27,19 @@ export default async function RewindPage({ searchParams }: { searchParams: Promi
   const stats = await db.execute(sql`
     SELECT
         count(*) as activity_count,
-        sum(CAST(CAST(data AS JSONB)->>'distance' AS NUMERIC) / 1000) as total_distance,
-        sum(CAST(CAST(data AS JSONB)->>'total_elevation_gain' AS NUMERIC)) as total_elevation,
-        sum(CAST(CAST(data AS JSONB)->>'moving_time' AS NUMERIC) / 3600) as total_hours,
-        sum(CAST(CAST(data AS JSONB)->>'calories' AS NUMERIC)) as total_calories,
+        sum(distance) as total_distance,
+        sum(elevation) as total_elevation,
+        sum(movingtimeinseconds / 3600.0) as total_hours,
+        sum(calories) as total_calories,
         count(DISTINCT to_char("startdatetime", 'YYYY-MM-DD')) as active_days
     FROM activity
     WHERE to_char("startdatetime", 'YYYY') = ${activeYear}
+    AND user_id = ${session.userId}
   `);
 
   const s = (stats[0] as any) || {};
-  const carbonSaved = (Number(s.total_distance || 0) * 0.2178).toFixed(1);
+  const distanceKm = Number(s.total_distance || 0) / 1000;
+  const carbonSaved = (distanceKm * 0.2178).toFixed(1);
 
   return (
     <div className="p-8 space-y-12 max-w-7xl mx-auto pb-24">
@@ -53,15 +61,21 @@ export default async function RewindPage({ searchParams }: { searchParams: Promi
           <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-[2rem] relative overflow-hidden group">
               <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest block mb-4">Distance</span>
               <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-black text-white">{Number(s.total_distance || 0).toFixed(0)}</span>
-                  <span className="text-xl text-zinc-600 font-bold uppercase">km</span>
+                  <span className="text-5xl font-black text-white">
+                    {convertDistance(Number(s.total_distance || 0), unitPreference).toFixed(0)}
+                  </span>
+                  <span className="text-xl text-zinc-600 font-bold uppercase">{getDistanceUnit(unitPreference)}</span>
               </div>
           </div>
           <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-[2rem] relative overflow-hidden group">
               <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest block mb-4">Elevation</span>
               <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-black text-white">{Number(s.total_elevation || 0).toFixed(0)}</span>
-                  <span className="text-xl text-zinc-600 font-bold uppercase">m</span>
+                  <span className="text-5xl font-black text-white">
+                    {unitPreference === 'imperial'
+                        ? (Number(s.total_elevation || 0) * 3.28084).toFixed(0)
+                        : Number(s.total_elevation || 0).toFixed(0)}
+                  </span>
+                  <span className="text-xl text-zinc-600 font-bold uppercase">{unitPreference === 'imperial' ? 'ft' : 'm'}</span>
               </div>
           </div>
           <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-[2rem] relative overflow-hidden group">
