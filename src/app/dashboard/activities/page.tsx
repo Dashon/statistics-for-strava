@@ -17,12 +17,13 @@ const ITEMS_PER_PAGE = 50;
 export default async function ActivitiesPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
   const session = await auth();
   if (!session) redirect("/");
 
-  const currentPage = parseInt(searchParams.page || "1", 10);
+  const params = await searchParams;
+  const currentPage = parseInt(params.page || "1", 10);
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   const [allActivities, [{ value: totalCount }]] = await Promise.all([

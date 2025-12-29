@@ -6,6 +6,22 @@ import { athleteProfile } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export interface AthleteProfileData {
+  // Strava synced fields (read-only for user)
+  stravaFirstName?: string | null;
+  stravaLastName?: string | null;
+  stravaProfilePicture?: string | null;
+  stravaBio?: string | null;
+  stravaWeight?: number | null;
+  stravaHeight?: number | null;
+  stravaCity?: string | null;
+  stravaState?: string | null;
+  stravaCountry?: string | null;
+  sex?: string | null;
+  // User override fields
+  displayName?: string | null;
+  customProfilePicture?: string | null;
+  bio?: string | null;
+  // Performance metrics
   maxHeartRate?: number | null;
   restingHeartRate?: number | null;
   functionalThresholdPower?: number | null;
@@ -17,7 +33,7 @@ export interface AthleteProfileData {
 export async function getAthleteProfile() {
   const session = await auth() as any;
   if (!session?.userId) {
-    throw new Error("Not authenticated");
+    return null; // Return null for unauthenticated users instead of throwing
   }
 
   const [profile] = await db

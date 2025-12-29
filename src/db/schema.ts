@@ -144,6 +144,22 @@ export const user = pgTable("User", {
 
 export const athleteProfile = pgTable("athlete_profile", {
     userId: varchar("user_id", { length: 255 }).primaryKey(),
+    // Strava profile fields (synced from Strava during login)
+    stravaFirstName: varchar("strava_first_name", { length: 255 }),
+    stravaLastName: varchar("strava_last_name", { length: 255 }),
+    stravaProfilePicture: varchar("strava_profile_picture", { length: 512 }),
+    stravaBio: text("strava_bio"),
+    stravaWeight: doublePrecision("strava_weight"),
+    stravaHeight: integer("strava_height"),
+    stravaCity: varchar("strava_city", { length: 255 }),
+    stravaState: varchar("strava_state", { length: 255 }),
+    stravaCountry: varchar("strava_country", { length: 255 }),
+    sex: varchar("sex", { length: 50 }),
+    // User override fields (nullable - when null, use Strava values)
+    displayName: varchar("display_name", { length: 255 }),
+    customProfilePicture: varchar("custom_profile_picture", { length: 512 }),
+    bio: text("bio"),
+    // Performance metrics
     maxHeartRate: integer("max_heart_rate"),
     restingHeartRate: integer("resting_heart_rate"),
     functionalThresholdPower: integer("functional_threshold_power"),
@@ -151,4 +167,26 @@ export const athleteProfile = pgTable("athlete_profile", {
     heightInCm: integer("height_in_cm"),
     dateOfBirth: date("date_of_birth", { mode: "string" }),
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
+});
+
+// Coaching Insights Table - AI-generated performance analysis
+export const coachingInsights = pgTable("coaching_insights", {
+    activityId: varchar("activity_id", { length: 255 }).primaryKey(),
+
+    // Structured insight data
+    runClassification: varchar("run_classification", { length: 255 }), // "controlled aerobic", "tempo", etc.
+    heartRateAnalysis: json("heart_rate_analysis"), // HR zones, drift patterns
+    pacingAnalysis: json("pacing_analysis"), // Split patterns, consistency
+    performanceImplications: text("performance_implications"),
+    recommendations: json("recommendations"), // Actionable next steps
+
+    // Full AI-generated text
+    insightText: text("insight_text").notNull(),
+    editedText: text("edited_text"),
+
+    // Metadata
+    generatedAt: integer("generated_at").notNull(),
+    editedAt: integer("edited_at"),
+    shareToken: varchar("share_token", { length: 255 }),
+    isPublic: boolean("is_public").default(false),
 });

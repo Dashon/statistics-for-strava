@@ -1,10 +1,12 @@
 
 import { auth, signOut } from "@/auth";
 import { db } from "@/db";
-import { activity } from "@/db/schema";
+import { activity, coachingInsights } from "@/db/schema";
 import { redirect } from "next/navigation";
+import { desc } from "drizzle-orm";
+import Link from "next/link";
 import SyncButton from "./SyncButton";
-import { MoveRight, Zap, Target, History, Map as MapIcon, Calendar } from "lucide-react";
+import { MoveRight, Zap, Target, History, Map as MapIcon, Calendar, TrendingUp, Brain } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -20,6 +22,17 @@ export default async function DashboardPage() {
   const recentActivities = totalActivities
     .sort((a, b) => new Date(b.startDateTime).getTime() - new Date(a.startDateTime).getTime())
     .slice(0, 5);
+
+  // Fetch latest coaching insight
+  const latestInsight = await db.query.coachingInsights.findFirst({
+    orderBy: [desc(coachingInsights.generatedAt)],
+  });
+
+  const latestInsightActivity = latestInsight
+    ? await db.query.activity.findFirst({
+        where: (activity, { eq }) => eq(activity.activityId, latestInsight.activityId),
+      })
+    : null;
 
   return (
     <div className="p-8 space-y-12">
@@ -95,6 +108,55 @@ export default async function DashboardPage() {
               ))}
           </div>
       </div>
+
+      {/* Latest AI Coaching Insight */}
+      {latestInsight && latestInsightActivity && (
+        <div className="bg-gradient-to-br from-purple-500/10 to-blue-600/5 border border-purple-500/20 rounded-[2rem] p-8">
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+                  Latest AI Coach Insight
+                </h2>
+                <p className="text-purple-400 text-xs font-bold uppercase tracking-widest">
+                  {latestInsightActivity.name}
+                </p>
+              </div>
+            </div>
+            <Link
+              href={`/dashboard/activities/${latestInsight.activityId}`}
+              className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2"
+            >
+              <TrendingUp className="w-3 h-3" />
+              View Full Analysis
+            </Link>
+          </div>
+
+          {latestInsight.runClassification && (
+            <div className="bg-purple-500/10 rounded-lg px-4 py-2 inline-block mb-4">
+              <span className="text-purple-400 font-black uppercase text-sm tracking-widest">
+                {latestInsight.runClassification}
+              </span>
+            </div>
+          )}
+
+          <div className="text-zinc-300 leading-relaxed line-clamp-6">
+            {latestInsight.editedText || latestInsight.insightText}
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-zinc-800">
+            <Link
+              href="/dashboard/run-letters"
+              className="text-purple-400 hover:text-purple-300 text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-colors"
+            >
+              View All Run Letters & Insights <MoveRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

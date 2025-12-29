@@ -2,7 +2,7 @@
 import NextAuth from "next-auth";
 import Strava from "next-auth/providers/strava";
 import { db } from "@/db";
-import { user } from "@/db/schema";
+import { user, athleteProfile } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -44,6 +44,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                ...userData,
                createdAt: new Date().toISOString(),
            });
+        }
+
+        // Sync Strava profile info to athlete_profile
+        const stravaProfile = profile as any;
+        const profileData = {
+          stravaFirstName: stravaProfile.firstname || stravaProfile.first_name || null,
+          stravaLastName: stravaProfile.lastname || stravaProfile.last_name || null,
+          stravaProfilePicture: stravaProfile.profile_medium || stravaProfile.profile || null,
+          stravaBio: stravaProfile.bio || null,
+          stravaWeight: stravaProfile.weight || null,
+          stravaCity: stravaProfile.city || null,
+          stravaState: stravaProfile.state || null,
+          stravaCountry: stravaProfile.country || null,
+          sex: stravaProfile.sex || null,
+          updatedAt: new Date().toISOString(),
+        };
+
+        const existingProfile = await db.query.athleteProfile.findFirst({
+          where: eq(athleteProfile.userId, userData.userId)
+        });
+
+        if (existingProfile) {
+          await db.update(athleteProfile)
+            .set(profileData)
+            .where(eq(athleteProfile.userId, userData.userId));
+        } else {
+          await db.insert(athleteProfile).values({
+            userId: userData.userId,
+            ...profileData,
+          });
         }
 
         token.accessToken = account.access_token;
