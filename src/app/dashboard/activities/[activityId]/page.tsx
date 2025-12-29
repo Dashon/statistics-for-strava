@@ -13,12 +13,7 @@ import { activityStream } from "@/db/schema";
 import ActivityCharts from "./ActivityCharts";
 import StatPanel from "./StatPanel";
 import { syncActivityStreams } from "@/app/actions/sync";
-import dynamic from "next/dynamic";
-
-const ActivityMap = dynamic(() => import("./ActivityMap"), { 
-  ssr: false,
-  loading: () => <div className="w-full h-full bg-zinc-900 animate-pulse" />
-}) as any;
+import MapWrapper from "./MapWrapper";
 
 export const metadata: Metadata = {
   title: "Activity Detail | QT Statistics for Strava",
@@ -188,7 +183,7 @@ export default async function ActivityDetailPage({
         {/* Right: Integrated Map Panel */}
         <div className="col-span-12 lg:col-span-5 h-full min-h-[600px] relative">
             <div className="absolute inset-0 bg-zinc-950 border border-zinc-900 rounded-sm overflow-hidden">
-                <ActivityMap 
+                <MapWrapper
                   latlng={stream?.latlng as [number, number][]} 
                   summaryPolyline={activityData.polyline}
                 />
