@@ -48,13 +48,13 @@ final readonly class FindYearlyStatsQueryHandler implements QueryHandler
 
         foreach ($results as $result) {
             $statsPerYear[] = [
-                'year' => Year::fromInt((int) $result['year']),
-                'activityType' => ActivityType::from($result['activityType']),
-                'numberOfActivities' => (int) $result['numberOfActivities'],
-                'distance' => Meter::from($result['totalDistance'])->toKilometer(),
-                'elevation' => Meter::from($result['totalElevation']),
-                'movingTime' => Seconds::from($result['totalMovingTime']),
-                'calories' => (int) $result['totalCalories'],
+                'year' => Year::fromInt((int) ($result['year'] ?? $result['year'])), // Postgres year is already lowercase if unquoted
+                'activityType' => ActivityType::from($result['activityType'] ?? $result['activitytype']),
+                'numberOfActivities' => (int) ($result['numberOfActivities'] ?? $result['numberofactivities']),
+                'distance' => Meter::from($result['totalDistance'] ?? $result['totaldistance'])->toKilometer(),
+                'elevation' => Meter::from($result['totalElevation'] ?? $result['totalelevation']),
+                'movingTime' => Seconds::from($result['totalMovingTime'] ?? $result['totalmovingtime']),
+                'calories' => (int) ($result['totalCalories'] ?? $result['totalcalories']),
             ];
         }
 

@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "build": "npm run tailwind && npm run webpack",
+    "tailwind": "npx @tailwindcss/cli -i ./public/css/tailwind.css -o ./public/css/dist/tailwind.min.css --minify",
+    "webpack": "npx webpack"
+  },
   "devDependencies": {
     "docsify-cli": "^4.4.4",
     "flowbite": "^3.1.2",

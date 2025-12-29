@@ -61,11 +61,11 @@ final readonly class FindYearlyStatsPerDayQueryHandler implements QueryHandler
 
         foreach ($results as $result) {
             $response->add(
-                date: SerializableDateTime::fromString($result['startDate']),
-                activityType: ActivityType::from($result['activityType']),
-                distance: Meter::from($result['cumulativeDistance'])->toKilometer(),
-                movingTime: Seconds::from($result['cumulativeMovingTime']),
-                elevation: Meter::from($result['cumulativeElevation']),
+                date: SerializableDateTime::fromString($result['startDate'] ?? $result['startdate']),
+                activityType: ActivityType::from($result['activityType'] ?? $result['activitytype']),
+                distance: Meter::from($result['cumulativeDistance'] ?? $result['cumulativedistance'])->toKilometer(),
+                movingTime: Seconds::from($result['cumulativeMovingTime'] ?? $result['cumulativemovingtime']),
+                elevation: Meter::from($result['cumulativeElevation'] ?? $result['cumulativeelevation']),
             );
         }
 

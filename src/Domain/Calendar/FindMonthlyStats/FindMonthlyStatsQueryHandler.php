@@ -51,8 +51,9 @@ final readonly class FindMonthlyStatsQueryHandler implements QueryHandler
         $statsPerMonth = [];
         $activityTypes = ActivityTypes::empty();
         foreach ($results as $result) {
-            $month = Month::fromDate(SerializableDateTime::fromString(sprintf('%s-01 00:00:00', $result['yearAndMonth'])));
-            $sportType = SportType::from($result['sportType']);
+            $yearAndMonth = $result['yearAndMonth'] ?? $result['yearandmonth'];
+            $month = Month::fromDate(SerializableDateTime::fromString(sprintf('%s-01 00:00:00', $yearAndMonth)));
+            $sportType = SportType::from($result['sportType'] ?? $result['sporttype']);
 
             if (!$activityTypes->has($sportType->getActivityType())) {
                 $activityTypes->add($sportType->getActivityType());
@@ -61,11 +62,11 @@ final readonly class FindMonthlyStatsQueryHandler implements QueryHandler
             $statsPerMonth[] = [
                 'month' => $month,
                 'sportType' => $sportType,
-                'numberOfActivities' => (int) $result['numberOfActivities'],
-                'distance' => Meter::from($result['totalDistance'])->toKilometer(),
-                'elevation' => Meter::from($result['totalElevation']),
-                'movingTime' => Seconds::from($result['totalMovingTime']),
-                'calories' => (int) $result['totalCalories'],
+                'numberOfActivities' => (int) ($result['numberOfActivities'] ?? $result['numberofactivities']),
+                'distance' => Meter::from($result['totalDistance'] ?? $result['totaldistance'])->toKilometer(),
+                'elevation' => Meter::from($result['totalElevation'] ?? $result['totalelevation']),
+                'movingTime' => Seconds::from($result['totalMovingTime'] ?? $result['totalmovingtime']),
+                'calories' => (int) ($result['totalCalories'] ?? $result['totalcalories']),
             ];
         }
 
@@ -90,8 +91,8 @@ final readonly class FindMonthlyStatsQueryHandler implements QueryHandler
 
             $minMaxDatePerActivityType[] = [
                 'activityType' => $activityType,
-                'min' => Month::fromDate(SerializableDateTime::fromString($result['minStartDate'])),
-                'max' => Month::fromDate(SerializableDateTime::fromString($result['maxStartDate'])),
+                'min' => Month::fromDate(SerializableDateTime::fromString($result['minStartDate'] ?? $result['minstartdate'])),
+                'max' => Month::fromDate(SerializableDateTime::fromString($result['maxStartDate'] ?? $result['maxstartdate'])),
             ];
         }
 

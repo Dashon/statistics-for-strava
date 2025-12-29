@@ -86,8 +86,8 @@ final readonly class DbalActivityWithRawDataRepository extends DbalRepository im
             'weather' => $activity->getWeather() ? Json::encode($activity->getWeather()) : null,
             'gearId' => $activity->getGearId(),
             'data' => Json::encode($this->cleanData($activityWithRawData->getRawData())),
-            'isCommute' => (int) $activity->isCommute(),
-            'streamsAreImported' => 0,
+            'isCommute' => $activity->isCommute() ? 'true' : 'false',
+            'streamsAreImported' => 'false',
             'workoutType' => $activity->getWorkoutType()?->value,
         ]);
     }
@@ -135,7 +135,7 @@ final readonly class DbalActivityWithRawDataRepository extends DbalRepository im
             'gearId' => $activity->getGearId(),
             'totalImageCount' => $activity->getTotalImageCount(),
             'localImagePaths' => implode(',', $activity->getLocalImagePaths()),
-            'isCommute' => (int) $activity->isCommute(),
+            'isCommute' => $activity->isCommute() ? 'true' : 'false',
             'workoutType' => $activity->getWorkoutType()?->value,
             'data' => Json::encode($this->cleanData($activityWithRawData->getRawData())),
         ]);
@@ -155,7 +155,7 @@ final readonly class DbalActivityWithRawDataRepository extends DbalRepository im
         $queryBuilder = $this->connection->createQueryBuilder();
         $queryBuilder->select('activityId')
             ->from('Activity')
-            ->andWhere('streamsAreImported = 0 OR streamsAreImported IS NULL')
+            ->andWhere('streamsAreImported = FALSE OR streamsAreImported IS NULL')
             ->andWhere('activityId = :activityId')
             ->setParameter('activityId', $activityId);
 
@@ -164,7 +164,7 @@ final readonly class DbalActivityWithRawDataRepository extends DbalRepository im
 
     public function markActivityStreamsAsImported(ActivityId $activityId): void
     {
-        $sql = 'UPDATE Activity SET streamsAreImported = 1 WHERE activityId = :activityId';
+        $sql = 'UPDATE Activity SET streamsAreImported = TRUE WHERE activityId = :activityId';
 
         $this->connection->executeStatement($sql, [
             'activityId' => $activityId,
@@ -173,14 +173,17 @@ final readonly class DbalActivityWithRawDataRepository extends DbalRepository im
 
     public function markActivitiesForDeletion(ActivityIds $activityIds): void
     {
-        $sql = 'UPDATE Activity SET markedForDeletion = 1 WHERE activityId IN (:activityIds)';
+        $sql = 'UPDATE Activity SET markedForDeletion = TRUE WHERE activityId IN (:activityIds)';
 
-        $this->connection->executeStatement($sql, [
-            'activityIds' => array_map(strval(...), $activityIds->toArray()),
-        ],
+        $this->connection->executeStatement(
+            $sql,
+            [
+                'activityIds' => array_map(strval(...), $activityIds->toArray()),
+            ],
             [
                 'activityIds' => ArrayParameterType::STRING,
-            ]);
+            ]
+        );
     }
 
     /**
