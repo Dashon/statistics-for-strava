@@ -3,7 +3,7 @@ import { auth, signOut } from "@/auth";
 import { db } from "@/db";
 import { activity, coachingInsights } from "@/db/schema";
 import { redirect } from "next/navigation";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import Link from "next/link";
 import SyncButton from "./SyncButton";
 import { MoveRight, Zap, Target, History, Map as MapIcon, Calendar, TrendingUp, Brain } from "lucide-react";
@@ -16,17 +16,24 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   const session = (await auth()) as any;
-  if (!session) redirect("/");
+  if (!session?.userId) redirect("/");
 
-  const totalActivities = await db.query.activity.findMany();
+  // SECURITY FIX: Filter activities by userId
+  const totalActivities = await db.query.activity.findMany({
+    where: eq(activity.userId, session.userId),
+  });
   const recentActivities = totalActivities
     .sort((a, b) => new Date(b.startDateTime).getTime() - new Date(a.startDateTime).getTime())
     .slice(0, 5);
 
-  // Fetch latest coaching insight
-  const latestInsight = await db.query.coachingInsights.findFirst({
-    orderBy: [desc(coachingInsights.generatedAt)],
-  });
+  // Fetch latest coaching insight for this user's activities
+  const userActivityIds = totalActivities.map(a => a.activityId);
+  const latestInsight = userActivityIds.length > 0
+    ? await db.query.coachingInsights.findFirst({
+        where: (insight, { inArray }) => inArray(insight.activityId, userActivityIds),
+        orderBy: [desc(coachingInsights.generatedAt)],
+      })
+    : null;
 
   const latestInsightActivity = latestInsight
     ? await db.query.activity.findFirst({

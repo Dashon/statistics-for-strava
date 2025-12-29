@@ -2,7 +2,7 @@
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { activity } from "@/db/schema";
-import { desc, count } from "drizzle-orm";
+import { desc, count, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Pagination from "./Pagination";
@@ -19,20 +19,22 @@ export default async function ActivitiesPage({
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
-  const session = await auth();
-  if (!session) redirect("/");
+  const session = await auth() as any;
+  if (!session?.userId) redirect("/");
 
   const params = await searchParams;
   const currentPage = parseInt(params.page || "1", 10);
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
+  // SECURITY FIX: Filter activities by userId
   const [allActivities, [{ value: totalCount }]] = await Promise.all([
     db.query.activity.findMany({
+      where: eq(activity.userId, session.userId),
       orderBy: [desc(activity.startDateTime)],
       limit: ITEMS_PER_PAGE,
       offset,
     }),
-    db.select({ value: count() }).from(activity),
+    db.select({ value: count() }).from(activity).where(eq(activity.userId, session.userId)),
   ]);
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);

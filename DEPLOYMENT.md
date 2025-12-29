@@ -51,8 +51,9 @@ Go to your Vercel project settings → Environment Variables:
 Add these to **Production** environment:
 
 ```bash
-# Database
-DATABASE_URL=postgres://postgres.[PROJECT_REF]:[PASSWORD]@aws-1-ap-south-1.pooler.supabase.com:6543/postgres
+# Database - IMPORTANT: URL-encode special characters in password!
+# Use this tool: node -e "console.log(encodeURIComponent('YOUR_PASSWORD'))"
+DATABASE_URL=postgres://postgres.[PROJECT_REF]:[URL_ENCODED_PASSWORD]@aws-1-ap-south-1.pooler.supabase.com:6543/postgres
 
 # Strava OAuth
 NEXT_PUBLIC_STRAVA_CLIENT_ID=192116
@@ -182,17 +183,26 @@ npm run trigger:deploy
 
 #### 3. Database Connection Errors
 
-**Error**: `connection to server failed`
+**Error**: `connection to server failed` or `URI malformed`
 
 **Check:**
 - Verify `DATABASE_URL` in Vercel matches Supabase
+- **URL-encode special characters in password!** (`#` → `%23`, `^` → `%5E`, etc.)
 - Check Supabase pooler is enabled
 - Ensure IP allowlist includes 0.0.0.0/0 (or Trigger.dev IPs)
 
 **Fix:**
+```bash
+# Encode your password properly
+node -e "console.log(encodeURIComponent('YOUR_PASSWORD'))"
+
+# Example: MpOvV8voqAbdQiNyIDR7#2xD^wl2^rge
+# Becomes: MpOvV8voqAbdQiNyIDR7%232xD%5Ewl2%5Erge
+```
+
 1. Go to Supabase → Settings → Database
 2. Enable "Connection Pooling" (Port 6543)
-3. Update `DATABASE_URL` in Vercel
+3. Update `DATABASE_URL` in Vercel with **encoded password**
 4. Redeploy
 
 ---

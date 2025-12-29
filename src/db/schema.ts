@@ -38,8 +38,9 @@ const jsonText = <TData>(name: string) =>
 // Activity Table
 export const activity = pgTable("activity", {
   activityId: varchar("activityid", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }), // SECURITY: Filter activities by user
   startDateTime: timestamp("startdatetime", { mode: "string" }).notNull(),
-  data: jsonText<any>("data").notNull(), 
+  data: jsonText<any>("data").notNull(),
   location: jsonText<any>("location"),
   weather: jsonText<any>("weather"),
   gearId: varchar("gearid", { length: 255 }),
@@ -72,6 +73,7 @@ export const activity = pgTable("activity", {
 }, (table) => {
     return {
         sportTypeIdx: index("activity_sporttype").on(table.sportType),
+        userIdIdx: index("activity_user_id").on(table.userId), // Index for filtering by user
     }
 });
 

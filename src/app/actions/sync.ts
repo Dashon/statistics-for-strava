@@ -21,6 +21,7 @@ export async function syncActivities() {
   for (const act of activities) {
     const activityData = {
       activityId: act.id.toString(),
+      userId: session.userId, // SECURITY FIX: Associate activity with user
       startDateTime: act.start_date,
       data: act,
       name: act.name,
@@ -37,6 +38,7 @@ export async function syncActivities() {
     });
 
     if (existing) {
+      // Update activity but ensure userId is set
       await db.update(activity).set(activityData).where(eq(activity.activityId, activityData.activityId));
     } else {
       await db.insert(activity).values(activityData);

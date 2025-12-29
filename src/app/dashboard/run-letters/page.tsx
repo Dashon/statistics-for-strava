@@ -2,7 +2,7 @@
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { activity, runLetters, coachingInsights, generationStatus } from "@/db/schema";
-import { desc, eq, isNull } from "drizzle-orm";
+import { desc, eq, isNull, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import GenerateLettersButton from "./GenerateLettersButton";
@@ -16,15 +16,19 @@ export const metadata: Metadata = {
 };
 
 export default async function RunLettersPage() {
-  const session = await auth();
-  if (!session) redirect("/");
+  const session = await auth() as any;
+  if (!session?.userId) redirect("/");
 
   // Only fetch recent activities (last 3 months) for initial page load
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
+  // SECURITY FIX: Filter activities by userId
   const activities = await db.query.activity.findMany({
-    where: eq(activity.sportType, "Run"),
+    where: and(
+      eq(activity.sportType, "Run"),
+      eq(activity.userId, session.userId)
+    ),
     orderBy: [desc(activity.startDateTime)],
     limit: 20, // Start with just 20 activities
   });

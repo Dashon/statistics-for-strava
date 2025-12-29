@@ -17,18 +17,23 @@ export default async function ActivityDetailPage({
 }: {
   params: Promise<{ activityId: string }>;
 }) {
-  const session = await auth();
-  if (!session) redirect("/");
+  const session = await auth() as any;
+  if (!session?.userId) redirect("/");
 
   const { activityId } = await params;
 
-  // Fetch activity with related data
+  // SECURITY FIX: Fetch activity and verify it belongs to the user
   const activityData = await db.query.activity.findFirst({
     where: eq(activity.activityId, activityId),
   });
 
   if (!activityData) {
     notFound();
+  }
+
+  // SECURITY CHECK: Ensure this activity belongs to the current user
+  if (activityData.userId !== session.userId) {
+    notFound(); // Return 404 if trying to access another user's activity
   }
 
   // Fetch or generate coaching insight
@@ -196,7 +201,7 @@ export default async function ActivityDetailPage({
                 AI Coach Analysis
               </h2>
               <p className="text-purple-400 text-xs font-bold uppercase tracking-widest">
-                Powered by Claude Sonnet 3.5
+                Powered by Claude Sonnet 4.5
               </p>
             </div>
           </div>

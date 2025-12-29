@@ -58,7 +58,10 @@
       "Bash(PGPASSWORD='MpOvV8voqAbdQiNyIDR7#2xD^wl2^rge' psql -h aws-1-ap-south-1.pooler.supabase.com -p 6543 -U postgres.ncnpxfbffnooxtahxrox -d postgres -c \"\\\\d activity\")",
       "Bash(PGPASSWORD='MpOvV8voqAbdQiNyIDR7#2xD^wl2^rge' psql -h aws-1-ap-south-1.pooler.supabase.com -p 6543 -U postgres.ncnpxfbffnooxtahxrox -d postgres -c \"\\\\d coaching_insights\")",
       "Bash(PGPASSWORD='MpOvV8voqAbdQiNyIDR7#2xD^wl2^rge' psql -h aws-1-ap-south-1.pooler.supabase.com -p 6543 -U postgres.ncnpxfbffnooxtahxrox -d postgres -c \"SELECT COUNT\\(*\\) FROM coaching_insights\")",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(node:*)",
+      "Bash(DATABASE_URL=\"postgres://postgres.ncnpxfbffnooxtahxrox:MpOvV8voqAbdQiNyIDR7%232xD%5Ewl2%5Erge@aws-1-ap-south-1.pooler.supabase.com:6543/postgres\" npx tsx:*)",
+      "Bash(export DATABASE_URL=\"postgres://postgres.ncnpxfbffnooxtahxrox:MpOvV8voqAbdQiNyIDR7%232xD%5Ewl2%5Erge@aws-1-ap-south-1.pooler.supabase.com:6543/postgres\")"
     ]
   }
 }
