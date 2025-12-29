@@ -43,3 +43,37 @@ export async function fetchStravaActivities(accessToken: string) {
   
   return allActivities;
 }
+
+/**
+ * Fetch detailed athlete info (includes gear/shoes/bikes)
+ */
+export async function fetchStravaAthlete(accessToken: string) {
+  const response = await fetch("https://www.strava.com/api/v3/athlete", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch athlete from Strava");
+  }
+
+  return response.json();
+}
+
+/**
+ * Fetch detailed activity info (includes description, calories, splits)
+ */
+export async function fetchStravaActivityDetail(accessToken: string, activityId: string) {
+  const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch activity detail for ${activityId}`);
+  }
+
+  return response.json();
+}
