@@ -8,7 +8,7 @@ import TimeRangeSelector from "./TimeRangeSelector";
 import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
 import { Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 
 interface ActivitiesPageContentProps {
   unitPreference: MeasurementUnit;
@@ -31,7 +31,10 @@ export default function ActivitiesPageContent({ unitPreference }: ActivitiesPage
   const [showFilters, setShowFilters] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
 
-  const { from, to } = getTimeRangeFromParams(params.range as any, params.from, params.to);
+  const { from, to } = useMemo(() => 
+    getTimeRangeFromParams(params.range as any, params.from, params.to),
+    [params.range, params.from, params.to]
+  );
 
   // Build query params
   const queryParams = new URLSearchParams({

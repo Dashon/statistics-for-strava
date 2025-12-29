@@ -10,6 +10,7 @@ import ActivityMap from "./ActivityMap";
 import DashboardCard from "./DashboardCard";
 import TimeRangeSelector from "./TimeRangeSelector";
 import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
+import { useMemo } from "react";
 
 interface DashboardContentProps {
   unitPreference: MeasurementUnit;
@@ -30,7 +31,10 @@ export default function DashboardContent({ unitPreference, initialData }: Dashbo
     range: parseAsString,
   });
 
-  const { from, to } = getTimeRangeFromParams(params.range as any, params.from, params.to);
+  const { from, to } = useMemo(() => 
+    getTimeRangeFromParams(params.range as any, params.from, params.to),
+    [params.range, params.from, params.to]
+  );
 
   // Fetch stats data
   const { data: statsData, isLoading: statsLoading } = useQuery({

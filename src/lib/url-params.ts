@@ -44,7 +44,14 @@ export function getTimeRangeFromParams(range?: TimeRange, from?: Date | null, to
   }
 
   // Default to last 30 days
-  return rangeMap['now-30d']();
+  // STABILIZATION: Round 'now' to the nearest minute to prevent infinite query loops
+  const stableNow = new Date();
+  stableNow.setSeconds(0, 0);
+  
+  return {
+    from: new Date(stableNow.getTime() - 30 * 24 * 60 * 60 * 1000),
+    to: stableNow
+  };
 }
 
 export function formatTimeRange(from: Date, to: Date): string {
