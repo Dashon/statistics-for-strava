@@ -19,23 +19,15 @@ export const batchIngestRunHistory = task({
   },
   run: async (payload: {
     userId: string;
-    tier: "free" | "premium";
-    maxActivities?: number; // Optional limit
   }, { ctx }) => {
     logger.info("Starting batch ingestion", {
       userId: payload.userId,
-      tier: payload.tier,
     });
 
-    // Determine how many activities to process based on tier
-    const isFreeTier = payload.tier === "free";
-    const maxActivities = payload.maxActivities || (isFreeTier ? 20 : undefined); // Free: 20, Premium: unlimited
-
-    // Fetch user's running activities
+    // Fetch ALL running activities (no limits)
     const allActivities = await db.query.activity.findMany({
       where: eq(activity.sportType, "Run"),
       orderBy: [desc(activity.startDateTime)],
-      limit: maxActivities,
     });
 
     logger.info(`Found ${allActivities.length} running activities`);
@@ -71,7 +63,7 @@ export const batchIngestRunHistory = task({
     };
 
     // Process activities in batches to manage concurrency
-    const BATCH_SIZE = isFreeTier ? 5 : 10; // Free tier: 5 at a time, Premium: 10 at a time
+    const BATCH_SIZE = 10; // Process 10 activities at a time
 
     for (let i = 0; i < activitiesToProcess.length; i += BATCH_SIZE) {
       const batch = activitiesToProcess.slice(i, i + BATCH_SIZE);

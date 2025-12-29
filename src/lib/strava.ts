@@ -1,14 +1,45 @@
-
+/**
+ * Fetch ALL activities from Strava with automatic pagination
+ * Retrieves the complete activity history by making multiple API calls
+ */
 export async function fetchStravaActivities(accessToken: string) {
-  const response = await fetch("https://www.strava.com/api/v3/athlete/activities?per_page=100", {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  const allActivities: any[] = [];
+  let page = 1;
+  const perPage = 200; // Maximum allowed by Strava API
+  
+  while (true) {
+    const response = await fetch(
+      `https://www.strava.com/api/v3/athlete/activities?per_page=${perPage}&page=${page}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch activities from Strava");
+    if (!response.ok) {
+      throw new Error(`Failed to fetch activities from Strava: ${response.statusText}`);
+    }
+
+    const activities = await response.json();
+    
+    // If no activities returned, we've fetched everything
+    if (!activities || activities.length === 0) {
+      break;
+    }
+    
+    allActivities.push(...activities);
+    
+    // If we got fewer activities than requested, we've reached the end
+    if (activities.length < perPage) {
+      break;
+    }
+    
+    page++;
+    
+    // Add a small delay to respect Strava's rate limits (100 requests per 15 minutes)
+    await new Promise(resolve => setTimeout(resolve, 200));
   }
-
-  return response.json();
+  
+  return allActivities;
 }

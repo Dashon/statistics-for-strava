@@ -90,27 +90,21 @@ export async function triggerBatchGeneration(activityIds: string[]) {
 }
 
 /**
- * Trigger full history ingestion (premium feature)
+ * Trigger full history ingestion for all users
  */
-export async function triggerHistoryIngestion(tier: "free" | "premium" = "free", maxActivities?: number) {
+export async function triggerHistoryIngestion() {
   const session = await auth() as any;
   if (!session?.userId) {
     throw new Error('Not authenticated');
   }
 
-  // TODO: Check if user has premium access
-  // For now, anyone can trigger, but we'll limit based on tier
-
   const handle = await tasks.trigger("batch-ingest-run-history", {
     userId: session.userId,
-    tier,
-    maxActivities,
   });
 
   return {
     success: true,
     runId: handle.id,
-    tier,
   };
 }
 
