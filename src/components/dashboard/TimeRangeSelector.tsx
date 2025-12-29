@@ -94,7 +94,7 @@ export default function TimeRangeSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-56 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl z-50">
+        <div className="absolute top-full right-0 mt-2 w-56 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl z-1001">
           <div className="p-2 space-y-1">
             <div className="px-3 py-2 text-xs font-medium text-zinc-500 uppercase tracking-wider">
               Quick Ranges

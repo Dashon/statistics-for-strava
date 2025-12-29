@@ -18,8 +18,14 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-zinc-950">
       <Sidebar profile={sidebarProfile} />
-      <main className="flex-1 overflow-y-auto lg:ml-0 pt-16 lg:pt-0">
-          {children}
+      {/* 
+          Main content shifts right on desktop to accommodate the 72 (w-72) wide fixed sidebar.
+          On mobile, we add pt-16 for the top sticky header.
+      */}
+      <main className="flex-1 lg:ml-72 pt-16 lg:pt-0 min-w-0">
+          <div className="h-full">
+            {children}
+          </div>
       </main>
     </div>
   );

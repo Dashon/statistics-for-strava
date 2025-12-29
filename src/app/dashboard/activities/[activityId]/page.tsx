@@ -189,7 +189,7 @@ export default async function ActivityDetailPage({
                 />
                 
                 {/* Map Overlay Controls - Grafana Style */}
-                <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
+                <div className="absolute top-4 right-4 flex flex-col gap-2 z-[41]">
                     <button className="w-8 h-8 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-black transition-colors">
                         <Zap className="w-4 h-4 text-zinc-400" />
                     </button>
