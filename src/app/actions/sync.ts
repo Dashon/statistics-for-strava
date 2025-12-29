@@ -41,99 +41,15 @@ export async function syncActivities() {
     console.error("Failed to sync gear:", err);
   }
 
-  // 2. Fetch Activities
-  const activities = await fetchStravaActivities(athlete.stravaAccessToken);
-
-  // 3. Process Activities
-  // To avoid hitting rate limits, we only fetch full details for the 5 most recent activities
-  // as summary activities (from the list) often lack description, calories, etc.
-  for (let i = 0; i < activities.length; i++) {
-    let act = activities[i];
-    
-    // Deep sync the most recent 5
-    if (i < 5) {
-      try {
-        const detail = await fetchStravaActivityDetail(athlete.stravaAccessToken, act.id.toString());
-        act = { ...act, ...detail };
-
-        // Fetch Streams
-        const streams = await fetchStravaActivityStreams(athlete.stravaAccessToken, act.id.toString());
-        if (streams) {
-          const streamData = {
-            activityId: act.id.toString(),
-            time: streams.time?.data || null,
-            distance: streams.distance?.data || null,
-            latlng: streams.latlng?.data || null,
-            altitude: streams.altitude?.data || null,
-            velocitySmooth: streams.velocity_smooth?.data || null,
-            heartrate: streams.heartrate?.data || null,
-            cadence: streams.cadence?.data || null,
-            watts: streams.watts?.data || null,
-            temp: streams.temp?.data || null,
-            moving: streams.moving?.data || null,
-            gradeSmooth: streams.grade_smooth?.data || null,
-            updatedAt: new Date().toISOString(),
-          };
-
-          await db.insert(activityStream).values(streamData).onConflictDoUpdate({
-            target: activityStream.activityId,
-            set: streamData
-          });
-        }
-      } catch (err) {
-        console.error(`Failed to fetch detail/streams for activity ${act.id}:`, err);
-      }
-    }
-
-    const activityData = {
-      activityId: act.id.toString(),
-      userId: session.userId,
-      startDateTime: act.start_date,
-      data: act,
-      name: act.name,
-      description: act.description,
-      distance: act.distance,
-      elevation: act.total_elevation_gain,
-      sportType: act.sport_type || act.type,
-      movingTimeInSeconds: act.moving_time,
-      isCommute: !!act.commute,
-      polyline: act.map?.summary_polyline,
-      streamsAreImported: i < 5, // Mark as imported for the ones we just synced
-      
-      // Performance Metrics
-      averageSpeed: act.average_speed,
-      maxSpeed: act.max_speed,
-      averageHeartRate: act.average_heartrate,
-      maxHeartRate: act.max_heartrate,
-      averageCadence: act.average_cadence,
-      averagePower: act.average_watts,
-      maxPower: act.max_watts,
-      calories: act.calories,
-      
-      // Metadata
-      gearId: act.gear_id,
-      deviceName: act.device_name,
-      kudoCount: act.kudos_count,
-      totalImageCount: act.total_photo_count,
-      workoutType: act.workout_type?.toString(),
-      
-      // Location
-      startingLatitude: act.start_latlng?.[0],
-      startingLongitude: act.start_latlng?.[1],
-    };
-
-    const existing = await db.query.activity.findFirst({
-      where: eq(activity.activityId, activityData.activityId),
-    });
-
-    if (existing) {
-      await db.update(activity).set(activityData).where(eq(activity.activityId, activityData.activityId));
-    } else {
-      await db.insert(activity).values(activityData);
-    }
+  // 2. Trigger Background Full Sync
+  try {
+    const { tasks } = await import("@trigger.dev/sdk");
+    await tasks.trigger("sync-strava-history", { userId: session.userId });
+    return { success: true, background: true };
+  } catch (err) {
+    console.error("Failed to trigger background sync:", err);
+    return { success: false, error: "Sync failed to start" };
   }
-
-  return { success: true, count: activities.length };
 }
 
 export async function syncActivityStreams(activityId: string) {

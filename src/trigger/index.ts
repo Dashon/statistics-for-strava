@@ -1,3 +1,2 @@
-// Export all Trigger.dev tasks
-export * from "./generate-run-content";
 export * from "./batch-ingestion";
+export * from "./strava-sync";

@@ -13,9 +13,13 @@ export default function SyncButton(): React.JSX.Element {
   const handleSync = async () => {
     setSyncing(true);
     try {
-      await syncActivities();
-      showToast("Activities synced successfully!", "success");
-      window.location.reload();
+      const result = await syncActivities();
+      if (result.background) {
+        showToast("Sync started in background. Activities will appear as they are processed.", "info");
+      } else {
+        showToast("Activities synced successfully!", "success");
+        window.location.reload();
+      }
     } catch (err) {
       console.error(err);
       showToast("Sync failed. Please try again.", "error");

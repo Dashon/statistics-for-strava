@@ -3,7 +3,8 @@ import { db } from "@/db";
 import { activity, coachingInsights, runLetters } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { redirect, notFound } from "next/navigation";
-import { Zap, MapPin, Trophy, Heart, TrendingUp, Clock, Activity, Footprints, Flame, Timer, Mountain, Dumbbell } from "lucide-react";
+import { Zap, MapPin, Trophy, Heart, TrendingUp, Clock, Activity, Footprints, Flame, Timer, Mountain, Dumbbell, RefreshCw } from "lucide-react";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { generateCoachingInsight, getCoachingInsight } from "@/app/actions/coaching";
 import { getAthleteProfile } from "@/app/actions/profile";
@@ -94,258 +95,227 @@ export default async function ActivityDetailPage({
     : "0:00";
 
   return (
-    <div className="p-8 space-y-6 max-w-[1800px] mx-auto min-h-screen bg-black text-zinc-300">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-xl">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-black text-white italic tracking-tight">
-                {activityData.name}
-              </h1>
-              <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest mt-1">
-                {new Date(activityData.startDateTime).toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-black text-zinc-300 font-sans selection:bg-[#f97316] selection:text-black">
+      {/* Precision Top Bar (Breadcrumbs / Search) */}
+      <div className="px-6 py-2 border-b border-zinc-900 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-[#09090b]">
+        <div className="flex items-center gap-4">
+            <Link href="/dashboard/activities" className="hover:text-white transition-colors">Dashboards</Link>
+            <span className="text-zinc-700">/</span>
+            <span className="text-zinc-400">Strava Activity Overview</span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="bg-zinc-900 text-zinc-400 px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest">
-            {activityData.sportType}
-          </span>
-          {activityData.deviceName && (
-            <span className="bg-zinc-900 text-zinc-500 px-4 py-2 rounded-xl text-xs font-bold">
-              {activityData.deviceName}
-            </span>
-          )}
+        <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+                <RefreshCw className="w-3 h-3 animate-spin duration-[3000ms]" />
+                <span>{new Date(activityData.startDateTime || "").toLocaleString()}</span>
+            </div>
+            <div className="flex items-center gap-2 border-l border-zinc-800 pl-6">
+                <Clock className="w-3 h-3" />
+                <span>LAST SYNC: {new Date().toLocaleString()}</span>
+            </div>
         </div>
       </div>
 
-      {/* Key Metrics - Grafana Inspired Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-        <div className="xl:col-span-3 space-y-6">
-            {/* Top Bar Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatPanel 
-                    label="Moving Time" 
-                    value={durationFormatted} 
-                    icon={Timer} 
-                    variant="orange"
-                    subValue={`Elapsed: ${elapsedFormatted}`}
-                />
-                <StatPanel 
-                    label="Distance" 
-                    value={distance} 
-                    unit={getDistanceUnit(unitPreference)} 
-                    icon={Activity}
-                />
-                <StatPanel 
-                    label="Pace" 
-                    value={pace} 
-                    unit={`/${getDistanceUnit(unitPreference)}`} 
-                    icon={Timer}
-                />
-                <StatPanel 
-                    label="Avg Heart Rate" 
-                    value={activityData.averageHeartRate || "—"} 
-                    unit="bpm"
-                    icon={Heart}
-                    variant="red"
-                />
+      <div className="p-4 space-y-4 max-w-[1920px] mx-auto">
+      {/* 1:1 Replica Header Section */}
+      <div className="grid grid-cols-12 gap-1 h-[140px]">
+        {/* Main Orange Banner Block */}
+        <div className="col-span-12 lg:col-span-7 bg-[#f97316] rounded-sm overflow-hidden flex flex-col">
+            {/* Title Bar */}
+            <div className="px-6 py-3 border-b border-black/10 flex justify-between items-center">
+                <h1 className="text-3xl font-black text-black tracking-tighter uppercase">{activityData.name}</h1>
+                <div className="flex gap-4">
+                    <div className="w-10 h-10 bg-black/10 rounded-sm flex items-center justify-center">
+                        <Footprints className="w-6 h-6 text-black" />
+                    </div>
+                </div>
             </div>
-
-            {/* Middle Row Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-               <StatPanel 
-                    label="Elevation" 
-                    value={unitPreference === 'imperial' 
-                        ? (activityData.elevation ? activityData.elevation * 3.28084 : 0).toFixed(0)
-                        : activityData.elevation?.toFixed(0) || "0"} 
-                    unit={unitPreference === 'imperial' ? 'ft' : 'm'}
-                    icon={Mountain}
-                />
-                <StatPanel 
-                    label="Calories" 
-                    value={activityData.calories || "—"} 
-                    icon={Flame}
-                />
-                <StatPanel 
-                    label="Cadence" 
-                    value={activityData.averageCadence || "—"} 
-                    unit="rpm"
-                    icon={Footprints}
-                />
-                <StatPanel 
-                    label="Avg Power" 
-                    value={activityData.averagePower || "—"} 
-                    unit="w"
-                    icon={Zap}
-                />
+            {/* Clustered Metrics In Banner */}
+            <div className="flex-1 grid grid-cols-3 divide-x divide-black/10">
+                <StatPanel label="Moving time" value={durationFormatted} variant="orange" size="lg" />
+                <StatPanel label="Distance" value={distance} unit={getDistanceUnit(unitPreference)} variant="orange" size="lg" />
+                <StatPanel label="Pace" value={pace} unit={`/${getDistanceUnit(unitPreference)}`} variant="orange" size="lg" />
             </div>
+        </div>
 
-            {/* Charts Section */}
+        {/* Achievement / Stats Clustered Area */}
+        <div className="col-span-12 lg:col-span-5 grid grid-cols-3 gap-1">
+            <div className="bg-zinc-900 rounded-sm flex flex-col items-center justify-center p-4">
+                <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-black text-white">{activityData.kudoCount || 0}</span>
+                    <Trophy className="w-6 h-6 text-orange-500" />
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 mt-2">Achievements</span>
+            </div>
+            <div className="bg-zinc-900 rounded-sm flex flex-col items-center justify-center p-4">
+                 <div className="w-10 h-10 bg-yellow-500/10 rounded-full flex items-center justify-center mb-2">
+                    <Trophy className="w-6 h-6 text-yellow-500" />
+                 </div>
+                 <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Medals</span>
+            </div>
+            <div className="bg-zinc-900 rounded-sm p-4 relative overflow-hidden group">
+                 <div className="relative z-10 flex flex-col h-full justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Device</span>
+                    <span className="text-xs font-black text-white uppercase">{activityData.deviceName || "GPS WATCH"}</span>
+                 </div>
+                 <Dumbbell className="absolute -bottom-2 -right-2 w-12 h-12 text-zinc-800 opacity-20 group-hover:scale-110 transition-transform" />
+            </div>
+        </div>
+      </div>
+
+      {/* Row 2: Nested Sub-Metrics */}
+      <div className="grid grid-cols-12 gap-1 h-[80px]">
+          <div className="col-span-12 lg:col-span-7 grid grid-cols-4 gap-1">
+                <StatPanel label="Elapsed time" value={elapsedFormatted} size="sm" />
+                <StatPanel label="Elevation" value={unitPreference === 'imperial' 
+                        ? (activityData.elevation ? activityData.elevation * 3.28084 : 0).toFixed(1)
+                        : activityData.elevation?.toFixed(1) || "0"} unit={unitPreference === 'imperial' ? 'ft' : 'm'} size="sm" />
+                <StatPanel label="Heart Rate" value={activityData.averageHeartRate || "—"} variant="zinc" size="sm" />
+                <StatPanel label="Calories" value={activityData.calories || "—"} size="sm" />
+          </div>
+          <div className="col-span-12 lg:col-span-5 bg-zinc-900/50 border border-zinc-900 rounded-sm flex items-center justify-between px-6">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Activity Date</span>
+                <span className="text-xs font-black text-zinc-400">{new Date(activityData.startDateTime || "").toLocaleString()}</span>
+          </div>
+      </div>
+
+      {/* Row 3: Main Data Area (Charts Left, Map Right) */}
+      <div className="grid grid-cols-12 gap-4">
+        {/* Left: Stacked Charts */}
+        <div className="col-span-12 lg:col-span-7">
             <ActivityCharts stream={stream} unit={unitPreference} />
         </div>
 
-        {/* Map & Meta Section */}
-        <div className="xl:col-span-1 space-y-6">
-            <div className="bg-zinc-950 border border-zinc-900 rounded-[2rem] overflow-hidden h-[500px] relative">
+        {/* Right: Integrated Map Panel */}
+        <div className="col-span-12 lg:col-span-5 h-full min-h-[600px] relative">
+            <div className="absolute inset-0 bg-zinc-950 border border-zinc-900 rounded-sm overflow-hidden">
                 <ActivityMap 
                   latlng={stream?.latlng as [number, number][]} 
                   summaryPolyline={activityData.polyline}
                 />
-            </div>
-            
-            <div className="bg-zinc-950 border border-zinc-900 rounded-2xl p-6">
-                <div className="flex items-center gap-2 text-zinc-500 mb-4">
-                    <Trophy className="w-4 h-4 text-yellow-500" />
-                    <span className="text-xs font-black uppercase tracking-widest">Achievements & Kudos</span>
+                
+                {/* Map Overlay Controls - Grafana Style */}
+                <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
+                    <button className="w-8 h-8 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-black transition-colors">
+                        <Zap className="w-4 h-4 text-zinc-400" />
+                    </button>
+                    <button className="w-8 h-8 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-black transition-colors">
+                        <MapPin className="w-4 h-4 text-zinc-400" />
+                    </button>
                 </div>
-                <div className="flex justify-between items-center">
-                    <div>
-                        <span className="text-3xl font-black text-white">{activityData.kudoCount || 0}</span>
-                        <span className="text-xs text-zinc-600 font-bold ml-2 uppercase">Kudos</span>
+            </div>
+        </div>
+      </div>
+
+      {/* AI Coaching & Insights Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="lg:col-span-8">
+            {insight && (
+                <div className="bg-gradient-to-br from-purple-500/10 to-blue-600/5 border border-purple-500/20 rounded-lg p-8 shadow-2xl shadow-purple-500/5">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
+                        <TrendingUp className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+                            AI Coach Analysis
+                        </h2>
+                        <p className="text-purple-400 text-[10px] font-black uppercase tracking-widest">
+                            Powered by Claude Sonnet 4.5
+                        </p>
+                        </div>
+                    </div>
+
+                    <div className="prose prose-invert max-w-none">
+                        <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap font-medium">
+                        {insight.editedText || insight.insightText}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
+        </div>
 
-            {activityData.deviceName && (
-                <div className="bg-zinc-950 border border-zinc-900 rounded-2xl p-6">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600 block mb-2">Device</span>
-                    <span className="text-white font-bold">{activityData.deviceName}</span>
+        <div className="lg:col-span-4">
+            {letter && (
+                <div className="bg-[#09090b] border border-zinc-900 rounded-lg p-8 h-full">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center">
+                            <Dumbbell className="w-5 h-5 text-zinc-400" />
+                        </div>
+                        <h2 className="text-xl font-black text-white uppercase tracking-tight">
+                            Run Letter
+                        </h2>
+                    </div>
+                    <div className="text-zinc-500 leading-relaxed italic font-serif text-lg">
+                        "{letter.editedText || letter.letterText}"
+                    </div>
                 </div>
             )}
         </div>
       </div>
 
-      {/* AI Coaching & Insights Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {insight && (
-            <div className="bg-gradient-to-br from-purple-500/10 to-blue-600/5 border border-purple-500/20 rounded-[2rem] p-8 shadow-2xl shadow-purple-500/5">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                    <h2 className="text-2xl font-black text-white uppercase tracking-tight">
-                        AI Coach Analysis
-                    </h2>
-                    <p className="text-purple-400 text-[10px] font-black uppercase tracking-widest">
-                        Powered by Claude Sonnet 4.5
-                    </p>
-                    </div>
-                </div>
-
-                {insight.runClassification && (
-                    <div className="bg-zinc-900/50 border border-purple-500/20 rounded-xl px-4 py-2 inline-block mb-6">
-                    <span className="text-purple-400 font-black uppercase text-xs tracking-widest">
-                        {insight.runClassification}
-                    </span>
-                    </div>
-                )}
-
-                <div className="prose prose-invert max-w-none">
-                    <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap font-medium">
-                    {insight.editedText || insight.insightText}
-                    </div>
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-zinc-800/50 text-[10px] text-zinc-600 font-bold uppercase tracking-widest flex justify-between items-center">
-                    <span>Generated {new Date(insight.generatedAt).toLocaleDateString()}</span>
-                    <span className="italic">Insight ID: {activityId.slice(-6)}</span>
-                </div>
-            </div>
-        )}
-
-        {letter && (
-            <div className="bg-zinc-950 border border-zinc-900 rounded-[2rem] p-8">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center">
-                        <Dumbbell className="w-5 h-5 text-zinc-400" />
-                    </div>
-                    <h2 className="text-xl font-black text-white uppercase tracking-tight">
-                        Run Letter
-                    </h2>
-                </div>
-                <div className="text-zinc-500 leading-relaxed italic font-serif text-lg">
-                    "{letter.editedText || letter.letterText}"
-                </div>
-            </div>
-        )}
-      </div>
-
-      {/* Segments Table - Grafana Style */}
+      {/* Segments Table - Grafana 1:1 Precision */}
       {(activityData.data as any)?.segment_efforts && (activityData.data as any).segment_efforts.length > 0 && (
-        <div className="bg-zinc-950 border border-zinc-900 rounded-[2rem] overflow-hidden">
-            <div className="px-8 py-6 border-b border-zinc-900 flex justify-between items-center">
-                <h3 className="text-sm font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-                    <MapPin className="w-4 h-4" /> Segments
+        <div className="bg-[#09090b] border border-zinc-900 rounded-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-zinc-900 flex justify-between items-center bg-zinc-900/30">
+                <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                    <MapPin className="w-3 h-3" /> Segments
                 </h3>
-                <span className="text-[10px] font-black text-zinc-700 uppercase tracking-widest">
-                    {(activityData.data as any).segment_efforts.length} efforts detected
-                </span>
             </div>
             <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse text-[11px]">
                     <thead>
-                        <tr className="bg-zinc-900/50">
-                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Name</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Time</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Distance</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Avg Heart Rate</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest text-right">PR</th>
+                        <tr className="bg-black/40 text-zinc-600 font-bold uppercase tracking-widest">
+                            <th className="px-6 py-3 border-r border-zinc-900">Name</th>
+                            <th className="px-6 py-3 border-r border-zinc-900">Achievements</th>
+                            <th className="px-6 py-3 border-r border-zinc-900">Time</th>
+                            <th className="px-6 py-3 border-r border-zinc-900">Pace</th>
+                            <th className="px-6 py-3 border-r border-zinc-900">Heart Rate</th>
+                            <th className="px-6 py-3 border-r border-zinc-900">Power</th>
+                            <th className="px-6 py-3 border-r border-zinc-900">Distance</th>
+                            <th className="px-6 py-3 border-r border-zinc-900 text-right">PR</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-900">
-                        {(activityData.data as any).segment_efforts.map((effort: any) => (
-                            <tr key={effort.id} className="hover:bg-zinc-900/30 transition-colors group">
-                                <td className="px-8 py-4">
-                                    <div className="text-white font-bold group-hover:text-orange-500 transition-colors cursor-default">
-                                        {effort.name}
-                                    </div>
-                                    <div className="text-[10px] text-zinc-600 font-black uppercase tracking-widest mt-0.5 font-mono">
-                                        ID: {effort.id}
-                                    </div>
+                        {(activityData.data as any).segment_efforts.map((effort: any) => {
+                             const effortPace = effort.distance && effort.moving_time
+                                ? formatPace((effort.moving_time / 60) / convertDistance(effort.distance, unitPreference))
+                                : "0:00";
+                             return (
+                            <tr key={effort.id} className="hover:bg-[#f97316]/5 transition-colors group">
+                                <td className="px-6 py-3 font-bold text-zinc-200 border-r border-zinc-900 group-hover:text-[#f97316]">
+                                    {effort.name}
                                 </td>
-                                <td className="px-8 py-4 font-mono text-white">
+                                <td className="px-6 py-3 border-r border-zinc-900">
+                                    {effort.pr_rank === 1 && <Trophy className="w-3 h-3 text-yellow-500" />}
+                                </td>
+                                <td className="px-6 py-3 font-mono text-zinc-400 border-r border-zinc-900">
                                     {formatDuration(effort.moving_time)}
                                 </td>
-                                <td className="px-8 py-4 font-mono text-zinc-400">
+                                <td className="px-6 py-3 font-mono text-zinc-400 border-r border-zinc-900">
+                                    {effortPace}
+                                </td>
+                                <td className="px-6 py-3 font-mono text-zinc-400 border-r border-zinc-900">
+                                    {effort.average_heartrate?.toFixed(0) || "—"} bpm
+                                </td>
+                                <td className="px-6 py-3 font-mono text-zinc-400 border-r border-zinc-900">
+                                    {effort.average_watts?.toFixed(0) || "—"} w
+                                </td>
+                                <td className="px-6 py-3 font-mono text-zinc-400 border-r border-zinc-900">
                                     {convertDistance(effort.distance, unitPreference).toFixed(2)} {getDistanceUnit(unitPreference)}
                                 </td>
-                                <td className="px-8 py-4">
-                                    {effort.average_heartrate ? (
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
-                                            <span className="font-mono text-white">{effort.average_heartrate.toFixed(0)}</span>
-                                        </div>
-                                    ) : "—"}
-                                </td>
-                                <td className="px-8 py-4 text-right">
-                                    {effort.pr_rank === 1 ? (
-                                        <span className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Personal Record</span>
-                                    ) : effort.pr_rank ? (
-                                        <span className="text-zinc-600 text-[10px] font-black uppercase tracking-widest">#{effort.pr_rank} overall</span>
-                                    ) : "—"}
+                                <td className="px-6 py-3 text-right text-zinc-500 font-bold uppercase tracking-widest text-[9px]">
+                                    {effort.pr_rank === 1 ? "Personal Record" : effort.pr_rank ? `#${effort.pr_rank}` : "—"}
                                 </td>
                             </tr>
-                        ))}
+                        );})}
                     </tbody>
                 </table>
             </div>
         </div>
       )}
     </div>
-  );
+  </div>
+);
 }
 
 function formatDuration(seconds: number): string {

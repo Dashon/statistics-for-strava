@@ -6,9 +6,10 @@ interface StatPanelProps {
   value: string | number;
   unit?: string;
   icon?: LucideIcon;
-  variant?: 'orange' | 'zinc' | 'red' | 'purple' | 'green';
+  variant?: 'orange' | 'zinc' | 'red' | 'purple' | 'green' | 'transparent';
   className?: string;
   subValue?: string;
+  size?: 'sm' | 'md' | 'lg' | 'title';
 }
 
 export default function StatPanel({ 
@@ -18,47 +19,68 @@ export default function StatPanel({
   icon: Icon, 
   variant = 'zinc',
   className = '',
-  subValue
+  subValue,
+  size = 'md'
 }: StatPanelProps) {
   const getVariantStyles = () => {
     switch (variant) {
       case 'orange':
-        return 'bg-orange-500/10 border-orange-500/20 text-orange-400';
-      case 'red':
-        return 'bg-red-500/10 border-red-500/20 text-red-400';
-      case 'purple':
-        return 'bg-purple-500/10 border-purple-500/20 text-purple-400';
-      case 'green':
-        return 'bg-green-500/10 border-green-500/20 text-green-400';
+        return 'bg-[#f97316] text-black border-none';
+      case 'transparent':
+        return 'bg-transparent border-zinc-800 text-zinc-400';
+      case 'zinc':
+        return 'bg-zinc-900 border-zinc-800 text-zinc-400';
       default:
-        return 'bg-zinc-950 border-zinc-800 text-zinc-400';
+        return 'bg-zinc-900 border-zinc-800 text-zinc-400';
     }
   };
 
+  const getValueSize = () => {
+    switch (size) {
+      case 'sm': return 'text-xl';
+      case 'lg': return 'text-4xl';
+      case 'title': return 'text-5xl';
+      default: return 'text-3xl';
+    }
+  };
+
+  const getLabelColor = () => {
+    return variant === 'orange' ? 'text-black/60' : 'text-zinc-500';
+  };
+
+  const getValueColor = () => {
+    return variant === 'orange' ? 'text-black' : 'text-white';
+  };
+
+  const getUnitColor = () => {
+    return variant === 'orange' ? 'text-black/40' : 'text-zinc-600';
+  };
+
   return (
-    <div className={`border rounded-2xl p-6 relative overflow-hidden group ${getVariantStyles()} ${className}`}>
-      <div className="relative z-10">
-        <div className="flex items-center gap-2 mb-2">
-          {Icon && <Icon className="w-4 h-4" />}
-          <span className="text-[10px] font-black uppercase tracking-[0.2em]">{label}</span>
+    <div className={`p-4 transition-all ${getVariantStyles()} ${className} flex flex-col justify-center`}>
+      <div className="flex flex-col">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className={`text-[10px] font-bold uppercase tracking-widest ${getLabelColor()}`}>
+            {label}
+          </span>
+          {Icon && <Icon className={`w-3 h-3 ${getLabelColor()}`} />}
         </div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-black text-white">{value}</span>
-          {unit && <span className="text-lg text-zinc-600 font-bold lowercase">{unit}</span>}
+        <div className="flex items-baseline gap-1.5">
+          <span className={`${getValueSize()} font-black tracking-tighter ${getValueColor()}`}>
+            {value}
+          </span>
+          {unit && (
+            <span className={`text-sm font-bold lowercase ${getUnitColor()}`}>
+              {unit}
+            </span>
+          )}
         </div>
         {subValue && (
-            <div className="mt-2 text-xs font-bold text-zinc-600 uppercase tracking-widest">
+            <div className={`mt-1 text-[10px] font-bold uppercase tracking-widest ${getLabelColor()}`}>
                 {subValue}
             </div>
         )}
       </div>
-      
-      {/* Subtle background icon for Grafana feel */}
-      {Icon && (
-        <div className="absolute -bottom-4 -right-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
-            <Icon className="w-24 h-24 stroke-[4]" />
-        </div>
-      )}
     </div>
   );
 }
