@@ -54,7 +54,7 @@ export default function MovingTimeChart({ data }: MovingTimeChartProps) {
   };
 
   return (
-    <div className="w-full h-[350px] bg-zinc-900/50 p-4 rounded-lg">
+    <div className="w-full h-[350px] bg-zinc-900/50 p-4 rounded-lg min-w-0">
       <h3 className="text-zinc-400 text-sm font-medium mb-4 uppercase tracking-wider">
         Moving time
         {params.from && params.to && (

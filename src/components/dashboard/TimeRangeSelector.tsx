@@ -73,15 +73,23 @@ export default function TimeRangeSelector() {
         <Calendar className="w-4 h-4" />
         <span className="text-sm font-medium">{formatTimeRange(from, to)}</span>
         {isFiltered && (
-          <button
+          <span
+            role="button"
+            tabIndex={0}
             onClick={(e) => {
               e.stopPropagation();
               handleClearFilter();
             }}
-            className="ml-1 hover:bg-orange-700 rounded p-0.5"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+                handleClearFilter();
+              }
+            }}
+            className="ml-1 hover:bg-orange-700 rounded p-0.5 inline-flex items-center justify-center"
           >
             <X className="w-3 h-3" />
-          </button>
+          </span>
         )}
       </button>
 
