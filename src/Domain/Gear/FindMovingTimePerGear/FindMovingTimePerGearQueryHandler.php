@@ -11,8 +11,12 @@ use App\Infrastructure\CQRS\Query\Response;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindMovingTimePerGearQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -22,11 +26,13 @@ final readonly class FindMovingTimePerGearQueryHandler implements QueryHandler
     {
         assert($query instanceof FindMovingTimePerGear);
 
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         return new FindMovingTimePerGearResponse($this->connection->executeQuery(
             <<<SQL
                 SELECT gearId, SUM(movingTimeInSeconds) as movingTimeInSeconds
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 AND gearId IS NOT NULL
                 AND activityType IN (:activityType)
                 GROUP BY gearId
@@ -34,7 +40,7 @@ final readonly class FindMovingTimePerGearQueryHandler implements QueryHandler
             [
                 'years' => array_map(strval(...), $query->getYears()->toArray()),
                 'activityType' => array_map(
-                    fn (ActivityType $activityType): string => $activityType->value,
+                    fn(ActivityType $activityType): string => $activityType->value,
                     $query->getActivityTypes()?->toArray() ?? ActivityType::cases()
                 ),
             ],

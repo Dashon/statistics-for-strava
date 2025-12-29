@@ -19,14 +19,64 @@ use App\Infrastructure\ValueObject\Time\Years;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final class DbalActivityRepository implements ActivityRepository
 {
+    use ProvidesDatabaseDateFormat;
+
     /** @var array<int|string, Activities> */
     public static array $cachedActivities = [];
 
     public function __construct(
         private readonly Connection $connection,
     ) {
+    }
+
+    /**
+     * Normalize database result keys to camelCase for PostgreSQL compatibility.
+     * PostgreSQL stores unquoted column names in lowercase, so we need to convert them.
+     *
+     * @param array<string, mixed> $result
+     * @return array<string, mixed>
+     */
+    private function normalizeResultKeys(array $result): array
+    {
+        // Map of known PostgreSQL lowercase column names to expected camelCase names
+        static $columnMap = [
+        'activityid' => 'activityId',
+        'startdatetime' => 'startDateTime',
+        'routegeography' => 'routeGeography',
+        'gearid' => 'gearId',
+        'activitytype' => 'activityType',
+        'streamsareimported' => 'streamsAreImported',
+        'worldtype' => 'worldType',
+        'devicename' => 'deviceName',
+        'markedfordeletion' => 'markedForDeletion',
+        'sporttype' => 'sportType',
+        'averagepower' => 'averagePower',
+        'maxpower' => 'maxPower',
+        'averagespeed' => 'averageSpeed',
+        'maxspeed' => 'maxSpeed',
+        'averageheartrate' => 'averageHeartRate',
+        'maxheartrate' => 'maxHeartRate',
+        'averagecadence' => 'averageCadence',
+        'movingtimeinseconds' => 'movingTimeInSeconds',
+        'kudocount' => 'kudoCount',
+        'totalimagecount' => 'totalImageCount',
+        'localimagepaths' => 'localImagePaths',
+        'iscommute' => 'isCommute',
+        'startingcoordinatelatitude' => 'startingCoordinateLatitude',
+        'startingcoordinatelongitude' => 'startingCoordinateLongitude',
+        ];
+
+        $normalized = [];
+        foreach ($result as $key => $value) {
+            // Use the predefined mapping if available, otherwise keep the key as-is
+            $normalizedKey = $columnMap[$key] ?? $key;
+            $normalized[$normalizedKey] = $value;
+        }
+        return $normalized;
     }
 
     public function find(ActivityId $activityId): Activity
@@ -41,30 +91,34 @@ final class DbalActivityRepository implements ActivityRepository
             throw new EntityNotFound(sprintf('Activity "%s" not found', $activityId));
         }
 
-        return $this->hydrate($result);
+        return $this->hydrate($this->normalizeResultKeys($result));
     }
 
     public function findLongestActivityFor(Years $years): Activity
     {
-        if (!$result = $this->connection->executeQuery(
-            <<<SQL
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
+        if (
+            !$result = $this->connection->executeQuery(
+                <<<SQL
                 SELECT *
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 ORDER BY movingTimeInSeconds DESC
                 LIMIT 1
             SQL,
-            [
-                'years' => array_map(strval(...), $years->toArray()),
-            ],
-            [
-                'years' => ArrayParameterType::STRING,
-            ]
-        )->fetchAssociative()) {
+                [
+                    'years' => array_map(strval(...), $years->toArray()),
+                ],
+                [
+                    'years' => ArrayParameterType::STRING,
+                ]
+            )->fetchAssociative()
+        ) {
             throw new EntityNotFound('Could not determine longest activity');
         }
 
-        return $this->hydrate($result);
+        return $this->hydrate($this->normalizeResultKeys($result));
     }
 
     public function count(): int
@@ -90,7 +144,7 @@ final class DbalActivityRepository implements ActivityRepository
             ->setMaxResults($limit);
 
         $activities = array_map(
-            $this->hydrate(...),
+            fn($result) => $this->hydrate($this->normalizeResultKeys($result)),
             $queryBuilder->executeQuery()->fetchAllAssociative()
         );
         DbalActivityRepository::$cachedActivities[$cacheKey] = Activities::fromArray($activities);
@@ -119,13 +173,13 @@ final class DbalActivityRepository implements ActivityRepository
             $queryBuilder->andWhere('sportType IN (:sportTypes)')
                 ->setParameter(
                     key: 'sportTypes',
-                    value: array_map(fn (SportType $sportType) => $sportType->value, $activityType->getSportTypes()->toArray()),
+                    value: array_map(fn(SportType $sportType) => $sportType->value, $activityType->getSportTypes()->toArray()),
                     type: ArrayParameterType::STRING
                 );
         }
 
         return Activities::fromArray(array_map(
-            $this->hydrate(...),
+            fn($result) => $this->hydrate($this->normalizeResultKeys($result)),
             $queryBuilder->executeQuery()->fetchAllAssociative()
         ));
     }
@@ -139,13 +193,13 @@ final class DbalActivityRepository implements ActivityRepository
             ->andWhere('sportType IN (:sportTypes)')
             ->setParameter(
                 key: 'sportTypes',
-                value: $sportTypes->map(fn (SportType $sportType) => $sportType->value),
+                value: $sportTypes->map(fn(SportType $sportType) => $sportType->value),
                 type: ArrayParameterType::STRING
             )
             ->orderBy('startDateTime', 'DESC');
 
         return Activities::fromArray(array_map(
-            $this->hydrate(...),
+            fn($result) => $this->hydrate($this->normalizeResultKeys($result)),
             $queryBuilder->executeQuery()->fetchAllAssociative()
         ));
     }
@@ -158,7 +212,7 @@ final class DbalActivityRepository implements ActivityRepository
             ->andWhere('sportType IN (:sportTypes)')
             ->setParameter(
                 key: 'sportTypes',
-                value: array_map(fn (SportType $sportType) => $sportType->value, $sportTypes->toArray()),
+                value: array_map(fn(SportType $sportType) => $sportType->value, $sportTypes->toArray()),
                 type: ArrayParameterType::STRING
             );
 
@@ -181,9 +235,22 @@ final class DbalActivityRepository implements ActivityRepository
     public function findUniqueStravaGearIds(?ActivityIds $restrictToActivityIds): GearIds
     {
         $queryBuilder = $this->connection->createQueryBuilder();
-        $queryBuilder->select('DISTINCT JSON_EXTRACT(data, "$.gear_id") as stravaGearId')
+
+        // Use platform-specific JSON extraction
+        $platform = $this->connection->getDatabasePlatform();
+        if ($platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform) {
+            $jsonExtract = 'JSON_EXTRACT(data, "$.gear_id")';
+            $whereCondition = 'stravaGearId IS NOT NULL';
+        } else {
+            // PostgreSQL uses -> or ->> for JSON extraction (need to cast text to jsonb first)
+            $jsonExtract = "CAST(data AS jsonb)->>'gear_id'";
+            // PostgreSQL requires repeating the expression or using lowercase alias
+            $whereCondition = "CAST(data AS jsonb)->>'gear_id' IS NOT NULL";
+        }
+
+        $queryBuilder->select("DISTINCT $jsonExtract as stravaGearId")
             ->from('Activity')
-            ->andWhere('stravaGearId IS NOT NULL');
+            ->andWhere($whereCondition);
 
         if ($restrictToActivityIds && !$restrictToActivityIds->isEmpty()) {
             $queryBuilder->andWhere('activityId IN (:activityIds)');

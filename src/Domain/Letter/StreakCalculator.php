@@ -5,8 +5,12 @@ namespace App\Domain\Letter;
 use Doctrine\DBAL\Connection;
 use App\Infrastructure\ValueObject\Time\SerializableDateTime;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class StreakCalculator
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -19,10 +23,12 @@ final readonly class StreakCalculator
     {
         $upToDate ??= new SerializableDateTime('now');
 
+        $daySql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y-%m-%d');
+
         // Get all activity days ordered desc
         $days = $this->connection->executeQuery(
             <<<SQL
-                SELECT DISTINCT strftime('%Y-%m-%d', startDateTime) as day
+                SELECT DISTINCT {$daySql} as day
                 FROM Activity
                 ORDER BY day DESC
             SQL

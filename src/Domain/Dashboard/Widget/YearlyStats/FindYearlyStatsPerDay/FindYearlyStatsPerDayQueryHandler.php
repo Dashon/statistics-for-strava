@@ -13,8 +13,12 @@ use App\Infrastructure\ValueObject\Measurement\Time\Seconds;
 use App\Infrastructure\ValueObject\Time\SerializableDateTime;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindYearlyStatsPerDayQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -24,22 +28,24 @@ final readonly class FindYearlyStatsPerDayQueryHandler implements QueryHandler
     {
         assert($query instanceof FindYearlyStatsPerDay);
 
-        $sql = <<<'SQL'
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
+        $sql = <<<SQL
                 SELECT
-                    strftime('%Y', startDateTime) AS year, DATE(startDateTime) AS startDate,
+                    {$yearSql} AS year, DATE(startDateTime) AS startDate,
                     activityType,
                     SUM(SUM(distance)) OVER (
-                        PARTITION BY strftime('%Y', startDateTime), activityType
+                        PARTITION BY {$yearSql}, activityType
                         ORDER BY DATE(startDateTime)
                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
                         ) AS cumulativeDistance,
                     SUM(SUM(movingTimeInSeconds)) OVER (
-                        PARTITION BY strftime('%Y', startDateTime), activityType
+                        PARTITION BY {$yearSql}, activityType
                         ORDER BY DATE(startDateTime)
                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
                         ) AS cumulativeMovingTime,
                     SUM(SUM(elevation)) OVER (
-                        PARTITION BY strftime('%Y', startDateTime), activityType
+                        PARTITION BY {$yearSql}, activityType
                         ORDER BY DATE(startDateTime)
                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
                         ) AS cumulativeElevation

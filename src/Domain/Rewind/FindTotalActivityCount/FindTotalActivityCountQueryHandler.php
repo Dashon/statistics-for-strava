@@ -10,8 +10,12 @@ use App\Infrastructure\CQRS\Query\Response;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindTotalActivityCountQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -21,11 +25,13 @@ final readonly class FindTotalActivityCountQueryHandler implements QueryHandler
     {
         assert($query instanceof FindTotalActivityCount);
 
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         $activityCount = (int) $this->connection->executeQuery(
             <<<SQL
                 SELECT COUNT(*)
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
             SQL,
             [
                 'years' => array_map(strval(...), $query->getYears()->toArray()),

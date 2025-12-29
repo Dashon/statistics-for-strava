@@ -11,8 +11,12 @@ use App\Infrastructure\ValueObject\Time\SerializableDateTime;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindStreaksQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -22,12 +26,15 @@ final readonly class FindStreaksQueryHandler implements QueryHandler
     {
         assert($query instanceof FindStreaks);
 
+        $daySql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y-%m-%d');
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         /** @var string[] $days */
         $days = $this->connection->executeQuery(
             <<<SQL
-                SELECT strftime('%Y-%m-%d', startDateTime) as day
+                SELECT {$daySql} as day
                 FROM activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 GROUP BY day
                 ORDER BY day ASC
             SQL,
@@ -39,13 +46,15 @@ final readonly class FindStreaksQueryHandler implements QueryHandler
             ]
         )->fetchFirstColumn();
 
+        $weekSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%W');
+
         /** @var array<int, array{'year': int, 'week': int}> $weeksAndYears */
         $weeksAndYears = $this->connection->executeQuery(
             <<<SQL
-                SELECT CAST(strftime('%W',startDateTime) AS INTEGER) as week,
-                       CAST(strftime('%Y',startDateTime) AS INTEGER) as year
+                SELECT CAST({$weekSql} AS INTEGER) as week,
+                       CAST({$yearSql} AS INTEGER) as year
                 FROM activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 GROUP BY year, week
                 ORDER BY year ASC, week ASC
             SQL,
@@ -57,12 +66,14 @@ final readonly class FindStreaksQueryHandler implements QueryHandler
             ]
         )->fetchAllAssociative();
 
+        $monthSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%m');
+
         /** @var int[] $months */
         $months = array_map(intval(...), $this->connection->executeQuery(
             <<<SQL
-                SELECT CAST(strftime('%Y', startDateTime) AS INTEGER) * 12 + CAST(strftime('%m', startDateTime) AS INTEGER) as month
+                SELECT CAST({$yearSql} AS INTEGER) * 12 + CAST({$monthSql} AS INTEGER) as month
                 FROM activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 GROUP BY month
                 ORDER BY month ASC
             SQL,

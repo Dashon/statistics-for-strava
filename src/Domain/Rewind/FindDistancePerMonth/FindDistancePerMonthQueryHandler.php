@@ -12,8 +12,12 @@ use App\Infrastructure\ValueObject\Measurement\Length\Meter;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindDistancePerMonthQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -23,11 +27,14 @@ final readonly class FindDistancePerMonthQueryHandler implements QueryHandler
     {
         assert($query instanceof FindDistancePerMonth);
 
+        $monthSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%m');
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         $totalDistance = (int) $this->connection->executeQuery(
             <<<SQL
                 SELECT SUM(distance) as distance
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
             SQL,
             [
                 'years' => array_map(strval(...), $query->getYears()->toArray()),
@@ -39,9 +46,9 @@ final readonly class FindDistancePerMonthQueryHandler implements QueryHandler
 
         $results = $this->connection->executeQuery(
             <<<SQL
-                SELECT CAST(strftime('%m', startDateTime) AS INTEGER) AS monthNumber, sportType, SUM(distance) as distance
+                SELECT CAST({$monthSql} AS INTEGER) AS monthNumber, sportType, SUM(distance) as distance
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 GROUP BY sportType, monthNumber
                 ORDER BY sportType ASC, monthNumber ASC
             SQL,
@@ -55,7 +62,7 @@ final readonly class FindDistancePerMonthQueryHandler implements QueryHandler
 
         return new FindDistancePerMonthResponse(
             distancePerMonth: array_map(
-                fn (array $result): array => [
+                fn(array $result): array => [
                     $result['monthNumber'],
                     SportType::from($result['sportType']),
                     Meter::from($result['distance'])->toKilometer(),

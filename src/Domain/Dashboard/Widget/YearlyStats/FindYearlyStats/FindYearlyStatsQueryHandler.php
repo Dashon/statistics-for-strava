@@ -13,8 +13,12 @@ use App\Infrastructure\ValueObject\Measurement\Time\Seconds;
 use App\Infrastructure\ValueObject\Time\Year;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindYearlyStatsQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -24,9 +28,11 @@ final readonly class FindYearlyStatsQueryHandler implements QueryHandler
     {
         assert($query instanceof FindYearlyStats);
 
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         $results = $this->connection->executeQuery(
             <<<SQL
-                SELECT strftime('%Y', startDateTime) AS year,
+                SELECT {$yearSql} AS year,
                        activityType,
                        COUNT(*) AS numberOfActivities,
                        SUM(distance) AS totalDistance,

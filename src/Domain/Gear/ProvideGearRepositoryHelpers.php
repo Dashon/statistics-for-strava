@@ -49,8 +49,17 @@ trait ProvideGearRepositoryHelpers
 
     private function fetchFindAllResults(GearType $gearType, bool $onlyUsedGear): Gears
     {
+        // Use platform-specific aggregation function
+        $platform = $this->getConnection()->getDatabasePlatform();
+        if ($platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform) {
+            $aggregateFunction = 'GROUP_CONCAT(DISTINCT Activity.sportType)';
+        } else {
+            // PostgreSQL uses STRING_AGG
+            $aggregateFunction = "STRING_AGG(DISTINCT Activity.sportType, ',')";
+        }
+
         $results = $this->getConnection()->executeQuery('
-            SELECT Gear.*, GROUP_CONCAT(DISTINCT Activity.sportType) AS sportTypes
+            SELECT Gear.*, '.$aggregateFunction.' AS sportTypes
             FROM Gear
             '.($onlyUsedGear ? 'INNER' : 'LEFT').' JOIN Activity ON Activity.gearId = Gear.gearId
             WHERE Gear.type = :type

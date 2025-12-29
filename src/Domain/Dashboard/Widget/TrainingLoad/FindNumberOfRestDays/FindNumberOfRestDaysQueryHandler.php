@@ -9,8 +9,12 @@ use App\Infrastructure\CQRS\Query\QueryHandler;
 use App\Infrastructure\CQRS\Query\Response;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindNumberOfRestDaysQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -20,13 +24,15 @@ final readonly class FindNumberOfRestDaysQueryHandler implements QueryHandler
     {
         assert($query instanceof FindNumberOfRestDays);
 
+        $dateSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y-%m-%d');
+
         $numberOfActiveDays = (int) $this->connection->executeQuery(
             <<<SQL
                 SELECT COUNT(*)
                 FROM (
-                SELECT strftime('%Y-%m-%d', startDateTime) AS date
+                SELECT {$dateSql} AS date
                       FROM Activity
-                      WHERE strftime('%Y-%m-%d', startDateTime) BETWEEN :startDate AND :endDate
+                      WHERE {$dateSql} BETWEEN :startDate AND :endDate
                       GROUP BY date
                )
             SQL,

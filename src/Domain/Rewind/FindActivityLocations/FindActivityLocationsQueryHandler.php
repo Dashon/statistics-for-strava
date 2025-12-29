@@ -11,8 +11,12 @@ use App\Infrastructure\CQRS\Query\Response;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindActivityLocationsQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -21,6 +25,8 @@ final readonly class FindActivityLocationsQueryHandler implements QueryHandler
     public function handle(Query $query): Response
     {
         assert($query instanceof FindActivityLocations);
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         /** @var array<int, array{0: float, 1: float, 2: int}> $results */
         $results = $this->connection->executeQuery(
             <<<SQL
@@ -32,7 +38,7 @@ final readonly class FindActivityLocationsQueryHandler implements QueryHandler
                            COUNT(*) as numberOfActivities
                     FROM Activity
                     WHERE (JSON_EXTRACT(routeGeography, '$.city') IS NOT NULL OR JSON_EXTRACT(routeGeography, '$.county') OR JSON_EXTRACT(routeGeography, '$.municipality'))
-                    AND strftime('%Y',startDateTime) IN (:years)
+                    AND {$yearSql} IN (:years)
                     AND worldType = :worldType
                     GROUP BY selectedLocation
                 ) tmp

@@ -10,8 +10,12 @@ use App\Infrastructure\CQRS\Query\Response;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindActivityStartTimesPerHourQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -21,12 +25,15 @@ final readonly class FindActivityStartTimesPerHourQueryHandler implements QueryH
     {
         assert($query instanceof FindActivityStartTimesPerHour);
 
+        $hourSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%H');
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         /** @var array<int, int> $results */
         $results = $this->connection->executeQuery(
             <<<SQL
-                SELECT CAST(LTRIM(strftime('%H',startDateTime), '0') as INTEGER) as hour, COUNT(*) as count
+                SELECT CAST(LTRIM({$hourSql}, '0') as INTEGER) as hour, COUNT(*) as count
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 GROUP BY hour
                 ORDER BY hour ASC
             SQL,

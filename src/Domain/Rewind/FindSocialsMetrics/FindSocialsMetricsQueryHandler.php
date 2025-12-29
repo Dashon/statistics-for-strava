@@ -10,8 +10,12 @@ use App\Infrastructure\CQRS\Query\Response;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindSocialsMetricsQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -21,12 +25,14 @@ final readonly class FindSocialsMetricsQueryHandler implements QueryHandler
     {
         assert($query instanceof FindSocialsMetrics);
 
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         /** @var array<string,mixed> $result */
         $result = $this->connection->executeQuery(
             <<<SQL
                 SELECT SUM(kudoCount) as kudoCount, SUM(JSON_EXTRACT(data, '$.comment_count')) as commentCount
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
             SQL,
             [
                 'years' => array_map(strval(...), $query->getYears()->toArray()),

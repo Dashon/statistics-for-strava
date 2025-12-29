@@ -10,8 +10,12 @@ use App\Infrastructure\CQRS\Query\Response;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindMovingTimePerDayQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -21,13 +25,16 @@ final readonly class FindMovingTimePerDayQueryHandler implements QueryHandler
     {
         assert($query instanceof FindMovingTimePerDay);
 
+        $dateSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y-%m-%d');
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         return new FindMovingTimePerDayResponse($this->connection->executeQuery(
             <<<SQL
                 SELECT
-                    strftime('%Y-%m-%d', startDateTime) AS date,
+                    {$dateSql} AS date,
                     SUM(movingTimeInSeconds) AS movingTimeInSeconds
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 GROUP BY date
                 ORDER BY date DESC
             SQL,

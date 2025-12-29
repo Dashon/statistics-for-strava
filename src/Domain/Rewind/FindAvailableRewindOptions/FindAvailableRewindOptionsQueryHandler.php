@@ -12,8 +12,12 @@ use App\Infrastructure\ValueObject\Time\Year;
 use App\Infrastructure\ValueObject\Time\Years;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindAvailableRewindOptionsQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -23,10 +27,12 @@ final readonly class FindAvailableRewindOptionsQueryHandler implements QueryHand
     {
         assert($query instanceof FindAvailableRewindOptions);
 
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         $now = $query->getNow();
         $years = $this->connection->executeQuery(
-            'SELECT DISTINCT strftime("%Y",startDateTime) AS year FROM Activity
-             ORDER BY year DESC',
+            "SELECT DISTINCT {$yearSql} AS year FROM Activity
+             ORDER BY year DESC",
         )->fetchFirstColumn();
 
         $allYears = Years::fromArray(array_map(

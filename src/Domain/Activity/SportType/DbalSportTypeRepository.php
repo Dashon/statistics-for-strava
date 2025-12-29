@@ -20,10 +20,12 @@ final readonly class DbalSportTypeRepository extends DbalRepository implements S
 
     public function findAll(): SportTypes
     {
+        // PostgreSQL requires ORDER BY expressions to appear in SELECT DISTINCT
+        $orderByExpr = sprintf('CASE sportType %s END', $this->buildOrderByStatement());
         return SportTypes::fromArray(array_map(
             SportType::from(...),
             $this->connection->executeQuery(
-                sprintf('SELECT DISTINCT sportType FROM Activity ORDER BY CASE sportType %s END', $this->buildOrderByStatement())
+                sprintf('SELECT DISTINCT sportType, %s AS sort_order FROM Activity ORDER BY sort_order', $orderByExpr)
             )->fetchFirstColumn()
         ));
     }
@@ -36,13 +38,15 @@ final readonly class DbalSportTypeRepository extends DbalRepository implements S
             $notInSportTypes[] = $sportType->value;
         }
 
+        // PostgreSQL requires ORDER BY expressions to appear in SELECT DISTINCT
+        $orderByExpr = sprintf('CASE sportType %s END', $this->buildOrderByStatement());
         return SportTypes::fromArray(array_map(
             SportType::from(...),
             $this->connection->executeQuery(
                 sprintf(
-                    'SELECT DISTINCT sportType FROM Activity WHERE totalImageCount > 0 AND sportType NOT IN (%s) ORDER BY CASE sportType %s END',
-                    "'".implode("','", $notInSportTypes)."'",
-                    $this->buildOrderByStatement()
+                    'SELECT DISTINCT sportType, %s AS sort_order FROM Activity WHERE totalImageCount > 0 AND sportType NOT IN (%s) ORDER BY sort_order',
+                    $orderByExpr,
+                    "'".implode("','", $notInSportTypes)."'"
                 )
             )->fetchFirstColumn()
         ));
@@ -52,7 +56,8 @@ final readonly class DbalSportTypeRepository extends DbalRepository implements S
     {
         $orderByStatement = [];
         foreach ($this->sportTypesSortingOrder as $index => $sportType) {
-            $orderByStatement[] = sprintf('WHEN "%s" THEN %d', $sportType->value, $index);
+            // Use single quotes for string literals (compatible with both SQLite and PostgreSQL)
+            $orderByStatement[] = sprintf("WHEN '%s' THEN %d", $sportType->value, $index);
         }
         $orderByStatement[] = 'ELSE 9999';
 

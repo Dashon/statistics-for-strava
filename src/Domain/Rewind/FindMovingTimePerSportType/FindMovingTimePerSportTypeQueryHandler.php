@@ -10,8 +10,12 @@ use App\Infrastructure\CQRS\Query\Response;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindMovingTimePerSportTypeQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -21,11 +25,13 @@ final readonly class FindMovingTimePerSportTypeQueryHandler implements QueryHand
     {
         assert($query instanceof FindMovingTimePerSportType);
 
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         $totalMovingTime = (int) $this->connection->executeQuery(
             <<<SQL
                 SELECT SUM(movingTimeInSeconds) as movingTimeInSeconds
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
             SQL,
             [
                 'years' => array_map(strval(...), $query->getYears()->toArray()),
@@ -40,7 +46,7 @@ final readonly class FindMovingTimePerSportTypeQueryHandler implements QueryHand
                 <<<SQL
                 SELECT sportType, SUM(movingTimeInSeconds) as movingTimeInSeconds
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 GROUP BY sportType
                 ORDER BY sportType ASC
                 SQL,

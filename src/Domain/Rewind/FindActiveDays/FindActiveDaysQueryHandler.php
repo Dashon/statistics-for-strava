@@ -10,8 +10,12 @@ use App\Infrastructure\CQRS\Query\Response;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindActiveDaysQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -21,13 +25,16 @@ final readonly class FindActiveDaysQueryHandler implements QueryHandler
     {
         assert($query instanceof FindActiveDays);
 
+        $dateSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y-%m-%d');
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         $numberOfActiveDays = (int) $this->connection->executeQuery(
             <<<SQL
                 SELECT COUNT(*)
                 FROM (
-                SELECT strftime('%Y-%m-%d', startDateTime) AS date
+                SELECT {$dateSql} AS date
                       FROM Activity
-                      WHERE strftime('%Y', startDateTime) IN (:years)
+                      WHERE {$yearSql} IN (:years)
                       GROUP BY date
                   )
             SQL,

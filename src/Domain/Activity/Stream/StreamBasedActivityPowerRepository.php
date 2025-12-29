@@ -122,13 +122,24 @@ final class StreamBasedActivityPowerRepository implements ActivityPowerRepositor
         }
 
         foreach (self::TIME_INTERVALS_IN_SECONDS_ALL as $timeIntervalInSeconds) {
-            $query = 'SELECT ActivityStream.* FROM ActivityStream 
-                        INNER JOIN Activity ON Activity.activityId = ActivityStream.activityId 
+            // Use platform-specific JSON extraction
+            $platform = $this->connection->getDatabasePlatform();
+            if ($platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform) {
+                $jsonExtractNotNull = 'JSON_EXTRACT(bestAverages, "$.'.$timeIntervalInSeconds.'") IS NOT NULL';
+                $jsonExtractOrder = 'JSON_EXTRACT(bestAverages, "$.'.$timeIntervalInSeconds.'")';
+            } else {
+                // PostgreSQL uses -> or ->> for JSON extraction (need to cast text to jsonb first)
+                $jsonExtractNotNull = "CAST(bestAverages AS jsonb)->>'$timeIntervalInSeconds' IS NOT NULL";
+                $jsonExtractOrder = "CAST(bestAverages AS jsonb)->>'$timeIntervalInSeconds'";
+            }
+
+            $query = 'SELECT ActivityStream.* FROM ActivityStream
+                        INNER JOIN Activity ON Activity.activityId = ActivityStream.activityId
                         WHERE streamType = :streamType
                         AND Activity.sportType IN(:sportType)
-                        AND Activity.startDateTime >= :dateFrom AND Activity.startDateTime <= :dateTill  
-                        AND JSON_EXTRACT(bestAverages, "$.'.$timeIntervalInSeconds.'") IS NOT NULL
-                        ORDER BY JSON_EXTRACT(bestAverages, "$.'.$timeIntervalInSeconds.'") DESC, createdOn DESC LIMIT 1';
+                        AND Activity.startDateTime >= :dateFrom AND Activity.startDateTime <= :dateTill
+                        AND '.$jsonExtractNotNull.'
+                        ORDER BY '.$jsonExtractOrder.' DESC, createdOn DESC LIMIT 1';
 
             if (!$result = $this->connection->executeQuery(
                 $query,

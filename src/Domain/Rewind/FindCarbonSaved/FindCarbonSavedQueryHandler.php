@@ -12,8 +12,12 @@ use App\Infrastructure\ValueObject\Measurement\Mass\Kilogram;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindCarbonSavedQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -23,11 +27,13 @@ final readonly class FindCarbonSavedQueryHandler implements QueryHandler
     {
         assert($query instanceof FindCarbonSaved);
 
+        $yearSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y');
+
         $result = $this->connection->executeQuery(
             <<<SQL
                 SELECT SUM(distance)
                 FROM Activity
-                WHERE strftime('%Y',startDateTime) IN (:years)
+                WHERE {$yearSql} IN (:years)
                 AND isCommute = 1
             SQL,
             [

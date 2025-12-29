@@ -13,8 +13,12 @@ use App\Infrastructure\ValueObject\Measurement\Time\Seconds;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindTrainingGoalMetricsQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -26,6 +30,8 @@ final readonly class FindTrainingGoalMetricsQueryHandler implements QueryHandler
 
         $sportTypes = $query->getSportTypes();
 
+        $dateSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y-%m-%d');
+
         $result = $this->connection->executeQuery(
             <<<SQL
                 SELECT SUM(distance) AS totalDistance,
@@ -33,10 +39,10 @@ final readonly class FindTrainingGoalMetricsQueryHandler implements QueryHandler
                        SUM(movingTimeInSeconds) AS movingTime
                 FROM Activity
                 WHERE SportType IN(:sportTypes)
-                AND strftime('%Y-%m-%d', startDateTime) BETWEEN :startDate AND :endDate
+                AND {$dateSql} BETWEEN :startDate AND :endDate
             SQL,
             [
-                'sportTypes' => $sportTypes->map(fn (SportType $sportType) => $sportType->value),
+                'sportTypes' => $sportTypes->map(fn(SportType $sportType) => $sportType->value),
                 'startDate' => (string) $query->getFrom()->format('Y-m-d'),
                 'endDate' => (string) $query->getTo()->format('Y-m-d'),
             ],

@@ -17,8 +17,12 @@ use App\Infrastructure\ValueObject\Time\SerializableDateTime;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindMonthlyStatsQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -28,9 +32,11 @@ final readonly class FindMonthlyStatsQueryHandler implements QueryHandler
     {
         assert($query instanceof FindMonthlyStats);
 
+        $yearAndMonthSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y-%m');
+
         $results = $this->connection->executeQuery(
             <<<SQL
-                SELECT strftime('%Y-%m', startDateTime) AS yearAndMonth,
+                SELECT {$yearAndMonthSql} AS yearAndMonth,
                        sportType,
                        COUNT(*) AS numberOfActivities,
                        SUM(distance) AS totalDistance,
@@ -75,7 +81,7 @@ final readonly class FindMonthlyStatsQueryHandler implements QueryHandler
                 WHERE sportType IN (:sportTypes)
                 SQL,
                 [
-                    'sportTypes' => $activityType->getSportTypes()->map(fn (SportType $sportType) => $sportType->value),
+                    'sportTypes' => $activityType->getSportTypes()->map(fn(SportType $sportType) => $sportType->value),
                 ],
                 [
                     'sportTypes' => ArrayParameterType::STRING,

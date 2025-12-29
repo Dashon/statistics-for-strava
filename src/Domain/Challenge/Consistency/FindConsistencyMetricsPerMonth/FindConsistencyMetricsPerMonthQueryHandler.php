@@ -15,8 +15,12 @@ use App\Infrastructure\ValueObject\Time\SerializableDateTime;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 
+use App\Infrastructure\Repository\ProvidesDatabaseDateFormat;
+
 final readonly class FindConsistencyMetricsPerMonthQueryHandler implements QueryHandler
 {
+    use ProvidesDatabaseDateFormat;
+
     public function __construct(
         private Connection $connection,
     ) {
@@ -28,9 +32,11 @@ final readonly class FindConsistencyMetricsPerMonthQueryHandler implements Query
 
         $sportTypes = $query->getSportTypes();
 
+        $yearAndMonthSql = $this->getDateFormatSql($this->connection, 'startDateTime', '%Y-%m');
+
         $results = $this->connection->executeQuery(
             <<<SQL
-                SELECT strftime('%Y-%m', startDateTime) AS yearAndMonth, 
+                SELECT {$yearAndMonthSql} AS yearAndMonth, 
                        COUNT(*) AS numberOfActivities,
                        SUM(distance) AS totalDistance, MAX(distance) AS maxDistance,
                        SUM(elevation) AS totalElevation, MAX(elevation) AS maxElevation,
@@ -41,7 +47,7 @@ final readonly class FindConsistencyMetricsPerMonthQueryHandler implements Query
                 GROUP BY yearAndMonth
             SQL,
             [
-                'sportTypes' => $sportTypes->map(fn (SportType $sportType) => $sportType->value),
+                'sportTypes' => $sportTypes->map(fn(SportType $sportType) => $sportType->value),
             ],
             [
                 'sportTypes' => ArrayParameterType::STRING,
