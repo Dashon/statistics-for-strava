@@ -190,3 +190,14 @@ export const coachingInsights = pgTable("coaching_insights", {
     shareToken: varchar("share_token", { length: 255 }),
     isPublic: boolean("is_public").default(false),
 });
+
+// Generation Status Table - Track background AI generation jobs
+export const generationStatus = pgTable("generation_status", {
+    activityId: varchar("activity_id", { length: 255 }).primaryKey(),
+    letterStatus: varchar("letter_status", { length: 50 }).notNull().default('pending'), // pending, generating, completed, failed
+    coachingStatus: varchar("coaching_status", { length: 50 }).notNull().default('pending'),
+    letterError: text("letter_error"),
+    coachingError: text("coaching_error"),
+    startedAt: integer("started_at"),
+    completedAt: integer("completed_at"),
+});

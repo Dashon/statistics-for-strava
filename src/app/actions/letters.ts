@@ -35,14 +35,22 @@ export async function generateRunLetter(activityId: string) {
 
   try {
     const msg = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 300,
       temperature: 0.7,
       system: "You are a thoughtful running philosopher.",
       messages: [{ role: "user", content: prompt }]
     });
 
-    const letterText = msg.content[0].type === 'text' ? msg.content[0].text : "";
+    const rawText = msg.content[0].type === 'text' ? msg.content[0].text : "";
+
+    // Strip markdown formatting for cleaner display
+    const letterText = rawText
+      .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold **text**
+      .replace(/\*([^*]+)\*/g, '$1') // Remove italic *text*
+      .replace(/^#+\s+/gm, '') // Remove headers
+      .replace(/^[-*]\s+/gm, '') // Remove bullet points
+      .replace(/\n{3,}/g, '\n\n'); // Normalize multiple newlines
 
     await db.insert(runLetters).values({
         activityId: activityId,

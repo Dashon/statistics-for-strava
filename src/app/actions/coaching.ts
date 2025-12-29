@@ -30,12 +30,12 @@ Be technical but clear. Use specific metrics. Focus on "why" not just "what".`;
 
 interface ActivityData {
   activityId: string;
-  name: string;
+  name: string | null;
   startDateTime: string;
-  sportType: string;
-  distance: number;
-  elevation: number;
-  movingTimeInSeconds: number;
+  sportType: string | null;
+  distance: number | null;
+  elevation: number | null;
+  movingTimeInSeconds: number | null;
   averageHeartRate: number | null;
   maxHeartRate: number | null;
   averageSpeed: number | null;
@@ -51,13 +51,17 @@ function buildCoachingPrompt(
 ): string {
   const { name, distance, movingTimeInSeconds, averageHeartRate, elevation } = activityData;
 
-  const distanceKm = (distance / 1000).toFixed(2);
-  const durationMin = Math.floor(movingTimeInSeconds / 60);
-  const avgPaceMinPerKm = movingTimeInSeconds / (distance / 1000) / 60;
-  const avgPaceDisplay = `${Math.floor(avgPaceMinPerKm)}:${Math.floor((avgPaceMinPerKm % 1) * 60).toString().padStart(2, '0')}`;
+  const distanceKm = distance ? (distance / 1000).toFixed(2) : '0.00';
+  const durationMin = movingTimeInSeconds ? Math.floor(movingTimeInSeconds / 60) : 0;
+  
+  let avgPaceDisplay = '0:00';
+  if (movingTimeInSeconds && distance && distance > 0) {
+    const avgPaceMinPerKm = movingTimeInSeconds / (distance / 1000) / 60;
+    avgPaceDisplay = `${Math.floor(avgPaceMinPerKm)}:${Math.floor((avgPaceMinPerKm % 1) * 60).toString().padStart(2, '0')}`;
+  }
 
   let prompt = `Analyze this running activity:\n\n`;
-  prompt += `**Activity**: ${name}\n`;
+  prompt += `**Activity**: ${name || 'Unnamed Activity'}\n`;
   prompt += `**Distance**: ${distanceKm} km\n`;
   prompt += `**Duration**: ${durationMin} minutes\n`;
   prompt += `**Average Pace**: ${avgPaceDisplay} min/km\n`;
@@ -174,7 +178,7 @@ export async function generateCoachingInsight(activityId: string) {
 
   // Call Claude for analysis
   const message = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
+    model: 'claude-haiku-4-5-20251001',
     max_tokens: 2000,
     temperature: 0.3, // Lower for more analytical/consistent
     system: COACHING_SYSTEM_PROMPT,
@@ -183,8 +187,16 @@ export async function generateCoachingInsight(activityId: string) {
 
   const aiResponse = message.content[0].type === 'text' ? message.content[0].text : '';
 
+  // Strip markdown formatting for cleaner display
+  const cleanText = aiResponse
+    .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold **text**
+    .replace(/\*([^*]+)\*/g, '$1') // Remove italic *text*
+    .replace(/^#+\s+/gm, '') // Remove headers
+    .replace(/^[-*]\s+/gm, '') // Remove bullet points
+    .replace(/\n{3,}/g, '\n\n'); // Normalize multiple newlines
+
   // Parse and structure the response
-  const insight = parseCoachingResponse(aiResponse);
+  const insight = parseCoachingResponse(cleanText);
 
   // Save to database
   await db.insert(coachingInsights).values({
