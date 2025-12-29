@@ -6,6 +6,7 @@ import { user } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   providers: [
     Strava({
       clientId: process.env.AUTH_STRAVA_ID,
