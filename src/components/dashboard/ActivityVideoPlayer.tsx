@@ -2,7 +2,7 @@
 
 import { Player } from "@remotion/player";
 import { RouteVideo, RouteVideoProps } from "@/remotion/RouteVideo";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Play, Maximize2 } from "lucide-react";
 
 interface ActivityVideoPlayerProps extends RouteVideoProps {

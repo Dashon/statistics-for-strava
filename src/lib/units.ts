@@ -28,7 +28,7 @@ export function getDistanceUnit(unit: MeasurementUnit): string {
 /**
  * Format distance value with its unit label
  */
-export function formatDistance(meters: number, unit: MeasurementUnit = 'metric', decimals: number = 1): string {
+export function formatDistance(meters: number, unit: MeasurementUnit = 'imperial', decimals: number = 1): string {
   const value = convertDistance(meters, unit);
   return `${value.toFixed(decimals)} ${getDistanceUnit(unit)}`;
 }
@@ -36,7 +36,7 @@ export function formatDistance(meters: number, unit: MeasurementUnit = 'metric',
 /**
  * Convert speed (meters per second) to preferred unit (km/h or mph)
  */
-export function formatSpeed(mps: number, unit: MeasurementUnit = 'metric', decimals: number = 1): string {
+export function formatSpeed(mps: number, unit: MeasurementUnit = 'imperial', decimals: number = 1): string {
   if (unit === 'imperial') {
     const mph = mps * 2.23694;
     return `${mph.toFixed(decimals)} mph`;

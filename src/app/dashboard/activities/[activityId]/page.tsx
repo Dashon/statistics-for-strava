@@ -264,7 +264,7 @@ export default async function ActivityDetailPage({
                             thumbnailPrompt={activityData.aiThumbnailPrompt}
                             videoUrl={activityData.aiVideoUrl || null}
                             // Enhanced props for dynamic player
-                            activityName={activityData.name}
+                            activityName={activityData.name || undefined}
                             polyline={activityData.polyline}
                             stats={{
                                 distance: distance + (unitPreference === 'imperial' ? ' mi' : ' km'),

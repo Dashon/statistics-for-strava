@@ -29,7 +29,7 @@ const navigation = [
   { 
     group: "Main",
     items: [
-      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, exact: true },
       { name: "Activities", href: "/dashboard/activities", icon: List },
       { name: "Heatmap", href: "/dashboard/heatmap", icon: MapPin },
     ]
@@ -87,7 +87,9 @@ export function Sidebar({ profile }: SidebarProps) {
   }, []);
 
   const NavItem = ({ item }: { item: typeof navigation[0]['items'][0] }) => {
-    const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+    const isActive = item.exact 
+      ? pathname === item.href 
+      : pathname === item.href || pathname?.startsWith(item.href + '/');
     return (
       <Link
         key={item.name}

@@ -181,7 +181,7 @@ export const athleteProfile = pgTable("athlete_profile", {
     weight: doublePrecision("weight"),
     heightInCm: integer("height_in_cm"),
     dateOfBirth: date("date_of_birth", { mode: "string" }),
-    measurementUnit: varchar("measurement_unit", { length: 20 }).default("metric"),
+    measurementUnit: varchar("measurement_unit", { length: 20 }).default("imperial"),
     
     // New expansion fields
     stravaFtp: integer("strava_ftp"),

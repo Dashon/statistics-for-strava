@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryStates, parseAsIsoDateTime, parseAsString } from "nuqs";
 import { getTimeRangeFromParams } from "@/lib/url-params";
 import MovingTimeChart from "./MovingTimeChart";
+import { getGranularity } from "@/lib/date-utils";
+
 import DistanceElevationChart from "./DistanceElevationChart";
 import ActivityTable from "./ActivityTable";
 import DashboardCard from "./DashboardCard";
@@ -45,8 +47,9 @@ export default function DashboardContent({ unitPreference, initialData }: Dashbo
   const { data: statsData, isLoading: statsLoading } = useQuery({
     queryKey: ["activity-stats", from.toISOString(), to.toISOString()],
     queryFn: async () => {
+      const granularity = getGranularity(from, to);
       const res = await fetch(
-        `/api/activities/stats?from=${from.toISOString()}&to=${to.toISOString()}`
+        `/api/activities/stats?from=${from.toISOString()}&to=${to.toISOString()}&groupBy=${granularity}`
       );
       if (!res.ok) throw new Error("Failed to fetch stats");
       return res.json();
@@ -163,14 +166,15 @@ export default function DashboardContent({ unitPreference, initialData }: Dashbo
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 auto-rows-min">
             {/* Left Column: Moving Time Chart & Table */}
             <div className="lg:col-span-2 space-y-4">
-              <MovingTimeChart
-                data={monthlyStats.map((s: any) => ({
-                  month: s.month,
-                  run: s.run,
-                  ride: s.ride,
-                  other: s.other,
-                }))}
-              />
+                <MovingTimeChart
+                  data={monthlyStats.map((s: any) => ({
+                    period: s.month,
+                    run: s.run,
+                    ride: s.ride,
+                    other: s.other,
+                  }))}
+                  granularity={statsData?.granularity}
+                />
               <div className="bg-zinc-900/30 rounded-lg overflow-hidden border border-zinc-800">
                 <div className="p-4 border-b border-zinc-800 font-bold uppercase tracking-widest text-xs text-zinc-500">
                   Recent Activities

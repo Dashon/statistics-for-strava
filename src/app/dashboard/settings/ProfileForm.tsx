@@ -37,7 +37,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     weight: initialData?.weight,
     heightInCm: initialData?.heightInCm,
     dateOfBirth: initialData?.dateOfBirth,
-    measurementUnit: initialData?.measurementUnit || 'metric',
+    measurementUnit: initialData?.measurementUnit || 'imperial',
   });
 
   const stravaName = `${initialData?.stravaFirstName || ''} ${initialData?.stravaLastName || ''}`.trim() || 'Not synced';
