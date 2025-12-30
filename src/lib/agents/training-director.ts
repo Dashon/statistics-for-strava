@@ -10,6 +10,7 @@ import { eq, desc, gte, and, lte } from "drizzle-orm";
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
+import { fetchForecast, fetchHistoricalWeather, WeatherData } from "@/lib/weather";
 
 // Validate API key at module load for early failure detection
 const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -102,7 +103,15 @@ export class TrainingDirector {
     const { profile, metrics } = context;
     const name = profile?.displayName || profile?.stravaFirstName || "Athlete";
     
-    // 2. Generate Script (Claude or GPT)
+    // 2. Fetch Existing Readiness Record (for consistency)
+    const existingReadiness = await db.query.athleteReadiness.findFirst({
+        where: and(
+            eq(athleteReadiness.userId, userId),
+            eq(athleteReadiness.date, today)
+        )
+    });
+
+    // 3. Generate Script (Claude or GPT)
     // We already have readiness data, let's use it if available, or just re-analyze lightly
     // For speed, let's just ask Claude to write a script based on the raw metrics
     
@@ -114,9 +123,20 @@ export class TrainingDirector {
     - Recent HRV: ${metrics[0]?.heartRateVariability || 'N/A'}
     - Sleep: ${metrics[0]?.sleepDurationSeconds ? (metrics[0]?.sleepDurationSeconds / 3600).toFixed(1) + 'h' : 'N/A'}
     
+    OFFICIAL READINESS ASSESSMENT (Must align with this):
+    - Score: ${existingReadiness?.readinessScore ?? 'Not calculated'} / 100
+    - Risk Level: ${existingReadiness?.injuryRisk ?? 'Unknown'}
+    - Coach Recommendation: "${existingReadiness?.recommendation ?? 'Listen to body'}"
+
+    WEATHER CONTEXT:
+    - Current: ${context.weather?.current ? `${context.weather.current.conditionDescription}, ${context.weather.current.temperature}°C, Wind ${context.weather.current.windSpeed}km/h` : 'Not available'}
+    - Last Run: ${context.weather?.lastRun ? `${context.weather.lastRun.conditionDescription}, ${context.weather.lastRun.temperature}°C (vs Today)` : 'N/A'}
+    
     STRUCTURE:
     - "Good morning ${name}."
     - Quick summary of their recovery status.
+    - **CRITICAL**: Mentions the specific Readiness Score/Risk ("Your readiness is high today...").
+    - Weather update & gear advice (e.g. "It's windy today, tuck in behind cover" or "Perfect conditions").
     - An encouraging tip for the day's training.
     - "Have a great run."
     
@@ -204,11 +224,37 @@ export class TrainingDirector {
       where: eq(athleteProfile.userId, userId)
     });
 
+    // D. Weather (New)
+    // We need to await activities to get location
+    const weatherData = await this.fetchWeatherContext(recentActivities);
+
     return {
       profile,
       metrics: recentMetrics,
-      activities: recentActivities
+      activities: recentActivities,
+      weather: weatherData
     };
+  }
+
+  private static async fetchWeatherContext(activities: any[]) {
+      // Find most recent activity with location
+      const lastLocActivity = activities.find(a => a.startingLatitude && a.startingLongitude);
+      
+      if (!lastLocActivity) return { current: null, lastRun: null };
+
+      const lat = lastLocActivity.startingLatitude;
+      const lon = lastLocActivity.startingLongitude;
+
+      // 1. Current Forecast
+      const current = await fetchForecast(lat, lon);
+
+      // 2. Historical Weather for that run
+      let lastRun = null;
+      if (lastLocActivity.startDateTime) {
+         lastRun = await fetchHistoricalWeather(lat, lon, lastLocActivity.startDateTime);
+      }
+
+      return { current, lastRun };
   }
 
   /**
@@ -244,6 +290,10 @@ export class TrainingDirector {
     - Total Activities: ${activities.length}
     - Total Strain (Suffer Score): ${recentStrain}
     - Recent activities: ${activities.map((a: any) => a.name).join(', ')}
+    
+    WEATHER:
+    - Current: ${context.weather?.current ? `${context.weather.current.conditionDescription}, ${context.weather.current.temperature}C` : 'Unknown'}
+    - Last Run: ${context.weather?.lastRun ? `${context.weather.lastRun.conditionDescription}, ${context.weather.lastRun.temperature}C` : 'Unknown'}
 
     INSTRUCTIONS:
     1. Compare today's metrics to baseline. Significant drop in HRV (>10%) or spike in RHR is a warning sign.
