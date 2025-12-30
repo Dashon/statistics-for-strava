@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import {
   ComposedChart,
   Bar,
@@ -21,7 +23,7 @@ interface DistanceElevationChartProps {
   data: StatsData[];
 }
 
-export default function DistanceElevationChart({ data }: DistanceElevationChartProps) {
+function DistanceElevationChart({ data }: DistanceElevationChartProps) {
   return (
     <div className="w-full h-[250px] bg-zinc-900/50 p-4 rounded-lg border border-zinc-800 min-w-0">
       <h3 className="text-zinc-400 text-xs font-bold mb-4 uppercase tracking-widest">Distance/Elevation gain</h3>
@@ -71,3 +73,5 @@ export default function DistanceElevationChart({ data }: DistanceElevationChartP
     </div>
   );
 }
+
+export default React.memo(DistanceElevationChart);

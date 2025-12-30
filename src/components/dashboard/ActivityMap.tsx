@@ -45,7 +45,7 @@ export default function ActivityMap({ activities }: ActivityMapProps) {
 
   return (
     <div className="w-full h-full min-h-[400px] bg-zinc-900/50 rounded-lg overflow-hidden relative border border-zinc-800">
-        <div className="absolute top-4 left-4 z-[1000] bg-zinc-900/80 p-2 rounded text-xs font-bold uppercase tracking-wider text-white border border-zinc-700">
+        <div className="absolute top-4 right-4 z-[1000] bg-zinc-900/80 p-2 rounded text-xs font-bold uppercase tracking-wider text-white border border-zinc-700">
             Activities on map
         </div>
       <MapContainer 

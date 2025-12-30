@@ -14,6 +14,7 @@ const TIME_RANGES: { value: TimeRange; label: string }[] = [
   { value: "now-30d", label: "Last 30 days" },
   { value: "now-90d", label: "Last 90 days" },
   { value: "now-1y", label: "Last year" },
+  { value: "all", label: "All Time" },
 ];
 
 export default function TimeRangeSelector() {
@@ -28,6 +29,7 @@ export default function TimeRangeSelector() {
       "now-30d",
       "now-90d",
       "now-1y",
+      "all",
     ]),
   });
 

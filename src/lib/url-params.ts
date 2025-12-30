@@ -1,6 +1,6 @@
 import { parseAsInteger, parseAsIsoDateTime, parseAsString, parseAsStringEnum } from 'nuqs';
 
-export type TimeRange = 'now-6h' | 'now-12h' | 'now-24h' | 'now-7d' | 'now-30d' | 'now-90d' | 'now-1y';
+export type TimeRange = 'now-6h' | 'now-12h' | 'now-24h' | 'now-7d' | 'now-30d' | 'now-90d' | 'now-1y' | 'all';
 
 export const urlParamsParsers = {
   from: parseAsIsoDateTime,
@@ -20,6 +20,7 @@ export const urlParamsParsers = {
     'now-30d',
     'now-90d',
     'now-1y',
+    'all',
   ]),
 };
 
@@ -37,6 +38,7 @@ export function getTimeRangeFromParams(range?: TimeRange, from?: Date | null, to
     'now-30d': () => ({ from: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), to: now }),
     'now-90d': () => ({ from: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000), to: now }),
     'now-1y': () => ({ from: new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000), to: now }),
+    'all': () => ({ from: new Date(0), to: now }), // 1970-01-01
   };
 
   if (range && rangeMap[range]) {
@@ -71,6 +73,11 @@ export function formatTimeRange(from: Date, to: Date): string {
     if (diffDays <= 30) return 'Last 30 days';
     if (diffDays <= 90) return 'Last 90 days';
     if (diffDays <= 365) return 'Last year';
+  }
+
+  // Handle 'all' time (start date near epoch) or huge ranges
+  if (from.getFullYear() <= 1970) {
+      return 'All Time';
   }
 
   // Custom range

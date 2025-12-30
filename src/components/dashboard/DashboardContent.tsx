@@ -70,12 +70,12 @@ export default function DashboardContent({ unitPreference, initialData }: Dashbo
     staleTime: 5 * 60 * 1000,
   });
 
-  // Fetch map activities (top 50 with coordinates)
+  // Fetch map activities (all coordinates in range)
   const { data: mapActivitiesData } = useQuery({
     queryKey: ["map-activities", from.toISOString(), to.toISOString()],
     queryFn: async () => {
       const res = await fetch(
-        `/api/activities?from=${from.toISOString()}&to=${to.toISOString()}&page=1&limit=50&sortBy=startDateTime&sortOrder=desc`
+        `/api/activities/coordinates?from=${from.toISOString()}&to=${to.toISOString()}`
       );
       if (!res.ok) throw new Error("Failed to fetch map activities");
       return res.json();
@@ -88,29 +88,44 @@ export default function DashboardContent({ unitPreference, initialData }: Dashbo
   const monthlyStats = statsData?.monthlyStats || [];
   const summary = statsData?.summary || {};
   const activities = activitiesData?.activities || [];
-  const mapActivities =
-    mapActivitiesData?.activities
-      ?.filter((a: any) => a.startingLatitude && a.startingLongitude)
-      .map((a: any) => ({
-        id: a.id,
-        lat: a.startingLatitude,
-        lng: a.startingLongitude,
-        name: a.name || "Activity",
-      })) || [];
+  const mapActivities = mapActivitiesData?.coordinates || [];
 
-  // Transform activities for table
-  const tableActivities = activities.map((a: any) => ({
-    id: a.id,
-    startDate: a.startDate,
-    name: a.name || "Untitled",
-    type: a.type || "Other",
-    distance: convertDistance(a.distance || 0, unitPreference),
-    movingTime: a.movingTime || 0,
-    heartRate: a.heartRate,
-    elevation: a.elevation || 0,
-    kilojoules: a.kilojoules,
-    achievementCount: a.achievementCount || 0,
-  }));
+  // Transform activities for table - memoized
+  const tableActivities = useMemo(() =>
+    activities.map((a: any) => ({
+      id: a.id,
+      startDate: a.startDate,
+      name: a.name || "Untitled",
+      type: a.type || "Other",
+      distance: convertDistance(a.distance || 0, unitPreference),
+      movingTime: a.movingTime || 0,
+      heartRate: a.heartRate,
+      elevation: a.elevation || 0,
+      kilojoules: a.kilojoules,
+      achievementCount: a.achievementCount || 0,
+    })),
+    [activities, unitPreference]
+  );
+
+  // Memoize chart data
+  const movingTimeChartData = useMemo(() =>
+    monthlyStats.map((s: any) => ({
+      period: s.month,
+      run: s.run,
+      ride: s.ride,
+      other: s.other,
+    })),
+    [monthlyStats]
+  );
+
+  const distanceElevationChartData = useMemo(() =>
+    monthlyStats.map((s: any) => ({
+      month: s.month,
+      distance: s.distance,
+      elevation: s.elevation,
+    })),
+    [monthlyStats]
+  );
 
   return (
     <div className="p-4 space-y-4">
@@ -167,12 +182,7 @@ export default function DashboardContent({ unitPreference, initialData }: Dashbo
             {/* Left Column: Moving Time Chart & Table */}
             <div className="lg:col-span-2 space-y-4">
                 <MovingTimeChart
-                  data={monthlyStats.map((s: any) => ({
-                    period: s.month,
-                    run: s.run,
-                    ride: s.ride,
-                    other: s.other,
-                  }))}
+                  data={movingTimeChartData}
                   granularity={statsData?.granularity}
                 />
               <div className="bg-zinc-900/30 rounded-lg overflow-hidden border border-zinc-800">
@@ -193,11 +203,7 @@ export default function DashboardContent({ unitPreference, initialData }: Dashbo
                 <ActivityMap activities={mapActivities} />
               </div>
               <DistanceElevationChart
-                data={monthlyStats.map((s: any) => ({
-                  month: s.month,
-                  distance: s.distance,
-                  elevation: s.elevation,
-                }))}
+                data={distanceElevationChartData}
               />
               {/* Legend */}
               <div className="bg-zinc-900/50 p-4 rounded-lg border border-zinc-800">

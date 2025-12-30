@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -28,7 +28,7 @@ interface MovingTimeChartProps {
   granularity?: TimeGranularity;
 }
 
-export default function MovingTimeChart({ data, granularity = 'month' }: MovingTimeChartProps) {
+function MovingTimeChart({ data, granularity = 'month' }: MovingTimeChartProps) {
   const [params, setParams] = useQueryStates({
     from: parseAsIsoDateTime,
     to: parseAsIsoDateTime,
@@ -155,3 +155,5 @@ export default function MovingTimeChart({ data, granularity = 'month' }: MovingT
     </div>
   );
 }
+
+export default React.memo(MovingTimeChart);
