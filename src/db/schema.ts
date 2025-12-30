@@ -331,6 +331,9 @@ export const athleteReadiness = pgTable("athlete_readiness", {
     summary: text("summary"), // "Your HRV is low, but you slept well..."
     recommendation: text("recommendation"), // "Take an easy day"
     
+    // Daily Audio Briefing
+    audioUrl: text("audio_url"), // URL to the generated MP3
+    
     generatedAt: timestamp("generated_at", { mode: "string" }).notNull(),
 }, (table) => {
     return {

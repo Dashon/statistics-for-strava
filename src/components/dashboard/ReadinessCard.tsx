@@ -1,5 +1,11 @@
 
-import { Activity, Brain, AlertTriangle, CheckCircle } from "lucide-react";
+"use client";
+
+
+import { Activity, Brain, AlertTriangle, CheckCircle, Play, Loader2, Headphones } from "lucide-react";
+import { useState } from "react";
+import { generateDailyBriefing } from "@/app/actions/audio-briefing";
+import { useRouter } from "next/navigation";
 
 interface ReadinessCardProps {
   score: number;
@@ -7,9 +13,24 @@ interface ReadinessCardProps {
   summary: string;
   recommendation: string;
   date: string;
+  audioUrl?: string | null;
 }
 
-export const ReadinessCard = ({ score, risk, summary, recommendation, date }: ReadinessCardProps) => {
+export const ReadinessCard = ({ score, risk, summary, recommendation, date, audioUrl }: ReadinessCardProps) => {
+  const router = useRouter();
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerateBriefing = async () => {
+    setIsGenerating(true);
+    try {
+      await generateDailyBriefing();
+      router.refresh(); // Refresh to show the new audio URL
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
   // Determine color theme based on score/risk
   let colorClass = "bg-zinc-800 border-zinc-700";
   let textClass = "text-zinc-200";
@@ -75,6 +96,28 @@ export const ReadinessCard = ({ score, risk, summary, recommendation, date }: Re
             <p className="text-sm text-white italic">
               "{recommendation}"
             </p>
+          </div>
+  
+          {/* Audio Briefing Section */}
+          <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-4">
+            {audioUrl ? (
+               <div className="bg-zinc-900/50 rounded-full px-4 py-2 flex items-center gap-3 border border-zinc-700 w-full md:w-auto">
+                 <div className="bg-indigo-500 rounded-full p-1.5 animate-pulse">
+                    <Headphones size={14} className="text-white" />
+                 </div>
+                 <audio controls src={audioUrl} className="h-8 max-w-[200px]" />
+                 <span className="text-xs text-zinc-400 font-medium whitespace-nowrap hidden sm:inline">Daily Briefing</span>
+               </div>
+            ) : (
+                <button 
+                  onClick={handleGenerateBriefing}
+                  disabled={isGenerating}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-full text-xs font-bold uppercase tracking-wider transition-all"
+                >
+                  {isGenerating ? <Loader2 className="animate-spin w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
+                  {isGenerating ? "Generating..." : "Play Daily Briefing"}
+                </button>
+            )}
           </div>
         </div>
       </div>

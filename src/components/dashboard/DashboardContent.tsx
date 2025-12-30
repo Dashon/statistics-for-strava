@@ -154,6 +154,7 @@ export default function DashboardContent({ unitPreference, initialData, readines
               summary={readiness.summary || 'No data available'}
               recommendation={readiness.recommendation || 'Listen to your body'}
               date={readiness.date}
+              audioUrl={readiness.audioUrl}
             />
           )}
 

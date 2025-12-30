@@ -8,14 +8,20 @@ import {
 } from "@/db/schema";
 import { eq, desc, gte, and, lte } from "drizzle-orm";
 import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
+import { createClient } from "@supabase/supabase-js";
 
 // Validate API key at module load for early failure detection
 const apiKey = process.env.ANTHROPIC_API_KEY;
-if (!apiKey) {
-  console.warn("[TrainingDirector] ANTHROPIC_API_KEY not set - AI features will use fallback mode");
+const openaiApiKey = process.env.OPENAI_API_KEY;
+
+if (!apiKey || !openaiApiKey) {
+  console.warn("[TrainingDirector] Missing AI keys - Some features will fail");
 }
 
 const anthropic = apiKey ? new Anthropic({ apiKey }) : null;
+const openai = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null;
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!);
 
 type ReadinessAssessment = {
   score: number; // 0-100
@@ -76,6 +82,92 @@ export class TrainingDirector {
     }
 
     return assessment;
+  }
+
+  /**
+   * Generates a "Daily Briefing" audio file (Podcast style)
+   * 1. Generates script based on readiness context
+   * 2. Uses OpenAI TTS to convert to audio
+   * 3. Uploads to Supabase storage
+   * 4. Returns URL
+   */
+  static async generateAudioBriefing(userId: string) {
+    if (!openai) throw new Error("OpenAI not configured");
+    
+    console.log(`[TrainingDirector] Generating Audio Briefing for ${userId}`);
+    const today = new Date().toISOString().split('T')[0];
+    
+    // 1. Get Context (Reuse existing logic)
+    const context = await this.gatherContext(userId, today);
+    const { profile, metrics } = context;
+    const name = profile?.displayName || profile?.stravaFirstName || "Athlete";
+    
+    // 2. Generate Script (Claude or GPT)
+    // We already have readiness data, let's use it if available, or just re-analyze lightly
+    // For speed, let's just ask Claude to write a script based on the raw metrics
+    
+    const prompt = `
+    Write a short, engaging "Morning Briefing" script for ${name} (approx 45-60 seconds spoken).
+    Tone: Professional but encouraging coach. Podcast host style.
+    
+    DATA:
+    - Recent HRV: ${metrics[0]?.heartRateVariability || 'N/A'}
+    - Sleep: ${metrics[0]?.sleepDurationSeconds ? (metrics[0]?.sleepDurationSeconds / 3600).toFixed(1) + 'h' : 'N/A'}
+    
+    STRUCTURE:
+    - "Good morning ${name}."
+    - Quick summary of their recovery status.
+    - An encouraging tip for the day's training.
+    - "Have a great run."
+    
+    Return ONLY the text to be spoken. No markdown, no "Script:" label.
+    `;
+    
+    let script = "";
+    if (anthropic) {
+       const msg = await anthropic.messages.create({
+        model: "claude-3-haiku-20240307",
+        max_tokens: 400,
+        messages: [{ role: "user", content: prompt }]
+      });
+      script = msg.content[0].type === 'text' ? msg.content[0].text : "Good morning. Go run.";
+    }
+
+    // 3. Text-to-Speech (OpenAI)
+    const mp3 = await openai.audio.speech.create({
+      model: "tts-1-hd",
+      voice: "alloy",
+      input: script,
+    });
+    
+    const buffer = Buffer.from(await mp3.arrayBuffer());
+    
+    // 4. Upload to Supabase Storage
+    const fileName = `briefings/${userId}/${today}.mp3`;
+    const { error: uploadError } = await supabase
+      .storage
+      .from('media') // Ensure 'media' bucket exists
+      .upload(fileName, buffer, {
+        contentType: 'audio/mpeg',
+        upsert: true
+      });
+      
+    if (uploadError) {
+      console.error("Upload failed", uploadError);
+      throw new Error("Failed to upload audio");
+    }
+    
+    const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(fileName);
+    
+    // 5. Update Database
+    await db.update(athleteReadiness)
+       .set({ audioUrl: publicUrl })
+       .where(and(
+         eq(athleteReadiness.userId, userId),
+         eq(athleteReadiness.date, today)
+       ));
+       
+    return publicUrl;
   }
 
   /**

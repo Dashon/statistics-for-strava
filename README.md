@@ -4,6 +4,7 @@ QT.run is a comprehensive running statistics and coaching platform. Explore our 
 
 - **[Multi-Provider Integration](MULTI_PROVIDER.md)** - Guide to connecting Garmin, Oura, WHOOP, Apple Health, and more.
 - **[AI Thumbnails & Scenery](AI_THUMBNAILS.md)** - Details on our Gemini-powered Street View selection and thumbnail generation.
+- **[AI Training Director](AI_COACHING.md)** - Your personal AI coach with readiness scores, daily briefings, and chat.
 - **[Trigger.dev Setup](TRIGGER_SETUP.md)** - Architecture for background sync and asynchronous processing.
 - **[Deployment Guide](DEPLOYMENT.md)** - How to deploy QT.run to Vercel and Supabase.
 
