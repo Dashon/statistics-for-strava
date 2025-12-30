@@ -248,33 +248,33 @@ export const syncStravaHistory = task({
       return { success: true, totalActivities: activities.length, deepSyncQueued: 0 };
     }
 
-    logger.info(`Queueing deep sync for ${activitiesToDeepSync.length} activities.`);
+    logger.info(`Queueing deep sync for ${activitiesToDeepSync.length} activities using batchTrigger.`);
     
-    // We process in batches of 20 to maintain reasonable progress without overwhelming Strava
-    const BATCH_SIZE = 20;
-    for (let i = 0; i < activitiesToDeepSync.length; i += BATCH_SIZE) {
-      const batch = activitiesToDeepSync.slice(i, i + BATCH_SIZE);
-      
-      logger.info(`Queueing deep sync batch ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(activitiesToDeepSync.length/BATCH_SIZE)}`);
-      
-      await Promise.all(batch.map(id => 
-        tasks.trigger("deep-sync-activity", {
-          activityId: id,
-          userId: payload.userId,
-          accessToken: athlete.stravaAccessToken
-        })
-      ));
-      
-      // Small pause between queueing batches
-      if (i + BATCH_SIZE < activitiesToDeepSync.length) {
-        await new Promise(r => setTimeout(r, 1000));
+    // Use batchTrigger for efficient bulk task creation with idempotency
+    // Idempotency keys prevent duplicate tasks if this sync is retried
+    const batchItems = activitiesToDeepSync.map(id => ({
+      payload: {
+        activityId: id,
+        userId: payload.userId,
+        accessToken: athlete.stravaAccessToken
+      },
+      options: {
+        // Idempotency key ensures this exact activity+user combo is only processed once
+        // even if the parent sync task is retried
+        idempotencyKey: `deep-sync-${payload.userId}-${id}`,
       }
-    }
+    }));
+
+    // batchTrigger is more efficient than individual triggers
+    // It creates all tasks in a single API call
+    const batchResult = await tasks.batchTrigger("deep-sync-activity", batchItems);
+    
+    logger.info(`Successfully queued ${activitiesToDeepSync.length} deep sync tasks.`);
 
     return { 
       success: true, 
       totalActivities: activities.length,
-      deepSyncQueued: activitiesToDeepSync.length
+      deepSyncQueued: activitiesToDeepSync.length,
     };
   },
 });

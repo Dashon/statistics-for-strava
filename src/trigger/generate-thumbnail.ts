@@ -181,6 +181,12 @@ export const generateAIThumbnail = task({
         backgroundImage: finalImageUrl // Use the AI Director's chosen image
       });
       
+      // TEMPORARY: Video generation disabled
+      if (!videoResult.filePath) {
+        logger.info("Video generation skipped (disabled).");
+        return { success: true, activityId: payload.activityId, video: "skipped" };
+      }
+
       logger.info(`Video rendered to ${videoResult.filePath}`);
 
       // 3. Upload to Supabase Storage

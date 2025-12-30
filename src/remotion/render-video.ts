@@ -40,16 +40,18 @@ export async function renderRouteVideo({
   backgroundImage,
 }: RenderVideoProps): Promise<{ filePath: string }> {
   
+  /*
+  // REMOTION RENDERER TEMPORARILY DISABLED
+  // Reason: Trigger.dev serverless environment does not support headless browser execution.
+  // Next Step: Configure Remotion Lambda (AWS) for production rendering.
+
   // 1. Bundle the Remotion project
-  // Points to the Root component we created
   const entryPoint = path.join(process.cwd(), "src/remotion/index.ts");
   
   console.log("Bundling Remotion project:", entryPoint);
 
   const bundleLocation = await bundle({
     entryPoint,
-    // If running in Docker/Lambda, might need to adjust webpack config
-    // For local dev/Trigger.dev, default is usually fine
   });
 
   // 2. Select the composition (must match ID in Root.tsx)
@@ -88,4 +90,8 @@ export async function renderRouteVideo({
   });
 
   return { filePath: outputLocation };
+  */
+ 
+  console.warn("Video generation is currently disabled pending Remotion Lambda setup.");
+  return { filePath: "" };
 }
