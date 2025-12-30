@@ -3,24 +3,45 @@
 import { useState, useEffect, useRef } from "react";
 import { generateThumbnail } from "@/app/actions/generate-thumbnail";
 import { getGenerationStatus } from "@/app/actions/get-generation-status";
-import { MapPin, RefreshCw, Loader2 } from "lucide-react";
+import { MapPin, RefreshCw, Loader2, Play } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import ActivityVideoPlayer from "@/components/dashboard/ActivityVideoPlayer";
+import { decodePolyline } from "@/lib/polyline";
 
 interface AiThumbnailProps {
   activityId: string;
   thumbnailUrl: string | null;
   thumbnailPrompt: string | null;
-  videoUrl?: string | null;
+  videoUrl?: string | null; // Keep for backward compatibility or future server-rendered fallback
+  
+  // New props for dynamic player
+  activityName?: string;
+  polyline?: string | null;
+  stats?: {
+      distance: string;
+      movingTime: string;
+      elevation: string;
+  };
 }
 
-export default function AiThumbnail({ activityId, thumbnailUrl, thumbnailPrompt, videoUrl }: AiThumbnailProps) {
+export default function AiThumbnail({ 
+    activityId, 
+    thumbnailUrl, 
+    thumbnailPrompt, 
+    videoUrl,
+    activityName = "Activity",
+    polyline,
+    stats
+}: AiThumbnailProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const hasTriggered = useRef(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Decode coordinates memoized (only run if playing to save standard render cost)
+  const coordinates = isPlayingVideo && polyline ? decodePolyline(polyline) : [];
 
   // Auto-trigger generation on mount if no thumbnail exists
   useEffect(() => {
@@ -29,13 +50,6 @@ export default function AiThumbnail({ activityId, thumbnailUrl, thumbnailPrompt,
       handleGenerate();
     }
   }, [thumbnailUrl]);
-
-  // Handle video element
-  useEffect(() => {
-      if (isPlayingVideo && videoRef.current) {
-          videoRef.current.play().catch(e => console.warn("Autoplay failed", e));
-      }
-  }, [isPlayingVideo]);
 
   // Poll for status when generating
   useEffect(() => {
@@ -46,13 +60,6 @@ export default function AiThumbnail({ activityId, thumbnailUrl, thumbnailPrompt,
         try {
           const result = await getGenerationStatus(activityId);
           
-          if ((result.thumbnailStatus === 'completed' || result.aiThumbnailUrl) && !isGenerating) {
-             // basic thumbnail done
-          }
-          
-          // Refresh if *either* thumbnail or video just finished appearing
-          // But here we rely on the component re-rendering from router.refresh() 
-          // triggered manually or by this poller
           if (result.thumbnailStatus === 'completed' || result.thumbnailStatus === 'failed') {
              setIsGenerating(false);
              clearInterval(interval);
@@ -86,16 +93,18 @@ export default function AiThumbnail({ activityId, thumbnailUrl, thumbnailPrompt,
     return (
       <div className="relative w-full h-full min-h-[400px] rounded-sm overflow-hidden group">
         
-        {/* Video Player or Thumbnail Image */}
-        {isPlayingVideo && videoUrl ? (
-            <video 
-                ref={videoRef}
-                src={videoUrl}
-                className="w-full h-full object-cover"
-                loop
-                muted
-                playsInline
-                controls={false}
+        {/* Dynamic Video Player or Thumbnail Image */}
+        {isPlayingVideo ? (
+            <ActivityVideoPlayer 
+                coordinates={coordinates}
+                activityName={activityName}
+                stats={{
+                    distance: stats?.distance || "0 km",
+                    time: stats?.movingTime || "0:00",
+                    elevation: stats?.elevation || "0 m"
+                }}
+                backgroundImage={thumbnailUrl}
+                autoPlay={true}
             />
         ) : (
             <Image
@@ -106,34 +115,35 @@ export default function AiThumbnail({ activityId, thumbnailUrl, thumbnailPrompt,
             />
         )}
 
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors pointer-events-none" />
+        {/* Overlay used when showing image */}
+        {!isPlayingVideo && (
+            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors pointer-events-none" />
+        )}
         
-        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20">
-          <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-sm border border-white/10">
+        {/* Controls Overlay */}
+        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20 pointer-events-none">
+          <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-sm border border-white/10 pointer-events-auto">
             <p className="text-[10px] font-bold uppercase tracking-widest text-white flex items-center gap-2">
               <MapPin className="w-3 h-3 text-[#f97316]" />
               {isPlayingVideo ? "Route Video" : "Street View"}
             </p>
           </div>
           
-          <div className="flex gap-2">
-            {videoUrl && (
-                <button 
-                    onClick={() => setIsPlayingVideo(!isPlayingVideo)}
-                    className="bg-black/60 backdrop-blur-md p-2 rounded-sm border border-white/10 hover:bg-black transition-colors"
-                    title={isPlayingVideo ? "Show Map" : "Play Video"}
-                >
-                    {isPlayingVideo ? (
-                        <MapPin className="w-4 h-4 text-white" />
-                    ) : (
-                        <div className="relative w-4 h-4 text-white flex items-center justify-center">
-                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                <path d="M8 5v14l11-7z" />
-                            </svg>
-                        </div>
-                    )}
-                </button>
-            )}
+          <div className="flex gap-2 pointer-events-auto">
+            {/* Play/Stop Video Button */}
+            <button 
+                onClick={() => setIsPlayingVideo(!isPlayingVideo)}
+                className="bg-black/60 backdrop-blur-md p-2 rounded-sm border border-white/10 hover:bg-black transition-colors"
+                title={isPlayingVideo ? "Show Static Map" : "Play Route Video"}
+            >
+                {isPlayingVideo ? (
+                    <MapPin className="w-4 h-4 text-white" />
+                ) : (
+                    <div className="relative w-4 h-4 text-white flex items-center justify-center">
+                        <Play className="w-4 h-4 text-white fill-white" />
+                    </div>
+                )}
+            </button>
 
             <button 
                 onClick={handleGenerate}
@@ -149,7 +159,7 @@ export default function AiThumbnail({ activityId, thumbnailUrl, thumbnailPrompt,
     );
   }
 
-  // Loading state 
+  // Loading / Error states
   return (
     <div className="w-full h-full min-h-[400px] bg-zinc-900/50 border border-zinc-800 rounded-sm flex flex-col items-center justify-center gap-4">
       {isGenerating ? (
@@ -181,4 +191,5 @@ export default function AiThumbnail({ activityId, thumbnailUrl, thumbnailPrompt,
     </div>
   );
 }
+
 

@@ -263,6 +263,16 @@ export default async function ActivityDetailPage({
                             thumbnailUrl={activityData.aiThumbnailUrl} 
                             thumbnailPrompt={activityData.aiThumbnailPrompt}
                             videoUrl={activityData.aiVideoUrl || null}
+                            // Enhanced props for dynamic player
+                            activityName={activityData.name}
+                            polyline={activityData.polyline}
+                            stats={{
+                                distance: distance + (unitPreference === 'imperial' ? ' mi' : ' km'),
+                                movingTime: durationFormatted,
+                                elevation: (unitPreference === 'imperial' 
+                                    ? (activityData.elevation ? activityData.elevation * 3.28084 : 0).toFixed(0) + " ft"
+                                    : (activityData.elevation?.toFixed(0) || "0") + " m")
+                            }}
                         />
                     </div>
 

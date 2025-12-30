@@ -21,6 +21,7 @@
     "@google/generative-ai": "^0.24.1",
     "@remotion/bundler": "^4.0.397",
     "@remotion/cli": "^4.0.397",
+    "@remotion/player": "^4.0.397",
     "@remotion/renderer": "^4.0.397",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",

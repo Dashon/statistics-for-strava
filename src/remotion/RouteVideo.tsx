@@ -6,12 +6,15 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for Leaflet icons in SSR/Remotion environment
-const icon = L.icon({
+let icon: L.Icon | undefined;
+if (typeof window !== 'undefined') {
+  icon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
     shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
-});
+  });
+}
 
 interface ActivityStats {
     distance: string;
@@ -100,7 +103,7 @@ export const RouteVideo: React.FC<RouteVideoProps> = ({ coordinates, activityNam
                             positions={currentPath} 
                             pathOptions={{ color: '#f97316', weight: 6, opacity: 0.9 }} 
                         />
-                        {currentHead && <Marker position={currentHead} icon={icon} />}
+                        {currentHead && icon && <Marker position={currentHead} icon={icon} />}
                     </MapContainer>
                 )}
             </div>
