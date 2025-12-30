@@ -39,6 +39,8 @@ const jsonText = <TData>(name: string) =>
 export const activity = pgTable("activity", {
   activityId: varchar("activityid", { length: 255 }).primaryKey(),
   userId: varchar("user_id", { length: 255 }), // SECURITY: Filter activities by user
+  provider: varchar("provider", { length: 50 }).default("strava"), // strava, garmin, oura, whoop, fitbit, apple_health, google_fit
+  externalId: varchar("external_id", { length: 255 }), // ID from the source platform
   startDateTime: timestamp("startdatetime", { mode: "string" }).notNull(),
   data: jsonText<any>("data").notNull(),
   location: jsonText<any>("location"),
@@ -153,9 +155,33 @@ export const user = pgTable("User", {
     stravaAccessToken: varchar("stravaaccesstoken", { length: 255 }).notNull(),
     stravaRefreshToken: varchar("stravarefreshtoken", { length: 255 }).notNull(),
     stravaTokenExpiresAt: timestamp("stravatokenexpiresat", { mode: "string" }).notNull(),
+    apiKey: varchar("api_key", { length: 64 }), // For generic ingestion webhook auth
     createdAt: timestamp("createdat", { mode: "string" }).notNull(),
     updatedAt: timestamp("updatedat", { mode: "string" }).notNull(),
     roles: json("roles").notNull(),
+});
+
+// Provider Connections - OAuth tokens for multiple fitness platforms
+export const providerConnection = pgTable("provider_connection", {
+    id: varchar("id", { length: 255 }).primaryKey(), // UUID
+    userId: varchar("user_id", { length: 255 }).notNull(),
+    provider: varchar("provider", { length: 50 }).notNull(), // garmin, oura, whoop, fitbit, coros, polar
+    isPrimary: boolean("is_primary").default(false), // The provider they logged in with
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    tokenExpiresAt: timestamp("token_expires_at", { mode: "string" }),
+    externalUserId: varchar("external_user_id", { length: 255 }), // User's ID on the platform
+    scopes: text("scopes"), // OAuth scopes granted
+    metadata: json("metadata"), // Any extra provider-specific data
+    lastSyncAt: timestamp("last_sync_at", { mode: "string" }),
+    syncStatus: varchar("sync_status", { length: 50 }).default("pending"), // pending, syncing, synced, error
+    syncError: text("sync_error"),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
+}, (table) => {
+    return {
+        userProviderIdx: index("provider_connection_user_provider").on(table.userId, table.provider),
+    }
 });
 
 export const athleteProfile = pgTable("athlete_profile", {

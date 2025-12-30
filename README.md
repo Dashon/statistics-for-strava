@@ -1,4 +1,11 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Features & Documentation
+
+QT.run is a comprehensive running statistics and coaching platform. Explore our feature-specific documentation:
+
+- **[Multi-Provider Integration](MULTI_PROVIDER.md)** - Guide to connecting Garmin, Oura, WHOOP, Apple Health, and more.
+- **[AI Thumbnails & Scenery](AI_THUMBNAILS.md)** - Details on our Gemini-powered Street View selection and thumbnail generation.
+- **[Trigger.dev Setup](TRIGGER_SETUP.md)** - Architecture for background sync and asynchronous processing.
+- **[Deployment Guide](DEPLOYMENT.md)** - How to deploy QT.run to Vercel and Supabase.
 
 ## Getting Started
 
