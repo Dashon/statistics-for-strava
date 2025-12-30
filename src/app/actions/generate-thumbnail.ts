@@ -8,7 +8,7 @@ import { tasks } from "@trigger.dev/sdk";
 
 export async function generateThumbnail(activityId: string) {
   const session = await auth();
-  if (!session?.userId) {
+  if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
 
@@ -25,7 +25,7 @@ export async function generateThumbnail(activityId: string) {
 
   // Fetch reference image (optional)
   const refImage = await db.query.userReferenceImages.findFirst({
-    where: eq(userReferenceImages.userId, session.userId),
+    where: eq(userReferenceImages.userId, session.user.id),
     orderBy: [desc(userReferenceImages.isDefault), desc(userReferenceImages.uploadedAt)],
   });
 
@@ -46,7 +46,7 @@ export async function generateThumbnail(activityId: string) {
   // Trigger generation
   await tasks.trigger("generate-ai-thumbnail", {
     activityId: activityId,
-    userId: session.userId,
+    userId: session.user.id,
     referenceImageUrl: refImage?.imageUrl || null,
     latitude: activityData.startingLatitude,
     longitude: activityData.startingLongitude,

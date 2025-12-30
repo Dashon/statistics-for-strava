@@ -19,7 +19,7 @@ interface ActivityStats {
     elevation: string;
 }
 
-interface RouteVideoProps {
+export interface RouteVideoProps {
     coordinates: [number, number][]; // [lat, lng] pairs
     activityName: string;
     stats: ActivityStats;

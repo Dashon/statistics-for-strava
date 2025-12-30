@@ -1,15 +1,15 @@
 
 import React from 'react';
 import { Composition } from 'remotion';
-import { RouteVideo } from './RouteVideo';
+import { RouteVideo, RouteVideoProps } from './RouteVideo';
 import "./style.css";
 
 export const RemotionRoot: React.FC = () => {
     return (
         <>
-            <Composition
+            <Composition<RouteVideoProps, Record<string, unknown>>
                 id="RouteVideo"
-                component={RouteVideo}
+                component={RouteVideo as any}
                 durationInFrames={300} // 10 seconds at 30fps
                 fps={30}
                 width={720}

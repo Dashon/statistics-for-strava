@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 
 export async function getGenerationStatus(activityId: string) {
   const session = await auth();
-  if (!session?.userId) {
+  if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
 

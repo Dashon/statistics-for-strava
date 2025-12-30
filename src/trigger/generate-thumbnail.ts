@@ -57,8 +57,13 @@ export const generateAIThumbnail = task({
         allCoordinates = decodePolyline(activityData.polyline);
     }
 
+    if (!activityData) {
+      throw new Error("Activity data not found");
+    }
 
-
+    let finalImageUrl: string | undefined;
+    let finalPrompt: string | undefined;
+    
     // 1. Generate Static Map Thumbnail (Enhanced with AI Director)
     try {
       // Find a valid point first (checks multiple spots along route)
@@ -68,8 +73,8 @@ export const generateAIThumbnail = task({
         additionalPoints: allCoordinates 
       });
 
-      let finalImageUrl = validLocationResult.imageUrl;
-      let finalPrompt = `Static Map at ${payload.latitude}, ${payload.longitude}`;
+      finalImageUrl = validLocationResult.imageUrl;
+      finalPrompt = `Static Map at ${payload.latitude}, ${payload.longitude}`;
       
       // If we found a valid Street View (not a fallback SVG) and have an API key, run the AI Director
       if (validLocationResult.source === 'streetview' && process.env.GOOGLE_MAPS_API_KEY) {
