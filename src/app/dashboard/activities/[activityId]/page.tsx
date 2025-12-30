@@ -83,13 +83,12 @@ export default async function ActivityDetailPage({
   // Fetch or generate coaching insight
   let insight = await getCoachingInsight(activityId);
   if (!insight && activityData.sportType === "Run") {
-    // Auto-generate if doesn't exist
-    try {
-      await generateCoachingInsight(activityId);
-      insight = await getCoachingInsight(activityId);
-    } catch (error) {
-      console.error("Failed to generate coaching insight:", error);
-    }
+    // Non-blocking background generation
+    // We don't await this so the page loads instantly. 
+    // The UI handles the "Generating..." state via missing insight or we rely on SWR/refresh.
+    generateCoachingInsight(activityId).catch(err => {
+      console.error("Background generation trigger failed:", err);
+    });
   }
 
   // Fetch stream data
@@ -97,16 +96,11 @@ export default async function ActivityDetailPage({
     where: eq(activityStream.activityId, activityId),
   });
 
-  // Auto-sync streams if missing
+  // Auto-sync streams if missing (Non-blocking)
   if (!stream && activityData.userId === session.userId) {
-    try {
-      await syncActivityStreams(activityId);
-      stream = await db.query.activityStream.findFirst({
-        where: eq(activityStream.activityId, activityId),
-      });
-    } catch (error) {
-      console.error("Failed to auto-sync streams:", error);
-    }
+     syncActivityStreams(activityId).catch(err => {
+        console.error("Background stream sync trigger failed:", err);
+     });
   }
 
   // Fetch run letter if exists

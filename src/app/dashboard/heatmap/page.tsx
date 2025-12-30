@@ -11,9 +11,12 @@ export default async function HeatmapPage() {
   if (!session?.userId) redirect("/");
 
   // SECURITY + PERFORMANCE: Only fetch user's activities, select minimal columns
+  // Limit to last 500 activities to prevent memory issues with large datasets
   const allActivities = await db.query.activity.findMany({
     where: eq(activity.userId, session.userId),
-    columns: { polyline: true, data: true }
+    columns: { polyline: true, data: true },
+    orderBy: (activity, { desc }) => [desc(activity.startDateTime)],
+    limit: 500,
   });
 
   const polylines = allActivities

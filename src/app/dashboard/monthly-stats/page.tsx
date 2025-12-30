@@ -14,6 +14,7 @@ export default async function MonthlyStatsPage() {
   const profile = await getAthleteProfile();
   const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
 
+  // Limit to last 24 months for performance
   const monthlyStats = await db.execute(sql`
     SELECT
         to_char("startdatetime", 'YYYY-MM') as month,
@@ -23,6 +24,7 @@ export default async function MonthlyStatsPage() {
     WHERE user_id = ${session.userId}
     GROUP BY month
     ORDER BY month DESC
+    LIMIT 24
   `);
 
   return (

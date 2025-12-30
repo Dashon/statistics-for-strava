@@ -43,19 +43,21 @@ export default async function RunLettersPage() {
 
   const activityIds = activities.map(a => a.activityId);
 
-  const letters = await db.query.runLetters.findMany({
-    where: (letter, { inArray }) => inArray(letter.activityId, activityIds),
-  });
+  // Parallel fetch related data
+  const [letters, insights, statuses] = await Promise.all([
+    db.query.runLetters.findMany({
+      where: (letter, { inArray }) => inArray(letter.activityId, activityIds),
+    }),
+    db.query.coachingInsights.findMany({
+      where: (insight, { inArray }) => inArray(insight.activityId, activityIds),
+    }),
+    db.query.generationStatus.findMany({
+      where: (status, { inArray }) => inArray(status.activityId, activityIds),
+    })
+  ]);
+
   const letterMap = new Map(letters.map((l) => [l.activityId, l]));
-
-  const insights = await db.query.coachingInsights.findMany({
-    where: (insight, { inArray }) => inArray(insight.activityId, activityIds),
-  });
   const insightMap = new Map(insights.map((i) => [i.activityId, i]));
-
-  const statuses = await db.query.generationStatus.findMany({
-    where: (status, { inArray }) => inArray(status.activityId, activityIds),
-  });
   const statusMap = new Map(statuses.map((s) => [s.activityId, s]));
 
   const missingActivities = activities.filter((a) => !letterMap.has(a.activityId));

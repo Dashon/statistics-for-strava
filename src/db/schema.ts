@@ -87,6 +87,7 @@ export const activity = pgTable("activity", {
         sportTypeIdx: index("activity_sporttype").on(table.sportType),
         userIdIdx: index("activity_user_id").on(table.userId), // Index for filtering by user
         userIdStartDateIdx: index("activity_user_id_start_date").on(table.userId, table.startDateTime), // Composite index for range queries
+        userIdSportTypeStartDateIdx: index("activity_user_id_sport_type_start_date").on(table.userId, table.sportType, table.startDateTime), // Optimized for Run Letters page
     }
 });
 
