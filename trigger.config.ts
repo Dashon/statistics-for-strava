@@ -20,4 +20,18 @@ export default defineConfig({
 
   // Max duration of a task in seconds (1 hour for batch processing)
   maxDuration: 3600,
+
+  build: {
+    extensions: [
+        // Ensure standard audio/video tools are available
+        // Note: For Remotion on standard Linux, usually chrome/ffmpeg is managed by Remotion itself
+    ],
+    external: [
+        // Externalize Remotion to avoid bundling issues
+        "remotion",
+        "@remotion/bundler",
+        "@remotion/renderer",
+        "@remotion/cli",
+    ]
+  }
 });

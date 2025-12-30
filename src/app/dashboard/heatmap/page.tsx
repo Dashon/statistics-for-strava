@@ -3,13 +3,18 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { activity } from "@/db/schema";
 import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
 import ActivitiesHeatmap from "./ActivitiesHeatmap";
 
 export default async function HeatmapPage() {
-  const session = await auth();
-  if (!session) redirect("/");
+  const session = await auth() as any;
+  if (!session?.userId) redirect("/");
 
-  const allActivities = await db.query.activity.findMany();
+  // SECURITY + PERFORMANCE: Only fetch user's activities, select minimal columns
+  const allActivities = await db.query.activity.findMany({
+    where: eq(activity.userId, session.userId),
+    columns: { polyline: true, data: true }
+  });
 
   const polylines = allActivities
     .map((a: any) => a.polyline || (a.data as any)?.map?.summary_polyline)

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-:root {
-    --background: #09090b;
-    --foreground: #fafafa;
+html,
+body {
+    overflow-x: hidden;
 }
 
 body {
@@ -23,7 +23,12 @@ body {
     max-width: 65ch;
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
     color: #fafafa;
     font-weight: 700;
     margin-top: 1.5em;
@@ -35,7 +40,8 @@ body {
     line-height: 1.75;
 }
 
-.prose ul, .prose ol {
+.prose ul,
+.prose ol {
     padding-left: 1.5em;
     margin-bottom: 1em;
 }

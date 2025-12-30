@@ -32,7 +32,7 @@ export async function generateRunningThumbnail({
   distance,
   startTime,
 }: {
-  referenceImageUrl: string;
+  referenceImageUrl?: string | null;
   latitude: number;
   longitude: number;
   activityName?: string;
@@ -41,21 +41,27 @@ export async function generateRunningThumbnail({
   startTime?: string;
 }): Promise<{ imageUrl: string; prompt: string }> {
 
-  // Fetch the reference image
-  const referenceImageResponse = await fetch(referenceImageUrl);
-  if (!referenceImageResponse.ok) {
-    throw new Error(`Failed to fetch reference image: ${referenceImageResponse.statusText}`);
+  let referenceImageBase64: string | null = null;
+  
+  if (referenceImageUrl) {
+    try {
+      // Fetch the reference image
+      const referenceImageResponse = await fetch(referenceImageUrl);
+      if (referenceImageResponse.ok) {
+        const referenceImageBuffer = await referenceImageResponse.arrayBuffer();
+        referenceImageBase64 = Buffer.from(referenceImageBuffer).toString('base64');
+      }
+    } catch (e) {
+      console.warn("Could not fetch reference image", e);
+    }
   }
-
-  const referenceImageBuffer = await referenceImageResponse.arrayBuffer();
-  const referenceImageBase64 = Buffer.from(referenceImageBuffer).toString('base64');
 
   // Get location context using reverse geocoding
   const locationName = await getLocationName(latitude, longitude);
 
   // Fetch Street View image for location context
   const streetViewUrl = getStreetViewUrl(latitude, longitude);
-  let streetViewBase64 = referenceImageBase64; // Fallback to reference if Street View fails
+  let streetViewBase64: string | null = null;
 
   try {
     const streetViewResponse = await fetch(streetViewUrl);
@@ -64,8 +70,15 @@ export async function generateRunningThumbnail({
       streetViewBase64 = Buffer.from(streetViewBuffer).toString('base64');
     }
   } catch (error) {
-    console.warn("Could not fetch Street View, using reference image only:", error);
+    console.warn("Could not fetch Street View:", error);
   }
+
+  // Fallback if Street View fails but reference exists
+  if (!streetViewBase64 && referenceImageBase64) {
+    streetViewBase64 = referenceImageBase64;
+  }
+  
+  // NOTE: If both are null, we proceed with text-only generation
 
   // Build the activity context
   const distanceKm = distance ? (distance / 1000).toFixed(1) : null;
@@ -78,7 +91,11 @@ export async function generateRunningThumbnail({
 
   // Create detailed prompt for Gemini image generation
   const prompt = `
-Generate a photorealistic image of the person provided in the first reference image, placed in the environment shown in the second reference image.
+Generate a photorealistic image of ${referenceImageBase64 ? "the person provided in the first reference image" : "a fit, athletic runner"}, ${
+    streetViewBase64 
+    ? `placed in the environment shown in the ${referenceImageBase64 ? "second" : "first"} reference image.` 
+    : `running in a scenic location at "${locationName}".`
+}
 
 CONTEXT:
 - Activity Location: ${locationName} (${latitude.toFixed(4)}, ${longitude.toFixed(4)})
@@ -87,13 +104,19 @@ ${distanceKm ? `- Distance: ${distanceKm} km` : ''}
 - Time of Day: ${timeOfDay}
 - Action/Mood: ${activityContext}
 
+${referenceImageBase64 ? `
 CRITICAL IDENTITY INSTRUCTIONS:
 - The face, facial structure, skin tone, and hair MUST MATCH the person in the first image exactly
 - Maintain the complete identity and appearance of the user from the reference photo
 - Keep recognizable facial features, body type, and proportions
+` : `
+CRITICAL IDENTITY INSTRUCTIONS:
+- Generate a generic, strong, and fit athlete
+- Focus on professional athletic appearance and form
+`}
 
 POSE & COMPOSITION INSTRUCTIONS:
-- **CHANGE THE POSE**: Do NOT copy the static pose from the reference. Create a new, dynamic action pose
+${referenceImageBase64 ? "- **CHANGE THE POSE**: Do NOT copy the static pose from the reference. Create a new, dynamic action pose" : ""}
 - Generate a full-body or 3/4 body shot showing the person in motion
 - Show the person ${activityContext}
 - Use ${timeOfDay} lighting appropriate for the scene
@@ -101,7 +124,10 @@ POSE & COMPOSITION INSTRUCTIONS:
 - Include motion blur and dynamic composition to convey speed and energy
 
 ENVIRONMENT & DETAILS:
-- Place the person in the location shown in the second image
+${streetViewBase64 
+    ? `- Place the person in the location shown in the ${referenceImageBase64 ? "second" : "first"} image`
+    : `- Create a realistic environment based on the location "${locationName}" (look up typical scenery for this area)`
+}
 - Include relevant landmarks and environmental details from ${locationName}
 - Use professional sports photography aesthetic - cinematic, inspiring, authentic
 - Show appropriate ${sportType?.toLowerCase() || 'running'} gear and athletic attire
@@ -114,24 +140,32 @@ The result should look like a professional action shot taken at this specific lo
     // Use Gemini 3 Pro Image for actual image generation
     const model = genAI.getGenerativeModel({ model: "gemini-3-pro-image-preview" });
 
+    const parts: any[] = [];
+    
+    if (referenceImageBase64) {
+      parts.push({
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: referenceImageBase64,
+        },
+      });
+    }
+    
+    if (streetViewBase64) {
+      parts.push({
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: streetViewBase64,
+        },
+      });
+    }
+    
+    parts.push({ text: prompt });
+
     const result = await model.generateContent({
       contents: [{
         role: "user",
-        parts: [
-          {
-            inlineData: {
-              mimeType: "image/jpeg",
-              data: referenceImageBase64,
-            },
-          },
-          {
-            inlineData: {
-              mimeType: "image/jpeg",
-              data: streetViewBase64,
-            },
-          },
-          { text: prompt }
-        ]
+        parts: parts
       }],
       generationConfig: {
         temperature: 0.8,
@@ -154,6 +188,7 @@ The result should look like a professional action shot taken at this specific lo
         }
       }
     }
+
 
     throw new Error("No image generated in response");
 
@@ -302,6 +337,82 @@ Dynamic angle, slow motion, professional sports videography, 4k, highly detailed
     throw new Error(`Failed to generate video: ${error.message}`);
   }
   */
+}
+
+/**
+ * Evaluate multiple scenery images and choose the best one
+ * Uses Gemini Vision to act as a "Director of Photography"
+ */
+export async function evaluateScenery(
+  images: { label: string; url: string }[]
+): Promise<{ bestLabel: string; reasoning: string }> {
+  try {
+    // Attempt to use the specific Flash 001 model version
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
+
+    const prompt = `
+    You are a Director of Photography for a high-end sports documentary.
+    You are scouting locations for a running/cycling video.
+    
+    Evaluate these ${images.length} street view camera angles.
+    Choose the ONE angle that looks the most cinematic, scenic, and appropriate for a background running video.
+    
+    Criteria for selection:
+    1. AESTHETICS: Good lighting, nice scenery (trees, open road, mountains, city skyline).
+    2. DEPTH: Avoid flat walls, staring directly at bushes/fences, or blocked views.
+    3. SUITABILITY: A clear path/road where a runner/cyclist would naturally be.
+    
+    Images provided:
+    ${images.map(img => `- ${img.label}`).join('\n')}
+    
+    Return a JSON object with:
+    - bestLabel: The label of the winning image.
+    - reasoning: A short, professional explanation of why this angle wins.
+    `;
+
+    const parts: any[] = [{ text: prompt }];
+
+    // Fetch and attach images
+    for (const img of images) {
+      try {
+        const response = await fetch(img.url);
+        if (response.ok) {
+          const buffer = await response.arrayBuffer();
+          const base64 = Buffer.from(buffer).toString("base64");
+          
+          parts.push({
+            inlineData: {
+              mimeType: "image/jpeg",
+              data: base64,
+            },
+          });
+          parts.push({ text: `Image Label: ${img.label}` });
+        }
+      } catch (e) {
+        console.warn(`Failed to fetch image for evaluation: ${img.url}`);
+      }
+    }
+
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts }],
+      generationConfig: {
+        temperature: 0.4,
+        responseMimeType: "application/json",
+      },
+    });
+
+    const responseText = result.response.text();
+    const responseJson = JSON.parse(responseText);
+    
+    return {
+      bestLabel: responseJson.bestLabel || images[0].label,
+      reasoning: responseJson.reasoning || "Default selection",
+    };
+
+  } catch (error) {
+    console.warn("AI Scenery Evaluation failed, defaulting to first option:", error);
+    return { bestLabel: images[0].label, reasoning: "Evaluation failed" };
+  }
 }
 
 /**

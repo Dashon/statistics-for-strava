@@ -15,7 +15,15 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'd3o5xota0a1f83.cloudfront.net',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'maps.geoapify.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'maps.googleapis.com',
+      },
     ],
   },
 

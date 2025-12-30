@@ -59,6 +59,29 @@ export async function GET(request: NextRequest) {
         orderBy: [orderClause],
         limit,
         offset,
+        columns: {
+          activityId: true,
+          startDateTime: true,
+          name: true,
+          sportType: true,
+          distance: true,
+          movingTimeInSeconds: true,
+          averageHeartRate: true,
+          elevation: true,
+          kilojoules: true,
+          kudoCount: true,
+          averageSpeed: true,
+          maxSpeed: true,
+          averagePower: true,
+          maxPower: true,
+          maxHeartRate: true,
+          averageCadence: true,
+          calories: true,
+          startingLatitude: true,
+          startingLongitude: true,
+          polyline: true,
+          data: true, // Needed for achievementCount
+        }
       }),
       // Count total matching records
       db
@@ -92,6 +115,7 @@ export async function GET(request: NextRequest) {
       calories: act.calories,
       startingLatitude: act.startingLatitude,
       startingLongitude: act.startingLongitude,
+      hasPolyline: !!act.polyline,
     }));
 
     return NextResponse.json({

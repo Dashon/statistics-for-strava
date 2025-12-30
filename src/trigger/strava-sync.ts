@@ -1,7 +1,7 @@
 import { task, logger, tasks } from "@trigger.dev/sdk";
 import { db } from "@/db";
-import { user, activity, activityStream, athleteProfile } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { user, activity, activityStream, athleteProfile, userReferenceImages } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { 
     fetchStravaActivities, 
     fetchStravaActivityDetail, 
@@ -111,6 +111,12 @@ export const deepSyncActivity = task({
         .set(activityData)
         .where(eq(activity.activityId, payload.activityId));
 
+      // 4. [New] Trigger AI Thumbnail Generation
+      // Automatically generate if we have coordinates
+      if (activityData.startingLatitude && activityData.startingLongitude) {
+        await triggerThumbnailGeneration(payload.activityId, payload.userId, detail);
+      }
+
       return { success: true, activityId: payload.activityId };
     } catch (error: any) {
       logger.error(`Failed to deep sync activity ${payload.activityId}`, { error: error.message });
@@ -118,6 +124,34 @@ export const deepSyncActivity = task({
     }
   },
 });
+
+// Helper to trigger AI thumbnail generation if possible
+async function triggerThumbnailGeneration(activityId: string, userId: string, detail: any) {
+    // 1. Check if we have valid coordinates
+    const lat = detail.start_latlng?.[0];
+    const lng = detail.start_latlng?.[1];
+
+    if (!lat || !lng) return;
+
+    // 2. Check if user has a reference image (optional)
+    const refImage = await db.query.userReferenceImages.findFirst({
+        where: eq(userReferenceImages.userId, userId),
+        orderBy: [desc(userReferenceImages.isDefault), desc(userReferenceImages.uploadedAt)],
+    });
+
+    await tasks.trigger("generate-ai-thumbnail", {
+        activityId: activityId,
+        userId: userId,
+        referenceImageUrl: refImage?.imageUrl || null,
+        latitude: lat,
+        longitude: lng,
+        activityName: detail.name,
+        sportType: detail.sport_type || detail.type,
+        distance: detail.distance,
+        startTime: detail.start_date,
+    });
+    logger.info(`Triggered AI thumbnail generation for ${activityId}`);
+}
 
 /**
  * Sync All Strava History Task

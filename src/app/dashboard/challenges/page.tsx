@@ -8,7 +8,9 @@ export default async function ChallengesPage() {
   const session = await auth();
   if (!session) redirect("/");
 
-  const allChallenges = await db.query.challenge.findMany();
+  const allChallenges = await db.query.challenge.findMany({
+    columns: { challengeId: true, name: true, logoUrl: true, createdOn: true }
+  });
 
   return (
     <div className="p-8 space-y-8">

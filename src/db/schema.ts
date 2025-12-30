@@ -70,9 +70,10 @@ export const activity = pgTable("activity", {
   routeGeography: text("routegeography"),
   localImagePaths: text("localimagepaths"),
   workoutType: varchar("workouttype", { length: 255 }),
-  aiThumbnailUrl: varchar("ai_thumbnail_url", { length: 512 }),
+  aiThumbnailUrl: text("ai_thumbnail_url"),
   aiThumbnailPrompt: text("ai_thumbnail_prompt"),
   aiThumbnailGeneratedAt: timestamp("ai_thumbnail_generated_at", { mode: "string" }),
+  aiVideoUrl: text("ai_video_url"), // Remotion generated video URL
   
   // New expansion fields
   kilojoules: doublePrecision("kilojoules"),

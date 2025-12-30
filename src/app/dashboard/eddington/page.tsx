@@ -17,6 +17,7 @@ export default async function EddingtonPage() {
 
   const allActivities = await db.query.activity.findMany({
     where: eq(activity.userId, session.userId),
+    columns: { distance: true, sportType: true }
   });
   
   const cyclingDistances = allActivities

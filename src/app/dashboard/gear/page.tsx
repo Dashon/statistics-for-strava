@@ -13,7 +13,9 @@ export default async function GearPage() {
   const profile = await getAthleteProfile();
   const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
 
-  const allGear = await db.query.gear.findMany();
+  const allGear = await db.query.gear.findMany({
+    columns: { gearId: true, name: true, type: true, distanceInMeter: true, isRetired: true, createdOn: true }
+  });
 
   return (
     <div className="p-8 space-y-8">

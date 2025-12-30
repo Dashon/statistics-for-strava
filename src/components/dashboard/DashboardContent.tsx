@@ -6,9 +6,14 @@ import { getTimeRangeFromParams } from "@/lib/url-params";
 import MovingTimeChart from "./MovingTimeChart";
 import DistanceElevationChart from "./DistanceElevationChart";
 import ActivityTable from "./ActivityTable";
-import ActivityMap from "./ActivityMap";
 import DashboardCard from "./DashboardCard";
 import TimeRangeSelector from "./TimeRangeSelector";
+import dynamic from "next/dynamic";
+
+const ActivityMap = dynamic(() => import("./ActivityMap"), { 
+  ssr: false,
+  loading: () => <div className="w-full h-full min-h-[500px] bg-zinc-900/30 animate-pulse rounded-lg border border-zinc-800" />
+});
 import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
 import { useMemo } from "react";
 

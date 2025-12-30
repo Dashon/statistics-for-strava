@@ -14,6 +14,7 @@ import ActivityCharts from "./ActivityCharts";
 import StatPanel from "./StatPanel";
 import { syncActivityStreams } from "@/app/actions/sync";
 import MapWrapper from "./MapWrapper";
+import AiThumbnail from "./AiThumbnail";
 
 export const metadata: Metadata = {
   title: "Activity Detail | QT Statistics for Strava",
@@ -36,6 +37,38 @@ export default async function ActivityDetailPage({
   // SECURITY FIX: Fetch activity and verify it belongs to the user
   const activityData = await db.query.activity.findFirst({
     where: eq(activity.activityId, activityId),
+    columns: {
+      activityId: true,
+      userId: true,
+      sportType: true,
+      startDateTime: true,
+      name: true,
+      deviceName: true,
+      distance: true,
+      movingTimeInSeconds: true,
+      elevation: true,
+      averageSpeed: true,
+      maxSpeed: true,
+      averagePower: true,
+      maxPower: true,
+      weightedAveragePower: true,
+      averageHeartRate: true,
+      maxHeartRate: true,
+      calories: true,
+      sufferScore: true,
+      kilojoules: true,
+      elevHigh: true,
+      elevLow: true,
+      averageTemp: true,
+      kudoCount: true,
+      startingLatitude: true,
+      startingLongitude: true,
+      polyline: true,
+      aiThumbnailUrl: true,
+      aiThumbnailPrompt: true,
+      aiVideoUrl: true,
+      data: true, // Needed for segment efforts
+    }
   });
 
   if (!activityData) {
@@ -211,30 +244,48 @@ export default async function ActivityDetailPage({
 
       {/* Row 3: Main Data Area (Charts Left, Map Right) */}
       <div className="grid grid-cols-12 gap-4">
-        {/* Left: Stacked Charts */}
-        <div className="col-span-12 lg:col-span-7">
+        {/* Left: Stacked Charts - Expand to full width if no map data */}
+        <div className={`col-span-12 ${
+          (activityData.startingLatitude && activityData.startingLongitude) || activityData.polyline 
+            ? "lg:col-span-7" 
+            : "lg:col-span-12"
+        }`}>
             <ActivityCharts stream={stream} unit={unitPreference} />
         </div>
 
-        {/* Right: Integrated Map Panel */}
-        <div className="col-span-12 lg:col-span-5 h-full min-h-[600px] relative">
-            <div className="absolute inset-0 bg-zinc-950 border border-zinc-900 rounded-sm overflow-hidden">
-                <MapWrapper
-                  latlng={stream?.latlng as [number, number][]} 
-                  summaryPolyline={activityData.polyline}
-                />
-                
-                {/* Map Overlay Controls - Grafana Style */}
-                <div className="absolute top-4 right-4 flex flex-col gap-2 z-[41]">
-                    <button className="w-8 h-8 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-black transition-colors">
-                        <Zap className="w-4 h-4 text-zinc-400" />
-                    </button>
-                    <button className="w-8 h-8 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-black transition-colors">
-                        <MapPin className="w-4 h-4 text-zinc-400" />
-                    </button>
+        {/* Right: Integrated Map and AI Panel - ONLY SHOW IF LOCATION DATA EXISTS */}
+        {((activityData.startingLatitude && activityData.startingLongitude) || activityData.polyline) && (
+            <div className="col-span-12 lg:col-span-5 flex flex-col gap-4">
+                {/* AI Immersive View */}
+                    <div className="h-[400px]">
+                        <AiThumbnail 
+                            activityId={activityId} 
+                            thumbnailUrl={activityData.aiThumbnailUrl} 
+                            thumbnailPrompt={activityData.aiThumbnailPrompt}
+                            videoUrl={activityData.aiVideoUrl || null}
+                        />
+                    </div>
+
+                <div className="h-[600px] relative">
+                    <div className="absolute inset-0 bg-zinc-950 border border-zinc-900 rounded-sm overflow-hidden">
+                        <MapWrapper
+                        latlng={stream?.latlng as [number, number][]} 
+                        summaryPolyline={activityData.polyline}
+                        />
+                        
+                        {/* Map Overlay Controls */}
+                        <div className="absolute top-4 right-4 flex flex-col gap-2 z-[41]">
+                            <button className="w-8 h-8 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-black transition-colors">
+                                <Zap className="w-4 h-4 text-zinc-400" />
+                            </button>
+                            <button className="w-8 h-8 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-black transition-colors">
+                                <MapPin className="w-4 h-4 text-zinc-400" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        )}
       </div>
 
       {/* AI Coaching & Insights Section */}

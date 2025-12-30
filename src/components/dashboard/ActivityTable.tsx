@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Zap, Footprints, Bike, Trophy, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Zap, Footprints, Bike, Trophy, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useQueryStates, parseAsInteger, parseAsString } from "nuqs";
@@ -15,6 +15,7 @@ interface Activity {
   movingTime: number;
   heartRate?: number;
   elevation: number;
+  hasPolyline?: boolean;
   kilojoules?: number;
   achievementCount?: number;
   kudosCount?: number;
@@ -178,8 +179,12 @@ export default function ActivityTable({ activities, distanceUnit, pagination, sh
                 </td>
                 <td className="px-4 py-2 text-zinc-500">
                   <div className="flex items-center gap-2">
-                    {getActivityIcon(activity.type)}
                     {activity.type}
+                    {activity.hasPolyline && (
+                      <span title="Has Route Map" className="text-[#f97316]">
+                         <MapPin className="w-3 h-3" />
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-2 text-right text-zinc-300 font-mono">

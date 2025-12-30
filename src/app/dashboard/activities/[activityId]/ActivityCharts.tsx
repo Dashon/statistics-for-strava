@@ -106,7 +106,7 @@ export default function ActivityCharts({ stream, unit }: ActivityChartsProps) {
       {/* Heart rate / Speed */}
       <div className="bg-[#09090b] border border-zinc-900 rounded-lg p-6 h-[300px]">
         <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Heart rate / Speed</h3>
-        <ResponsiveContainer width="100%" height="85%">
+        <ResponsiveContainer width="100%" height="85%" debounce={100}>
           <AreaChart data={mainChartData}>
              <defs>
               <linearGradient id="colorHr" x1="0" y1="0" x2="0" y2="1">
@@ -131,7 +131,7 @@ export default function ActivityCharts({ stream, unit }: ActivityChartsProps) {
       {/* Altitude */}
       <div className="bg-[#09090b] border border-zinc-900 rounded-lg p-6 h-[150px]">
         <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Altitude</h3>
-        <ResponsiveContainer width="100%" height="80%">
+        <ResponsiveContainer width="100%" height="80%" debounce={100}>
           <AreaChart data={mainChartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#18181b" vertical={false} />
             <XAxis dataKey="time" hide />
@@ -146,7 +146,7 @@ export default function ActivityCharts({ stream, unit }: ActivityChartsProps) {
           {/* Pace Splits */}
           <div className="bg-[#09090b] border border-zinc-900 rounded-lg p-4 h-[250px]">
             <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Pace splits</h3>
-            <ResponsiveContainer width="100%" height="80%">
+            <ResponsiveContainer width="100%" height="80%" debounce={100}>
                 <BarChart data={splits}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#18181b" vertical={false} />
                     <XAxis dataKey="name" hide />
@@ -159,7 +159,7 @@ export default function ActivityCharts({ stream, unit }: ActivityChartsProps) {
           {/* Heartrate Splits */}
           <div className="bg-[#09090b] border border-zinc-900 rounded-lg p-4 h-[250px]">
             <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Heartrate splits</h3>
-            <ResponsiveContainer width="100%" height="80%">
+            <ResponsiveContainer width="100%" height="80%" debounce={100}>
                 <BarChart data={splits}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#18181b" vertical={false} />
                     <XAxis dataKey="name" hide />
@@ -176,7 +176,7 @@ export default function ActivityCharts({ stream, unit }: ActivityChartsProps) {
           {/* HR Distribution */}
           <div className="bg-[#09090b] border border-zinc-900 rounded-lg p-4 h-[250px]">
             <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Heart rate distribution</h3>
-            <ResponsiveContainer width="100%" height="80%">
+            <ResponsiveContainer width="100%" height="80%" debounce={100}>
                 <BarChart data={hrDistribution}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#18181b" vertical={false} />
                     <XAxis dataKey="bucket" stroke="#52525b" fontSize={8} tickLine={false} axisLine={false} />

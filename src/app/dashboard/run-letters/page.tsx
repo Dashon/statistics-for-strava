@@ -31,6 +31,14 @@ export default async function RunLettersPage() {
     ),
     orderBy: [desc(activity.startDateTime)],
     limit: 20, // Start with just 20 activities
+    columns: {
+      activityId: true,
+      name: true,
+      startDateTime: true,
+      distance: true,
+      movingTimeInSeconds: true,
+      averageHeartRate: true,
+    }
   });
 
   const activityIds = activities.map(a => a.activityId);

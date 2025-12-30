@@ -40,6 +40,13 @@ export async function GET(request: NextRequest) {
 
     const activities = await db.query.activity.findMany({
       where: and(...conditions),
+      columns: {
+        startDateTime: true,
+        distance: true,
+        movingTimeInSeconds: true,
+        elevation: true,
+        sportType: true,
+      }
     });
 
     // Calculate monthly stats
