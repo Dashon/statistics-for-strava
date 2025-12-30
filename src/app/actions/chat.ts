@@ -5,9 +5,9 @@ import { TrainingDirector } from "@/lib/agents/training-director";
 import { auth } from "@/auth";
 
 export async function askTrainingDirector(query: string) {
-  const session = await auth();
+  const session = (await auth()) as any;
   
-  if (!session?.user?.id) {
+  if (!session?.userId) {
     throw new Error("Unauthorized");
   }
   
@@ -19,7 +19,7 @@ export async function askTrainingDirector(query: string) {
   // In the future: Add a specific `answerQuery` method to TrainingDirector
   
   try {
-     const analysis = await TrainingDirector.performDailyCheckIn(session.user.id);
+     const analysis = await TrainingDirector.performDailyCheckIn(session.userId);
      
      // Simple rule-based response for now until we add full conversational tools
      return `[Training Director]: I've looked at your latest data. Your readiness score is ${analysis.score}/100 (${analysis.riskLevel} risk). 

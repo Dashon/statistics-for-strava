@@ -47,7 +47,7 @@ export default function Heatmap({ polylines }: { polylines: string[] }) {
         {allCoords.length > 0 && <ChangeView bounds={bounds} />}
       </MapContainer>
       
-      <div className="absolute bottom-6 left-6 z-[1000] bg-zinc-950/80 backdrop-blur-md border border-zinc-800 px-6 py-3 rounded-2xl shadow-2xl">
+      <div className="absolute bottom-6 left-6 z-[60]] bg-zinc-950/80 backdrop-blur-md border border-zinc-800 px-6 py-3 rounded-2xl shadow-2xl">
           <div className="flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
               <span className="text-white font-bold text-sm tracking-widest uppercase">{polylines.length} ACTIVITIES MAPPED</span>

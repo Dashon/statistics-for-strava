@@ -23,7 +23,7 @@ export default async function DashboardPage() {
 
   // Fetch latest Agent Readiness Score
   const latestReadiness = await db.select().from(athleteReadiness)
-    .where(eq(athleteReadiness.userId, session.user.id))
+    .where(eq(athleteReadiness.userId, session.userId))
     .orderBy(desc(athleteReadiness.date))
     .limit(1)
     .then(res => res[0] || null);

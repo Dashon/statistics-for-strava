@@ -212,7 +212,9 @@ export class TrainingDirector {
       movingTime: activity.movingTimeInSeconds,
       sufferScore: activity.sufferScore,
       date: activity.startDateTime,
-      type: activity.sportType
+      type: activity.sportType,
+      startingLatitude: activity.startingLatitude,
+      startingLongitude: activity.startingLongitude,
     }).from(activity)
       .where(and(
         eq(activity.userId, userId),
