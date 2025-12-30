@@ -127,8 +127,8 @@ export default function DashboardContent({ unitPreference, initialData }: Dashbo
       {!isLoading && (
         <>
           {/* Top Metric Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-0 divide-x divide-zinc-800 border border-zinc-800 rounded-lg overflow-hidden">
-            <div className="bg-orange-600 p-6 flex items-center justify-center col-span-1 md:col-span-1">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-0 divide-x divide-zinc-800 border border-zinc-800 rounded-lg overflow-hidden">
+            <div className="bg-orange-600 p-6 flex items-center justify-center col-span-2 md:col-span-1 lg:col-span-1">
               <h1 className="text-5xl font-bold tracking-tighter leading-none text-center">
                 Summary
               </h1>

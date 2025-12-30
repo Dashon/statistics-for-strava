@@ -145,13 +145,13 @@ export default async function ActivityDetailPage({
 
       <div className="p-4 space-y-4 max-w-[1920px] mx-auto">
       {/* 1:1 Replica Header Section */}
-      <div className="grid grid-cols-12 gap-1 h-[140px]">
+      <div className="grid grid-cols-12 gap-4 lg:gap-1 min-h-[140px] h-auto lg:h-[140px]">
         {/* Main Orange Banner Block */}
         <div className="col-span-12 lg:col-span-7 bg-[#f97316] rounded-sm overflow-hidden flex flex-col">
             {/* Title Bar */}
             <div className="px-6 py-3 border-b border-black/10 flex justify-between items-center">
-                <h1 className="text-3xl font-black text-black tracking-tighter uppercase">{activityData.name}</h1>
-                <div className="flex gap-4">
+                <h1 className="text-xl lg:text-3xl font-black text-black tracking-tighter uppercase break-words pr-2">{activityData.name}</h1>
+                <div className="flex gap-4 shrink-0">
                     <div className="w-10 h-10 bg-black/10 rounded-sm flex items-center justify-center">
                         <Footprints className="w-6 h-6 text-black" />
                     </div>
@@ -180,7 +180,7 @@ export default async function ActivityDetailPage({
                  </div>
                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Medals</span>
             </div>
-            <div className="bg-zinc-900 rounded-sm p-4 relative overflow-hidden group">
+            <div className="bg-zinc-900 rounded-sm p-4 relative overflow-hidden group min-h-[100px] lg:min-h-0">
                  <div className="relative z-10 flex flex-col h-full justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Device</span>
                     <span className="text-xs font-black text-white uppercase">{activityData.deviceName || "GPS WATCH"}</span>
@@ -191,8 +191,8 @@ export default async function ActivityDetailPage({
       </div>
 
       {/* Row 2: Nested Sub-Metrics */}
-      <div className="grid grid-cols-12 gap-1 h-auto lg:h-[80px]">
-          <div className="col-span-12 lg:col-span-9 grid grid-cols-3 lg:grid-cols-6 gap-1">
+      <div className="grid grid-cols-12 gap-1 min-h-[80px] h-auto lg:h-[80px]">
+          <div className="col-span-12 lg:col-span-9 grid grid-cols-2 lg:grid-cols-6 gap-1">
                 <StatPanel label="Elapsed" value={elapsedFormatted} size="sm" />
                 
                 <StatPanel 
@@ -230,7 +230,7 @@ export default async function ActivityDetailPage({
 
                 <StatPanel label="Suffer Score" value={activityData.sufferScore || "—"} variant={activityData.sufferScore && activityData.sufferScore > 100 ? "red" : "zinc"} size="sm" />
           </div>
-          <div className="col-span-12 lg:col-span-3 bg-zinc-900/50 border border-zinc-900 rounded-sm flex items-center justify-between px-6">
+          <div className="col-span-12 lg:col-span-3 bg-zinc-900/50 border border-zinc-900 rounded-sm flex items-center justify-between px-6 py-4 lg:py-0">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Date</span>
                 <span className="text-xs font-black text-zinc-400">{new Date(activityData.startDateTime || "").toLocaleDateString(undefined, {
                     weekday: 'short',
