@@ -5,6 +5,9 @@ import { getAthleteProfile } from "@/app/actions/profile";
 import { type MeasurementUnit } from "@/lib/units";
 import SyncButton from "./SyncButton";
 import DashboardContent from "@/components/dashboard/DashboardContent";
+import { db } from "@/db";
+import { athleteReadiness } from "@/db/schema";
+import { desc, eq } from "drizzle-orm";
 
 export const metadata = {
   title: "Dashboard | QT Statistics for Strava",
@@ -17,6 +20,13 @@ export default async function DashboardPage() {
 
   const profile = await getAthleteProfile();
   const unitPreference = (profile?.measurementUnit as MeasurementUnit) || 'metric';
+
+  // Fetch latest Agent Readiness Score
+  const latestReadiness = await db.select().from(athleteReadiness)
+    .where(eq(athleteReadiness.userId, session.user.id))
+    .orderBy(desc(athleteReadiness.date))
+    .limit(1)
+    .then(res => res[0] || null);
 
   return (
     <div className="bg-zinc-950 min-h-screen text-white">
@@ -35,7 +45,10 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <DashboardContent unitPreference={unitPreference} />
+      <DashboardContent 
+        unitPreference={unitPreference} 
+        readiness={latestReadiness}
+      />
     </div>
   );
 }

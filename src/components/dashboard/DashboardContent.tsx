@@ -11,6 +11,7 @@ import ActivityTable from "./ActivityTable";
 import DashboardCard from "./DashboardCard";
 import TimeRangeSelector from "./TimeRangeSelector";
 import dynamic from "next/dynamic";
+import { ReadinessCard } from "./ReadinessCard";
 
 const ActivityMap = dynamic(() => import("./ActivityMap"), { 
   ssr: false,
@@ -22,6 +23,7 @@ import { useMemo } from "react";
 interface DashboardContentProps {
   unitPreference: MeasurementUnit;
   initialData?: any;
+  readiness?: any; // Ideally typed from schema infer
 }
 
 function formatSeconds(seconds: number): string {
@@ -31,7 +33,7 @@ function formatSeconds(seconds: number): string {
   return [h, m, s].map((v) => v.toString().padStart(2, "0")).join(":");
 }
 
-export default function DashboardContent({ unitPreference, initialData }: DashboardContentProps) {
+export default function DashboardContent({ unitPreference, initialData, readiness }: DashboardContentProps) {
   const [params] = useQueryStates({
     from: parseAsIsoDateTime,
     to: parseAsIsoDateTime,
@@ -144,6 +146,17 @@ export default function DashboardContent({ unitPreference, initialData }: Dashbo
 
       {!isLoading && (
         <>
+          {/* Readiness Card (Agentic Feature) */}
+          {readiness && (
+            <ReadinessCard
+              score={readiness.readinessScore || 0}
+              risk={readiness.injuryRisk || 'low'}
+              summary={readiness.summary || 'No data available'}
+              recommendation={readiness.recommendation || 'Listen to your body'}
+              date={readiness.date}
+            />
+          )}
+
           {/* Top Metric Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-0 divide-x divide-zinc-800 border border-zinc-800 rounded-lg overflow-hidden">
             <div className="bg-orange-600 p-6 flex items-center justify-center col-span-2 md:col-span-1 lg:col-span-1">
