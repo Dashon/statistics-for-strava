@@ -376,3 +376,75 @@ export const socialContent = pgTable("social_content", {
         activityIdx: index("social_content_activity_id").on(table.activityId),
     }
 });
+
+// ============================================================================
+// INFLUENCER PROFILE FEATURE
+// ============================================================================
+
+// Public Profile - Public-facing athlete settings
+export const publicProfile = pgTable("public_profile", {
+    userId: varchar("user_id", { length: 255 }).primaryKey(),
+    username: varchar("username", { length: 50 }).unique(), // URL slug: /athlete/[username]
+    isPublic: boolean("is_public").default(false),
+    displayName: varchar("display_name", { length: 255 }),
+    tagline: text("tagline"), // "Ultra Runner | 100-mile finisher"
+    coverImageUrl: text("cover_image_url"),
+    socialLinks: json("social_links"), // { instagram, twitter, strava, youtube }
+    featuredActivityId: varchar("featured_activity_id", { length: 255 }),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
+}, (table) => ({
+    usernameIdx: index("public_profile_username").on(table.username),
+}));
+
+// Live Event - Scheduled/active events
+export const liveEvent = pgTable("live_event", {
+    eventId: varchar("event_id", { length: 255 }).primaryKey(),
+    userId: varchar("user_id", { length: 255 }).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    eventType: varchar("event_type", { length: 50 }), // marathon, ultra, training, podcast
+    status: varchar("status", { length: 20 }).default("scheduled"), // scheduled, live, ended
+    scheduledStart: timestamp("scheduled_start", { mode: "string" }),
+    actualStart: timestamp("actual_start", { mode: "string" }),
+    actualEnd: timestamp("actual_end", { mode: "string" }),
+    streamUrl: text("stream_url"), // YouTube/Twitch embed URL
+    thumbnailUrl: text("thumbnail_url"),
+    linkedActivityId: varchar("linked_activity_id", { length: 255 }),
+    viewerCount: integer("viewer_count").default(0),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+}, (table) => ({
+    userStatusIdx: index("live_event_user_status").on(table.userId, table.status),
+    scheduledIdx: index("live_event_scheduled").on(table.scheduledStart),
+}));
+
+// Event Chat - Real-time chat messages
+export const eventChat = pgTable("event_chat", {
+    messageId: varchar("message_id", { length: 255 }).primaryKey(),
+    eventId: varchar("event_id", { length: 255 }).notNull(),
+    userId: varchar("user_id", { length: 255 }).notNull(),
+    userName: varchar("user_name", { length: 255 }), // Denormalized for perf
+    userAvatar: varchar("user_avatar", { length: 512 }),
+    content: text("content").notNull(),
+    isDeleted: boolean("is_deleted").default(false),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+}, (table) => ({
+    eventCreatedIdx: index("event_chat_event_created").on(table.eventId, table.createdAt),
+}));
+
+// Broadcast Archive - Past event recordings
+export const broadcastArchive = pgTable("broadcast_archive", {
+    archiveId: varchar("archive_id", { length: 255 }).primaryKey(),
+    eventId: varchar("event_id", { length: 255 }),
+    userId: varchar("user_id", { length: 255 }).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    videoUrl: text("video_url").notNull(), // YouTube/Vimeo URL
+    thumbnailUrl: text("thumbnail_url"),
+    durationSeconds: integer("duration_seconds"),
+    viewCount: integer("view_count").default(0),
+    linkedActivityId: varchar("linked_activity_id", { length: 255 }),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+}, (table) => ({
+    userIdx: index("broadcast_archive_user").on(table.userId),
+}));

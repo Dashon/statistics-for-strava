@@ -21,8 +21,11 @@ import {
   X,
   User,
   LogOut,
-  ChevronRight
+  ChevronRight,
+  Video,
+  Globe
 } from "lucide-react";
+
 import { signOut } from "next-auth/react";
 
 const navigation = [
@@ -52,12 +55,20 @@ const navigation = [
     ]
   },
   {
+    group: "Creator",
+    items: [
+      { name: "Live Events", href: "/dashboard/events", icon: Video },
+      { name: "Public Profile", href: "/dashboard/profile/public", icon: Globe },
+    ]
+  },
+  {
     group: "System",
     items: [
       { name: "Settings", href: "/dashboard/settings", icon: Settings },
     ]
   }
 ];
+
 
 interface SidebarProps {
   profile?: {

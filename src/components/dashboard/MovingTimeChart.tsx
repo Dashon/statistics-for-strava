@@ -108,7 +108,7 @@ function MovingTimeChart({ data, granularity = 'month' }: MovingTimeChartProps) 
             itemStyle={{ color: "#fff" }}
             cursor={{ fill: "rgba(255, 255, 255, 0.05)" }}
             labelFormatter={(label) => formatPeriodLabel(label, granularity)}
-            formatter={(value: number | undefined, name: string) => [`${((value || 0) / 3600).toFixed(1)}h`, name]}
+            formatter={(value: number | undefined, name?: string) => [`${((value || 0) / 3600).toFixed(1)}h`, name || '']}
           />
           <Legend iconType="circle" wrapperStyle={{ paddingTop: "20px" }} />
           <Bar
