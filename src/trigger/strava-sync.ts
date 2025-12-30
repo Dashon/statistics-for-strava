@@ -77,12 +77,12 @@ export const deepSyncActivity = task({
         // Performance Metrics
         averageSpeed: detail.average_speed,
         maxSpeed: detail.max_speed,
-        averageHeartRate: detail.average_heartrate ? Math.round(detail.average_heartrate) : null,
-        maxHeartRate: detail.max_heartrate ? Math.round(detail.max_heartrate) : null,
-        averageCadence: detail.average_cadence ? Math.round(detail.average_cadence) : null,
-        averagePower: detail.average_watts ? Math.round(detail.average_watts) : null,
-        maxPower: detail.max_watts ? Math.round(detail.max_watts) : null,
-        calories: detail.calories ? Math.round(detail.calories) : null,
+        averageHeartRate: detail.average_heartrate ? Math.round(Number(detail.average_heartrate)) : null,
+        maxHeartRate: detail.max_heartrate ? Math.round(Number(detail.max_heartrate)) : null,
+        averageCadence: detail.average_cadence ? Math.round(Number(detail.average_cadence)) : null,
+        averagePower: detail.average_watts ? Math.round(Number(detail.average_watts)) : null,
+        maxPower: detail.max_watts ? Math.round(Number(detail.max_watts)) : null,
+        calories: detail.calories ? Math.round(Number(detail.calories)) : null,
         
         // Metadata
         gearId: detail.gear_id,
@@ -93,11 +93,11 @@ export const deepSyncActivity = task({
         
         // New Expansion Fields
         kilojoules: detail.kilojoules,
-        weightedAveragePower: detail.weighted_average_watts ? Math.round(detail.weighted_average_watts) : null,
+        weightedAveragePower: detail.weighted_average_watts ? Math.round(Number(detail.weighted_average_watts)) : null,
         elevHigh: detail.elev_high,
         elevLow: detail.elev_low,
-        averageTemp: detail.average_temp ? Math.round(detail.average_temp) : null,
-        sufferScore: detail.suffer_score ? Math.round(detail.suffer_score) : null,
+        averageTemp: detail.average_temp ? Math.round(Number(detail.average_temp)) : null,
+        sufferScore: detail.suffer_score ? Math.round(Number(detail.suffer_score)) : null,
         
         // Full raw data
         data: detail,
@@ -192,13 +192,13 @@ export const syncStravaHistory = task({
         // Basic metrics from summary
         averageSpeed: act.average_speed,
         maxSpeed: act.max_speed,
-        averageHeartRate: act.average_heartrate ? Math.round(act.average_heartrate) : null,
-        maxHeartRate: act.max_heartrate ? Math.round(act.max_heartrate) : null,
+        averageHeartRate: act.average_heartrate ? Math.round(Number(act.average_heartrate)) : null,
+        maxHeartRate: act.max_heartrate ? Math.round(Number(act.max_heartrate)) : null,
         startingLatitude: act.start_latlng?.[0],
         startingLongitude: act.start_latlng?.[1],
         
         // Basic expansion metrics from summary if available
-        sufferScore: act.suffer_score ? Math.round(act.suffer_score) : null,
+        sufferScore: act.suffer_score ? Math.round(Number(act.suffer_score)) : null,
       };
 
       await db.insert(activity).values(activityData).onConflictDoUpdate({
