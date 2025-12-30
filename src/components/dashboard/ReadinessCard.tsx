@@ -1,10 +1,9 @@
 
 "use client";
 
-
 import { Activity, Brain, AlertTriangle, CheckCircle, Play, Loader2, Headphones } from "lucide-react";
 import { useState } from "react";
-import { generateDailyBriefing } from "@/app/actions/audio-briefing";
+import { generateDailyBriefing, getBriefingStatus } from "@/app/actions/audio-briefing";
 import { useRouter } from "next/navigation";
 
 interface ReadinessCardProps {
@@ -24,13 +23,29 @@ export const ReadinessCard = ({ score, risk, summary, recommendation, date, audi
     setIsGenerating(true);
     try {
       await generateDailyBriefing();
-      router.refresh(); // Refresh to show the new audio URL
+      
+      // Poll for completion
+      const interval = setInterval(async () => {
+          const result = await getBriefingStatus();
+          if (result.status === 'completed') {
+              clearInterval(interval);
+              setIsGenerating(false);
+              router.refresh(); // Refresh to show the new audio URL
+          }
+      }, 3000); // Check every 3 seconds
+
+      // Timeout after 60s
+      setTimeout(() => {
+          clearInterval(interval);
+          setIsGenerating(false);
+      }, 60000);
+
     } catch (e) {
       console.error(e);
-    } finally {
       setIsGenerating(false);
     }
   };
+
   // Determine color theme based on score/risk
   let colorClass = "bg-zinc-800 border-zinc-700";
   let textClass = "text-zinc-200";
