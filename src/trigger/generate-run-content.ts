@@ -2,7 +2,7 @@ import { task, logger } from "@trigger.dev/sdk";
 import { db } from "@/db";
 import { activity, runLetters, coachingInsights, generationStatus, athleteProfile } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import {
   calculateHRDrift,
   calculateHeartRateZones,
@@ -10,8 +10,8 @@ import {
   calculateMaxHeartRate,
 } from "@/lib/training-metrics";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
 // Helper function to strip markdown
@@ -72,15 +72,17 @@ export const generateRunLetterTask = task({
         Do not use "Dear Diary". Just start writing. Focus on the feeling of showing up.
       `;
 
-      const msg = await anthropic.messages.create({
-        model: "claude-haiku-4-5-20251001",
+      const response = await openai.chat.completions.create({
+        model: "gpt-5.2",
         max_tokens: 300,
         temperature: 0.7,
-        system: "You are a thoughtful running philosopher.",
-        messages: [{ role: "user", content: prompt }]
+        messages: [
+          { role: "system", content: "You are a thoughtful running philosopher." },
+          { role: "user", content: prompt }
+        ]
       });
 
-      const rawText = msg.content[0].type === 'text' ? msg.content[0].text : "";
+      const rawText = response.choices[0].message.content || "";
       const letterText = stripMarkdown(rawText);
 
       // Save to database
@@ -179,15 +181,17 @@ export const generateCoachingInsightTask = task({
       prompt += `3. What are the performance implications?\n`;
       prompt += `4. What should the athlete do next?`;
 
-      const message = await anthropic.messages.create({
-        model: 'claude-haiku-4-5-20251001',
+      const response = await openai.chat.completions.create({
+        model: "gpt-5.2",
         max_tokens: 2000,
         temperature: 0.3,
-        system: "You are an elite endurance coach analyzing workout data.",
-        messages: [{ role: 'user', content: prompt }],
+        messages: [
+          { role: "system", content: "You are an elite endurance coach analyzing workout data." },
+          { role: "user", content: prompt }
+        ],
       });
 
-      const aiResponse = message.content[0].type === 'text' ? message.content[0].text : '';
+      const aiResponse = response.choices[0].message.content || "";
       const cleanText = stripMarkdown(aiResponse);
 
       // Extract run classification

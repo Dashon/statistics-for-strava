@@ -4,11 +4,11 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { activity, runLetters } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { revalidatePath } from "next/cache";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.CLAUDE_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function generateRunLetter(activityId: string) {
@@ -34,15 +34,17 @@ export async function generateRunLetter(activityId: string) {
   `;
 
   try {
-    const msg = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+    const response = await openai.chat.completions.create({
+      model: "gpt-5.2",
       max_tokens: 300,
       temperature: 0.7,
-      system: "You are a thoughtful running philosopher.",
-      messages: [{ role: "user", content: prompt }]
+      messages: [
+        { role: "system", content: "You are a thoughtful running philosopher." },
+        { role: "user", content: prompt }
+      ]
     });
 
-    const rawText = msg.content[0].type === 'text' ? msg.content[0].text : "";
+    const rawText = response.choices[0].message.content || "";
 
     // Strip markdown formatting for cleaner display
     const letterText = rawText

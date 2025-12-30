@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { activity, coachingInsights, athleteProfile } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 import {
   calculateHRDrift,
   calculateHeartRateZones,
@@ -12,8 +12,8 @@ import {
   calculateMaxHeartRate,
 } from '@/lib/training-metrics';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
 const COACHING_SYSTEM_PROMPT = `You are an elite endurance coach analyzing workout data. Your role is to provide detailed, actionable performance insights based on heart rate, pacing, and effort data.
@@ -176,16 +176,18 @@ export async function generateCoachingInsight(activityId: string) {
   // Build comprehensive prompt
   const prompt = buildCoachingPrompt(activityData, athleteMaxHR, hrStreamData, paceStreamData);
 
-  // Call Claude for analysis
-  const message = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
+  // Call OpenAI for analysis
+  const response = await openai.chat.completions.create({
+    model: 'gpt-5.2',
     max_tokens: 2000,
-    temperature: 0.3, // Lower for more analytical/consistent
-    system: COACHING_SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.3,
+    messages: [
+      { role: 'system', content: COACHING_SYSTEM_PROMPT },
+      { role: 'user', content: prompt }
+    ],
   });
 
-  const aiResponse = message.content[0].type === 'text' ? message.content[0].text : '';
+  const aiResponse = response.choices[0].message.content || '';
 
   // Strip markdown formatting for cleaner display
   const cleanText = aiResponse
