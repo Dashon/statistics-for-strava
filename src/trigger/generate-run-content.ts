@@ -74,7 +74,7 @@ export const generateRunLetterTask = task({
 
       const response = await openai.chat.completions.create({
         model: "gpt-5.2",
-        max_tokens: 300,
+        max_completion_tokens: 300,
         temperature: 0.7,
         messages: [
           { role: "system", content: "You are a thoughtful running philosopher." },
@@ -183,7 +183,7 @@ export const generateCoachingInsightTask = task({
 
       const response = await openai.chat.completions.create({
         model: "gpt-5.2",
-        max_tokens: 2000,
+        max_completion_tokens: 2000,
         temperature: 0.3,
         messages: [
           { role: "system", content: "You are an elite endurance coach analyzing workout data." },

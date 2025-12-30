@@ -179,7 +179,7 @@ export async function generateCoachingInsight(activityId: string) {
   // Call OpenAI for analysis
   const response = await openai.chat.completions.create({
     model: 'gpt-5.2',
-    max_tokens: 2000,
+    max_completion_tokens: 2000,
     temperature: 0.3,
     messages: [
       { role: 'system', content: COACHING_SYSTEM_PROMPT },

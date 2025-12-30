@@ -121,7 +121,7 @@ export default function AiThumbnail({
         )}
         
         {/* Controls Overlay */}
-        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20 pointer-events-none">
+        <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-20 pointer-events-none">
           <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-sm border border-white/10 pointer-events-auto">
             <p className="text-[10px] font-bold uppercase tracking-widest text-white flex items-center gap-2">
               <MapPin className="w-3 h-3 text-[#f97316]" />

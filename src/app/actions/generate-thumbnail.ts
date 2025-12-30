@@ -7,8 +7,8 @@ import { eq, desc } from "drizzle-orm";
 import { tasks } from "@trigger.dev/sdk";
 
 export async function generateThumbnail(activityId: string) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const session = await auth() as any;
+  if (!session?.userId) {
     throw new Error("Unauthorized");
   }
 
@@ -25,7 +25,7 @@ export async function generateThumbnail(activityId: string) {
 
   // Fetch reference image (optional)
   const refImage = await db.query.userReferenceImages.findFirst({
-    where: eq(userReferenceImages.userId, session.user.id),
+    where: eq(userReferenceImages.userId, session.userId),
     orderBy: [desc(userReferenceImages.isDefault), desc(userReferenceImages.uploadedAt)],
   });
 
@@ -46,7 +46,7 @@ export async function generateThumbnail(activityId: string) {
   // Trigger generation
   await tasks.trigger("generate-ai-thumbnail", {
     activityId: activityId,
-    userId: session.user.id,
+    userId: session.userId,
     referenceImageUrl: refImage?.imageUrl || null,
     latitude: activityData.startingLatitude,
     longitude: activityData.startingLongitude,
