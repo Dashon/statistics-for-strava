@@ -67,14 +67,15 @@ export async function checkUsernameAvailable(username: string): Promise<{ availa
 // Get the current user's public profile
 export async function getMyPublicProfile(): Promise<PublicProfileData | null> {
   const session = await auth() as any;
-  if (!session?.userId) {
+  const userId = session?.user?.id || session?.userId;
+  if (!userId) {
     return null;
   }
 
   const profiles = await db
     .select()
     .from(publicProfile)
-    .where(eq(publicProfile.userId, session.userId))
+    .where(eq(publicProfile.userId, userId))
     .limit(1);
 
   if (!profiles[0]) return null;
@@ -142,7 +143,8 @@ export async function updatePublicProfile(data: {
   isPublic?: boolean;
 }): Promise<{ success: boolean; error?: string }> {
   const session = await auth() as any;
-  if (!session?.userId) {
+  const userId = session?.user?.id || session?.userId;
+  if (!userId) {
     return { success: false, error: 'Not authenticated' };
   }
 
@@ -155,7 +157,7 @@ export async function updatePublicProfile(data: {
       const existing = await db
         .select({ username: publicProfile.username })
         .from(publicProfile)
-        .where(eq(publicProfile.userId, session.userId))
+        .where(eq(publicProfile.userId, userId))
         .limit(1);
 
       // Only block if username is taken by someone else
@@ -170,13 +172,13 @@ export async function updatePublicProfile(data: {
     const existingProfile = await db
       .select({ userId: publicProfile.userId })
       .from(publicProfile)
-      .where(eq(publicProfile.userId, session.userId))
+      .where(eq(publicProfile.userId, userId))
       .limit(1);
 
     if (existingProfile.length === 0) {
       // Create new profile
       await db.insert(publicProfile).values({
-        userId: session.userId,
+        userId: userId,
         username: data.username || null,
         displayName: data.displayName || null,
         tagline: data.tagline || null,
@@ -201,7 +203,7 @@ export async function updatePublicProfile(data: {
           ...(data.isPublic !== undefined && { isPublic: data.isPublic }),
           updatedAt: now,
         })
-        .where(eq(publicProfile.userId, session.userId));
+        .where(eq(publicProfile.userId, userId));
     }
 
     revalidatePath('/dashboard/profile/public');
@@ -218,12 +220,13 @@ export async function updatePublicProfile(data: {
 
 export async function updateLayoutConfig(config: any) {
   const session = await auth() as any;
-  if (!session?.userId) throw new Error("Unauthorized");
+  const userId = session?.user?.id || session?.userId;
+  if (!userId) throw new Error("Unauthorized");
 
   await db
     .update(publicProfile)
     .set({ layoutConfig: config, updatedAt: new Date().toISOString() })
-    .where(eq(publicProfile.userId, session.userId));
+    .where(eq(publicProfile.userId, userId));
 
   revalidatePath('/athlete/[username]', 'page');
   revalidatePath('/dashboard/profile/layout');

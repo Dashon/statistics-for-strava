@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { getFeaturedProfile } from "@/app/actions/modular-profile";
 import { StatsHeaderDetailed } from "./widgets/StatsHeader";
 import { TrainingVolume } from "./widgets/TrainingVolume";
@@ -10,13 +11,16 @@ import { ConsistencyCalendar } from "./widgets/ConsistencyCalendar";
 import { NextRace } from "./widgets/NextRace";
 import { FormCurve } from "./widgets/FormCurve";
 import Image from "next/image";
-import { Instagram, Twitter, Youtube, Trophy, ExternalLink, Share2, Bell } from "lucide-react";
+import { Instagram, Twitter, Youtube, Trophy, ExternalLink, Share2, Bell, Edit3 } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import dynamic from "next/dynamic";
+import { CinematicHero } from "./CinematicHero";
+import { ProfileEditorDock } from "./ProfileEditorDock";
 
+// Grid Layout is only used for backward compatibility if user has a custom layout saved
 const GridLayout = dynamic(
   () => import("react-grid-layout").then((mod) => {
     const RGL = mod.default || mod;
@@ -30,6 +34,7 @@ const GridLayout = dynamic(
 
 interface ModularProfileProps {
   data: NonNullable<Awaited<ReturnType<typeof getFeaturedProfile>>>;
+  isOwner?: boolean;
 }
 
 // Helper function for formatting duration
@@ -39,74 +44,18 @@ function formatDuration(seconds: number) {
   return `${h}:${m.toString().padStart(2, '0')}`;
 }
 
-// Extracted ProfileHeader component
-function ProfileHeader({ user }: { user: ModularProfileProps['data']['user'] }) {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 border-b border-zinc-800 pb-6 gap-4"
-    >
-      <div className="flex items-center gap-6">
-        {user.avatarUrl ? (
-          <div className="relative">
-            <div className="absolute inset-0 bg-orange-500 blur-lg opacity-20 rounded-full" />
-            <img 
-              src={user.avatarUrl} 
-              alt={user.displayName || 'Athlete'} 
-              className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-zinc-900 relative z-10"
-            />
-          </div>
-        ) : (
-           <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center font-bold text-2xl border-4 border-zinc-900">
-              {user.displayName?.[0] || 'A'}
-           </div>
-        )}
-        
-        <div>
-           <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white uppercase leading-none">
-             {user.displayName || 'Featured Athlete'}
-           </h1>
-           {user.tagline && (
-             <p className="text-zinc-400 font-medium text-lg mt-1 max-w-xl">
-               {user.tagline}
-             </p>
-           )}
-        </div>
-      </div>
-
-      <div className="flex gap-4">
-         {/* Social Links */}
-         {!!user.socialLinks && typeof user.socialLinks === 'object' && (
-           <div className="flex gap-2">
-             {(user.socialLinks as any).instagram && (
-                <Link href={(user.socialLinks as any).instagram} target="_blank" className="p-2 bg-zinc-800 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
-                    <Instagram className="w-4 h-4" />
-                </Link>
-             )}
-             {(user.socialLinks as any).twitter && (
-                <Link href={(user.socialLinks as any).twitter} target="_blank" className="p-2 bg-zinc-800 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
-                    <Twitter className="w-4 h-4" />
-                </Link>
-             )}
-             {(user.socialLinks as any).youtube && (
-                <Link href={(user.socialLinks as any).youtube} target="_blank" className="p-2 bg-zinc-800 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
-                    <Youtube className="w-4 h-4" />
-                </Link>
-             )}
-           </div>
-         )}
-         <Link href="/dashboard" className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full font-bold text-sm transition-colors border border-zinc-700">
-            Dashboard
-         </Link>
-      </div>
-    </motion.div>
-  );
-}
-
-export function ModularProfile({ data }: ModularProfileProps) {
-  const { user, stats, recentActivities, previousRaces, upcomingEvents, upcomingRaces, calendarData, formCurve } = data;
+export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
+  const {  stats, recentActivities, previousRaces, upcomingEvents, upcomingRaces, calendarData, formCurve } = data;
+  
+  // Edit Mode State
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // Local state for WYSIWYG editing
+  const [userState, setUserState] = useState(data.user);
+  
+  const handleProfileUpdate = (newData: Partial<typeof userState>) => {
+    setUserState(prev => ({ ...prev, ...newData }));
+  };
 
   const widgets: Record<string, React.ReactNode> = {
     stats_header: <StatsHeaderDetailed stats={stats} />,
@@ -185,20 +134,27 @@ export function ModularProfile({ data }: ModularProfileProps) {
     ),
   };
   
-  // Custom Layout Render
-  if (Array.isArray((user as any).layoutConfig)) {
-      const layout = (user as any).layoutConfig as any[];
+  // Custom Layout Render using Grid Layout (Legacy or Specific Config)
+  if (Array.isArray((userState as any).layoutConfig)) {
+      const layout = (userState as any).layoutConfig as any[];
       return (
         <div className="min-h-screen bg-zinc-950 text-white p-4 md:p-6 lg:p-8 font-sans">
           <div className="max-w-[1600px] mx-auto space-y-6">
-            <ProfileHeader user={user} />
+             {/* Note: ProfileHeader is removed here as we switch to CinematicHero */}
+            <CinematicHero 
+               user={userState} 
+               heroImageUrl={userState.heroImageUrl}
+               isEditing={isEditing}
+               onHeroUpdate={(url) => handleProfileUpdate({ heroImageUrl: url })}
+            />
+            
             <div className="relative">
                 <GridLayout
                   className="layout"
                   layout={layout}
                   cols={12}
                   rowHeight={30}
-                  width={1600} // This should be responsive, but simplified for now
+                  width={1600} 
                   isDraggable={false}
                   isResizable={false}
                 >
@@ -214,72 +170,75 @@ export function ModularProfile({ data }: ModularProfileProps) {
       );
   }
 
+  // STANDARD TEMPLATE RENDER (Runner / Racer / Global / Minimal)
+  // For now we implement the default comprehensive view, but styles can change based on templateId
   return (
-    <div className="min-h-screen bg-zinc-950 text-white p-4 md:p-6 lg:p-8 font-sans">
-      <div className="max-w-[1600px] mx-auto space-y-6">
-        
-        {/* Top Header: Identity */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 border-b border-zinc-800 pb-6 gap-4"
+    <div className={`min-h-screen bg-zinc-950 text-white pb-32 font-sans relative`}>
+      
+      {/* Edit Toggle for Owner */}
+      {isOwner && !isEditing && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          onClick={() => setIsEditing(true)}
+          className="fixed bottom-6 right-6 z-50 px-6 py-3 bg-white text-black font-bold rounded-full shadow-2xl hover:scale-105 transition-transform flex items-center gap-2"
         >
-          <div className="flex items-center gap-6">
-            {user.avatarUrl ? (
-              <div className="relative">
-                <div className="absolute inset-0 bg-orange-500 blur-lg opacity-20 rounded-full" />
-                <img 
-                  src={user.avatarUrl} 
-                  alt={user.displayName || 'Athlete'} 
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-zinc-900 relative z-10"
-                />
-              </div>
-            ) : (
-               <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center font-bold text-2xl border-4 border-zinc-900">
-                  {user.displayName?.[0] || 'A'}
-               </div>
-            )}
-            
-            <div>
-               <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white uppercase leading-none">
-                 {user.displayName || 'Featured Athlete'}
-               </h1>
-               {user.tagline && (
-                 <p className="text-zinc-400 font-medium text-lg mt-1 max-w-xl">
-                   {user.tagline}
-                 </p>
-               )}
-            </div>
-          </div>
+          <Edit3 className="w-4 h-4" />
+          Edit Profile
+        </motion.button>
+      )}
 
-          <div className="flex gap-4">
-             {/* Social Links */}
-             {/* Social Links */}
-             {!!user.socialLinks && typeof user.socialLinks === 'object' && (
-               <div className="flex gap-2">
-                 {(user.socialLinks as any).instagram && (
-                    <Link href={(user.socialLinks as any).instagram} target="_blank" className="p-2 bg-zinc-800 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
+      {/* Profile Editor Dock */}
+      <AnimatePresence>
+        {isEditing && (
+          <ProfileEditorDock 
+            initialData={{
+              templateId: (userState.templateId as any) || 'runner',
+              displayName: userState.displayName || '',
+              tagline: userState.tagline || '',
+              countryCode: userState.countryCode || undefined
+            }}
+            onUpdate={handleProfileUpdate}
+            onClose={() => setIsEditing(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <div className="max-w-[1600px] mx-auto space-y-6 p-4 md:p-6 lg:p-8">
+        
+        {/* Cinematic Hero Section */}
+        <CinematicHero 
+          user={userState}
+          heroImageUrl={userState.heroImageUrl}
+          isEditing={isEditing}
+          onHeroUpdate={(url) => handleProfileUpdate({ heroImageUrl: url })}
+        />
+
+        {/* Social Links Bar */}
+        <div className="flex justify-end gap-2 border-b border-zinc-800 pb-4">
+             {!!userState.socialLinks && typeof userState.socialLinks === 'object' && (
+               <>
+                 {(userState.socialLinks as any).instagram && (
+                    <Link href={(userState.socialLinks as any).instagram} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
                         <Instagram className="w-4 h-4" />
                     </Link>
                  )}
-                 {(user.socialLinks as any).twitter && (
-                    <Link href={(user.socialLinks as any).twitter} target="_blank" className="p-2 bg-zinc-800 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
+                 {(userState.socialLinks as any).twitter && (
+                    <Link href={(userState.socialLinks as any).twitter} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
                         <Twitter className="w-4 h-4" />
                     </Link>
                  )}
-                 {(user.socialLinks as any).youtube && (
-                    <Link href={(user.socialLinks as any).youtube} target="_blank" className="p-2 bg-zinc-800 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
+                 {(userState.socialLinks as any).youtube && (
+                    <Link href={(userState.socialLinks as any).youtube} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
                         <Youtube className="w-4 h-4" />
                     </Link>
                  )}
-               </div>
+               </>
              )}
              <Link href="/dashboard" className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full font-bold text-sm transition-colors border border-zinc-700">
                 Dashboard
              </Link>
-          </div>
-        </motion.div>
+        </div>
 
         {/* Row 1: Summary Stats Bar */}
         <motion.div

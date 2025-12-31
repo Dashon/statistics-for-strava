@@ -16,6 +16,7 @@ export default function PublicProfileEditorPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
+  const [initialUsername, setInitialUsername] = useState<string>('');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -50,6 +51,7 @@ export default function PublicProfileEditorPage() {
             youtube: '',
           },
         });
+        setInitialUsername(profile.username || '');
       }
       setIsLoading(false);
     }
@@ -64,6 +66,10 @@ export default function PublicProfileEditorPage() {
     }
 
     const timer = setTimeout(async () => {
+      if (formData.username === initialUsername) {
+        setUsernameStatus('available');
+        return;
+      }
       setUsernameStatus('checking');
       const result = await checkUsernameAvailable(formData.username);
       setUsernameStatus(result.available ? 'available' : 'taken');

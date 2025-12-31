@@ -5,7 +5,20 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 async function runMigration() {
-  const migrationPath = path.join(process.cwd(), 'scripts', 'migrations', '003_races_system.sql');
+  const argFile = process.argv[2];
+  let migrationPath: string;
+  
+  if (argFile) {
+    migrationPath = path.isAbsolute(argFile) ? argFile : path.join(process.cwd(), argFile);
+  } else {
+    migrationPath = path.join(process.cwd(), 'scripts', 'migrations', '003_races_system.sql');
+  }
+
+  if (!fs.existsSync(migrationPath)) {
+    console.error(`Migration file not found: ${migrationPath}`);
+    process.exit(1);
+  }
+
   const migrationSql = fs.readFileSync(migrationPath, 'utf-8');
   
   console.log('Running migration with Drizzle...');

@@ -406,6 +406,13 @@ export const publicProfile = pgTable("public_profile", {
     socialLinks: json("social_links"), // { instagram, twitter, strava, youtube }
     layoutConfig: json("layout_config"), // Layout preferences and privacy settings
     featuredActivityId: varchar("featured_activity_id", { length: 255 }),
+    // Cinematic profile fields
+    heroImageUrl: text("hero_image_url"), // AI-generated cinematic poster
+    heroGeneratedAt: timestamp("hero_generated_at", { mode: "string" }),
+    templateId: varchar("template_id", { length: 50 }).default("runner"), // runner, racer, global, minimal
+    accolades: json("accolades"), // Array of { id, imageUrl, caption, type }
+    countryCode: varchar("country_code", { length: 3 }), // ISO 3166-1 alpha-2 for flag
+    profileSetupComplete: boolean("profile_setup_complete").default(false),
     createdAt: timestamp("created_at", { mode: "string" }).notNull(),
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
 }, (table) => ({
