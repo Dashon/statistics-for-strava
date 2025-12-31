@@ -23,10 +23,18 @@ import {
   Plus, 
   Trash2, 
   Image as ImageIcon,
-  Upload
+  Upload,
+  Palette
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const TEMPLATES = [
+  { id: 'runner', name: 'Runner', emoji: '🏃‍♂️', color: 'from-orange-500 to-red-600', desc: 'Bold, data-focused layout for serious mileage.' },
+  { id: 'racer', name: 'Racer', emoji: '🏁', color: 'from-purple-500 to-pink-600', desc: 'Aggressive, high-contrast style for competitive spirits.' },
+  { id: 'global', name: 'Global', emoji: '🌍', color: 'from-blue-500 to-cyan-600', desc: 'Clean, map-centric view for the world traveler.' },
+  { id: 'minimal', name: 'Minimal', emoji: '✨', color: 'from-zinc-500 to-zinc-700', desc: 'Sophisticated, typography-first aesthetic.' },
+];
 
 export default function PublicProfileEditorPage() {
   const router = useRouter();
@@ -52,6 +60,7 @@ export default function PublicProfileEditorPage() {
     tagline: '',
     coverImageUrl: '',
     heroImageUrl: '',
+    templateId: 'runner',
     isPublic: false,
     socialLinks: {
       instagram: '',
@@ -76,6 +85,7 @@ export default function PublicProfileEditorPage() {
           tagline: profile.tagline || '',
           coverImageUrl: profile.coverImageUrl || '',
           heroImageUrl: profile.heroImageUrl || '',
+          templateId: profile.templateId || 'runner',
           isPublic: profile.isPublic || false,
           socialLinks: (profile.socialLinks as SocialLinks) || {
             instagram: '',
@@ -128,6 +138,7 @@ export default function PublicProfileEditorPage() {
         coverImageUrl: formData.coverImageUrl || undefined,
         isPublic: formData.isPublic,
         socialLinks: formData.socialLinks,
+        templateId: formData.templateId,
       });
 
       if (result.success) {
@@ -346,6 +357,41 @@ export default function PublicProfileEditorPage() {
                         </Link>
                     </div>
                 )}
+            </div>
+
+            {/* Layout Mode Selection */}
+            <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800 rounded-3xl p-8 space-y-6 shadow-xl">
+               <h3 className="text-xl font-bold flex items-center gap-2 mb-2">
+                    <Palette className="w-5 h-5 text-zinc-400" />
+                    Profile Layout
+               </h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {TEMPLATES.map((t) => (
+                    <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, templateId: t.id }))}
+                        className={`p-6 rounded-2xl border-2 text-left transition-all ${
+                            formData.templateId === t.id 
+                            ? 'border-orange-500 bg-orange-500/5 shadow-lg shadow-orange-500/10' 
+                            : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700'
+                        }`}
+                    >
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${t.color} flex items-center justify-center text-xl shadow-lg`}>
+                                {t.emoji}
+                            </div>
+                            {formData.templateId === t.id && (
+                                <div className="bg-orange-500 rounded-full p-1">
+                                    <Check className="w-3 h-3 text-white" />
+                                </div>
+                            )}
+                        </div>
+                        <h4 className="font-bold text-white mb-1 uppercase tracking-tight">{t.name} Mode</h4>
+                        <p className="text-xs text-zinc-500 leading-relaxed">{t.desc}</p>
+                    </button>
+                  ))}
+               </div>
             </div>
 
 

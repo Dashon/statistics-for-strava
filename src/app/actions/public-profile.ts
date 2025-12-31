@@ -21,6 +21,7 @@ export type PublicProfileData = {
   tagline: string | null;
   coverImageUrl: string | null;
   heroImageUrl: string | null;
+  templateId: string | null;
   socialLinks: SocialLinks | null;
   featuredActivityId: string | null;
   createdAt: string;
@@ -141,6 +142,7 @@ export async function updatePublicProfile(data: {
   tagline?: string;
   coverImageUrl?: string;
   socialLinks?: SocialLinks;
+  templateId?: string;
   featuredActivityId?: string;
   isPublic?: boolean;
 }): Promise<{ success: boolean; error?: string }> {
@@ -186,6 +188,7 @@ export async function updatePublicProfile(data: {
         tagline: data.tagline || null,
         coverImageUrl: data.coverImageUrl || null,
         socialLinks: data.socialLinks || null,
+        templateId: data.templateId || 'runner',
         featuredActivityId: data.featuredActivityId || null,
         isPublic: data.isPublic ?? false,
         createdAt: now,
@@ -201,6 +204,7 @@ export async function updatePublicProfile(data: {
           ...(data.tagline !== undefined && { tagline: data.tagline }),
           ...(data.coverImageUrl !== undefined && { coverImageUrl: data.coverImageUrl }),
           ...(data.socialLinks !== undefined && { socialLinks: data.socialLinks }),
+          ...(data.templateId !== undefined && { templateId: data.templateId }),
           ...(data.featuredActivityId !== undefined && { featuredActivityId: data.featuredActivityId }),
           ...(data.isPublic !== undefined && { isPublic: data.isPublic }),
           updatedAt: now,
