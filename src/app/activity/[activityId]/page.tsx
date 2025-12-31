@@ -48,28 +48,35 @@ export default async function PublicActivityPage({
     : "0:00";
 
   return (
-    <div className="min-h-screen bg-black text-zinc-300 font-sans selection:bg-[#06b6d4] selection:text-black">
-      {/* Precision Top Bar (Public Version) */}
-      <div className="px-6 py-2 border-b border-zinc-900 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-[#09090b]">
+    <div className="min-h-screen bg-zinc-950 text-zinc-300 font-sans selection:bg-[#06b6d4] selection:text-black">
+      {/* App Header - Matching Home Page */}
+      <div className="p-4 flex justify-between items-center border-b border-zinc-900 sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-md">
+         <div className="flex items-center gap-4">
+            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
+                QT.run
+            </Link>
+         </div>
+         <div className="flex items-center gap-4">
+             <Link href="/dashboard" className="px-4 py-2 bg-white text-black hover:bg-zinc-200 text-xs font-bold uppercase tracking-widest rounded-full transition-colors flex items-center gap-2">
+                Dashboard
+             </Link>
+         </div>
+      </div>
+
+      {/* Breadcrumb Bar */}
+      <div className="px-6 py-2 border-b border-zinc-900 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-[#09090b] max-w-[1600px] mx-auto">
         <div className="flex items-center gap-4">
             <Link href={`/athlete/${user.username}`} className="hover:text-white transition-colors">{user.displayName}'s Profile</Link>
             <span className="text-zinc-700">/</span>
             <span className="text-zinc-400">Activity Overview</span>
         </div>
-        <div className="flex items-center gap-4">
-             <div className="flex items-center gap-2">
-                <Clock className="w-3 h-3" />
-                <span>{new Date(activityData.startDateTime || "").toLocaleString()}</span>
-            </div>
-            {/* Attribution */}
-            <div className="border-l border-zinc-800 pl-4">
-                <span className="text-zinc-600">VIEWING VIA </span>
-                <span className="text-cyan-500 font-black">QT.RUN</span>
-            </div>
+        <div className="flex items-center gap-2">
+             <Clock className="w-3 h-3" />
+             <span>{new Date(activityData.startDateTime || "").toLocaleString()}</span>
         </div>
       </div>
 
-      <div className="p-4 space-y-4 max-w-[1920px] mx-auto pb-20">
+      <div className="p-4 md:p-6 lg:p-8 space-y-4 max-w-[1600px] mx-auto pb-20">
         {/* 1:1 Replica Header Section */}
         <div className="grid grid-cols-12 gap-4 lg:gap-1 min-h-[140px] h-auto lg:h-[140px]">
             <div className="col-span-12 lg:col-span-7 bg-[#06b6d4] rounded-sm overflow-hidden flex flex-col">

@@ -301,6 +301,7 @@ export async function getFeaturedProfile(username: string, viewerId?: string) {
     title: l.activityName || 'Run Diary',
     date: l.activityDate,
     excerpt: l.letterText.substring(0, 150) + '...',
+    fullText: l.letterText,
   }));
 
   // 10. Get Countries
