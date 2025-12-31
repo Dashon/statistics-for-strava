@@ -380,11 +380,10 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
     <div className={cn(
       "min-h-screen text-white pb-32 font-sans relative",
       // Template specific background tweaks
-      templateId === 'minimal' && "bg-black"
     )}>
       
       {/* App Header */}
-      <div className="p-4 flex justify-between items-center border-b border-zinc-900 sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-md">
+      <div className="p-4 flex justify-between items-center border-b border-white/5 sticky top-0 z-40 bg-transparent backdrop-blur-md">
          <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
                 QT.run
@@ -436,32 +435,38 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
         />
       )}
 
-      <div className="p-4 md:p-6 lg:p-8">
+      <div className="p-4 md:p-6 lg:p-8 relative z-10">
          {/* Social Links - Consistent across templates */}
-         <div className="flex justify-end gap-2 border-b border-zinc-800 pb-4 mb-8 max-w-[1600px] mx-auto">
-             {!!userState.socialLinks && typeof userState.socialLinks === 'object' && (
-               <>
-                 {(userState.socialLinks as any).instagram && (
-                    <Link href={(userState.socialLinks as any).instagram} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-cyan-600 hover:text-white transition-colors text-zinc-400">
+         {(() => {
+           const sl = userState.socialLinks as any;
+           const hasSocials = sl && (sl.instagram || sl.twitter || sl.youtube);
+           
+           if (!hasSocials) return null;
+
+           return (
+             <div className="flex justify-end gap-2 border-b border-white/10 pb-4 mb-8 max-w-[1600px] mx-auto">
+                 {sl.instagram && (
+                    <Link href={sl.instagram} target="_blank" className="p-2 bg-zinc-900/50 hover:bg-cyan-600 hover:text-white transition-colors text-zinc-400 rounded-full backdrop-blur-sm border border-white/5">
                         <Instagram className="w-4 h-4" />
                     </Link>
                  )}
-                 {(userState.socialLinks as any).twitter && (
-                    <Link href={(userState.socialLinks as any).twitter} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-cyan-600 hover:text-white transition-colors text-zinc-400">
+                 {sl.twitter && (
+                    <Link href={sl.twitter} target="_blank" className="p-2 bg-zinc-900/50 hover:bg-cyan-600 hover:text-white transition-colors text-zinc-400 rounded-full backdrop-blur-sm border border-white/5">
                         <Twitter className="w-4 h-4" />
                     </Link>
                  )}
-                 {(userState.socialLinks as any).youtube && (
-                    <Link href={(userState.socialLinks as any).youtube} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-cyan-600 hover:text-white transition-colors text-zinc-400">
+                 {sl.youtube && (
+                    <Link href={sl.youtube} target="_blank" className="p-2 bg-zinc-900/50 hover:bg-cyan-600 hover:text-white transition-colors text-zinc-400 rounded-full backdrop-blur-sm border border-white/5">
                         <Youtube className="w-4 h-4" />
                     </Link>
                  )}
-               </>
-             )}
+             </div>
+           );
+         })()}
              {/* <Link href="/dashboard" className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full font-bold text-sm transition-colors border border-zinc-700">
                 Dashboard
              </Link> */}
-        </div>
+
 
         {/* Minimal Hero (if selected) */}
         {templateId === 'minimal' && (

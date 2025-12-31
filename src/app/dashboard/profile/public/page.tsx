@@ -262,7 +262,7 @@ export default function PublicProfileEditorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white pb-32">
+    <div className="min-h-screen text-white pb-32">
       {/* Header with Sign Out */}
       <div className="p-4 flex justify-between items-center border-b border-zinc-900">
         <div className="flex items-center gap-4">

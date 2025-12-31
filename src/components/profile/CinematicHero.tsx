@@ -60,7 +60,7 @@ export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: C
   return (
     <>
       {/* Fixed Background Layer - Apple Glass Effect */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         {/* Hero Image - Heavily blurred and faded */}
         <AnimatePresence mode="wait">
           {currentHeroUrl ? (
@@ -78,8 +78,8 @@ export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: C
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{
-                  filter: 'blur(40px) saturate(120%)',
-                  opacity: 0.15,
+                  filter: 'blur(30px) saturate(120%)',
+                  opacity: 0.4,
                   transform: 'scale(1.1)', // Prevent blur edge artifacts
                 }}
               />
@@ -98,8 +98,8 @@ export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: C
           }}
         />
 
-        {/* Vignette gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/30 to-zinc-950/80" />
+        {/* Vignette gradient overlay - softened */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/10 to-zinc-950/60" />
         
         {/* Top fade for header area */}
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-zinc-950/60 to-transparent" />

@@ -20,7 +20,7 @@ export default async function DashboardLayout({
   } : null;
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen">
       <Sidebar profile={sidebarProfile} />
       {/* 
           Main content shifts right on desktop to accommodate the 72 (w-72) wide fixed sidebar.
