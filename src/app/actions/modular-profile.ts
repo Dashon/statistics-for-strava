@@ -239,14 +239,18 @@ export async function getFeaturedProfile(username: string, viewerId?: string) {
   }));
 
   // 7. Get Upcoming Races (from races table)
-  const now = new Date().toISOString();
+  // Use start of today to include races happening today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayStr = today.toISOString();
+  
   const upcomingRacesRaw = await db
     .select()
     .from(races)
     .where(and(
       eq(races.userId, userId),
       eq(races.status, 'upcoming'),
-      gte(races.date, now)
+      gte(races.date, todayStr)
     ))
     .orderBy(asc(races.date))
     .limit(5);

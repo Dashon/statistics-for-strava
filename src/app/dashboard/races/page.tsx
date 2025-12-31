@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RaceDashboardPage() {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/");
+  const session = await auth() as any;
+  if (!session?.userId) redirect("/");
 
   // Fetch all races (upcoming and completed)
   const races = await getRaces('all');
