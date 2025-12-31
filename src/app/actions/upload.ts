@@ -29,7 +29,7 @@ export async function uploadProfilePicture(formData: FormData) {
   const filePath = `avatars/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
-    .from('avatars')
+    .from('profile-assets')
     .upload(filePath, file);
 
   if (uploadError) {
@@ -38,7 +38,7 @@ export async function uploadProfilePicture(formData: FormData) {
   }
 
   const { data: { publicUrl } } = supabase.storage
-    .from('avatars')
+    .from('profile-assets')
     .getPublicUrl(filePath);
 
   return { url: publicUrl };

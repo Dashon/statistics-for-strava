@@ -282,6 +282,49 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
         // The default "comprehensive" runner layout
         return (
           <div className="max-w-[1600px] mx-auto space-y-6">
+             {/* Profile Identity Header */}
+             <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.5, delay: 0.1 }}
+               className="flex flex-col md:flex-row items-start md:items-end gap-6 md:gap-8 pb-2"
+             >
+                {/* Avatar */}
+                <div className="relative group">
+                    <div className="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="w-32 h-32 md:w-40 md:h-40 relative rounded-2xl overflow-hidden border-4 border-white/10 shadow-2xl ring-1 ring-white/20 rotate-[-2deg] hover:rotate-0 transition-transform duration-300 bg-zinc-800">
+                        {userState.stravaProfilePicture ? (
+                           <Image 
+                              src={userState.stravaProfilePicture} 
+                              alt={userState.displayName || 'Athlete'} 
+                              fill 
+                              className="object-cover"
+                           />
+                        ) : (
+                           <div className="flex items-center justify-center h-full text-zinc-500 font-mono text-xs p-4 text-center">
+                              No image
+                           </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Text Identity */}
+                <div className="flex-1 space-y-2 mb-2">
+                    <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-zinc-400 drop-shadow-lg">
+                        {userState.displayName || 'Athlete'}
+                    </h1>
+                    <div className="flex items-center gap-4">
+                        <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold uppercase tracking-widest text-xs rounded">
+                           {userState.tagline || 'Endurance Athlete'}
+                        </span>
+                        {userState.countryCode && (
+                           <span className="text-2xl drop-shadow-md filter grayscale-[0.3] hover:grayscale-0 transition-all">
+                               {userState.countryCode} {/* You might need a flag component here if this is just a code */}
+                           </span>
+                        )}
+                    </div>
+                </div>
+             </motion.div>
              {/* Row 1: Summary Stats Bar */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
