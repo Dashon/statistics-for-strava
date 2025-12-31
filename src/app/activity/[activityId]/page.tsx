@@ -37,7 +37,7 @@ export default async function PublicActivityPage({
   }
 
   const { activity: activityData, insight, stream, letter, user } = data;
-  const unitPreference = 'metric'; // Default to metric for public for now, or could store in user profile
+  const unitPreference = 'metric' as 'metric' | 'imperial'; // Default to metric for public for now, or could store in user profile
 
   const distance = activityData.distance ? convertDistance(activityData.distance, unitPreference).toFixed(2) : "0.00";
   const durationFormatted = formatDuration(activityData.movingTimeInSeconds || 0);

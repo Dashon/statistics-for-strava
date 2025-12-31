@@ -15,7 +15,7 @@ export async function getPublicActivityDetail(activityId: string) {
   // 2. Security Check: Is the owner's profile public?
   const profile = await db.query.publicProfile.findFirst({
     where: and(
-      eq(publicProfile.userId, activityData.userId),
+      eq(publicProfile.userId, activityData.userId!),
       eq(publicProfile.isPublic, true)
     ),
   });

@@ -1,3 +1,4 @@
+export {};
 const dotenv = require('dotenv');
 dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
@@ -16,11 +17,11 @@ async function main() {
 
     // 2. Get all existing public profiles
     const existingProfiles = await db.select({ userId: publicProfile.userId }).from(publicProfile);
-    const existingUserIds = new Set(existingProfiles.map(p => p.userId));
+    const existingUserIds = new Set(existingProfiles.map((p: any) => p.userId));
     console.log(`Found ${existingUserIds.size} existing public profiles.`);
 
     // 3. Identify users without a profile
-    const usersToProcess = allUsers.filter(u => !existingUserIds.has(u.userId));
+    const usersToProcess = allUsers.filter((u: any) => !existingUserIds.has(u.userId));
     console.log(`${usersToProcess.length} users need a public profile.`);
 
     if (usersToProcess.length === 0) {
@@ -32,9 +33,9 @@ async function main() {
     const athleteProfiles = await db
       .select()
       .from(athleteProfile)
-      .where(inArray(athleteProfile.userId, usersToProcess.map(u => u.userId)));
+      .where(inArray(athleteProfile.userId, usersToProcess.map((u: any) => u.userId)));
     
-    const athleteProfileMap = new Map(athleteProfiles.map(p => [p.userId, p]));
+    const athleteProfileMap = new Map(athleteProfiles.map((p: any) => [p.userId, p]));
 
     // 5. Create missing profiles
     console.log("Creating missing profiles...");
@@ -42,7 +43,7 @@ async function main() {
     let CreatedCount = 0;
     
     for (const u of usersToProcess) {
-      const ap = athleteProfileMap.get(u.userId);
+      const ap = athleteProfileMap.get(u.userId) as any;
       
       // Generate a default username
       const stravaId = u.stravaAthleteId;

@@ -36,7 +36,7 @@ interface ModularProfileProps {
 // ... existing code ...
 
 export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
-  const { stats, recentActivities, previousRaces, upcomingEvents, upcomingRaces, calendarData, formCurve, diaryEntries, countries } = data;
+  const { stats, recentActivities, previousRaces, upcomingEvents, upcomingRaces, calendarData, formCurve, diaryEntries, countries } = data as any;
   
   // Edit Mode State
   const [isEditing, setIsEditing] = useState(false);
@@ -312,7 +312,7 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
 
               {/* 2. Accolade Vault (Trophy Case) */}
               {/* Mobile: 2nd (Matches Image), Desktop: 3rd (Full Width below) */}
-              {userState?.accolades && <div className="order-2 lg:order-3 lg:col-span-3">
+              {!!userState?.accolades && <div className="order-2 lg:order-3 lg:col-span-3">
                  <AccoladeVault 
                     accolades={(userState.accolades as any[]) || []}
                     isEditing={isEditing}
