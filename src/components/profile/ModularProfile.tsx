@@ -302,7 +302,7 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
       default:
         // The default "comprehensive" runner layout
         return (
-          <div className="max-w-[1600px] mx-auto space-y-6">
+          <div className="max-w-[1600px] mx-auto space-y-4 md:space-y-6">
              {/* Profile Identity Header */}
              <motion.div 
                initial={{ opacity: 0, y: 20 }}
@@ -503,7 +503,7 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
         />
       )}
 
-      <div className="p-4 md:p-6 lg:p-8 relative z-10">
+      <div className="p-3 md:p-6 lg:p-8 relative z-10">
          {/* Social Links - Consistent across templates */}
          {(() => {
            const sl = userState.socialLinks as any;
