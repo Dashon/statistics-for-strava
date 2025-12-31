@@ -11,12 +11,12 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 const outfit = Outfit({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Qt.run | Your AI-Powered Running Coach",
+  title: "Qt.run | My AI-Powered Running Coach",
   description: "Qt.run delivers cinematic statistics, AI-powered insights, and personalized coaching for runners. Track performance, analyze workouts, and achieve your running goals.",
   keywords: ["Qt.run", "running", "AI coaching", "training", "fitness", "workout analysis", "running coach", "performance tracking"],
   authors: [{ name: "Qt.run" }],
   openGraph: {
-    title: "Qt.run | Your AI-Powered Running Coach",
+    title: "Qt.run | My AI-Powered Running Coach",
     description: "Qt.run delivers cinematic statistics, AI-powered insights, and personalized coaching for runners.",
     type: "website",
     siteName: "Qt.run",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Qt.run | Your AI-Powered Running Coach",
+    title: "Qt.run | My AI-Powered Running Coach",
     description: "Qt.run delivers cinematic statistics, AI-powered insights, and personalized coaching for runners.",
   },
 };
