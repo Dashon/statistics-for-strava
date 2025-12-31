@@ -72,6 +72,7 @@ export async function getFeaturedProfile(username: string, viewerId?: string) {
       tagline: publicProfile.tagline,
       coverImageUrl: publicProfile.coverImageUrl,
       stravaProfilePicture: athleteProfile.stravaProfilePicture,
+      customProfilePicture: athleteProfile.customProfilePicture,
       socialLinks: publicProfile.socialLinks,
       layoutConfig: publicProfile.layoutConfig,
       heroImageUrl: publicProfile.heroImageUrl,

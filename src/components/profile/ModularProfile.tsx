@@ -314,16 +314,16 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
                 <div className="relative group">
                     <div className="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="w-32 h-32 md:w-40 md:h-40 relative rounded-2xl overflow-hidden border-4 border-white/10 shadow-2xl ring-1 ring-white/20 rotate-[-2deg] hover:rotate-0 transition-transform duration-300 bg-zinc-800">
-                        {userState.stravaProfilePicture ? (
+                        {userState.customProfilePicture || userState.stravaProfilePicture ? (
                            <Image 
-                              src={userState.stravaProfilePicture} 
-                              alt={userState.displayName || 'Athlete'} 
-                              fill 
-                              className="object-cover"
+                               src={userState.customProfilePicture || userState.stravaProfilePicture!} 
+                               alt={userState.displayName || 'Athlete'} 
+                               fill 
+                               className="object-cover"
                            />
                         ) : (
                            <div className="flex items-center justify-center h-full text-zinc-500 font-mono text-xs p-4 text-center">
-                              No image
+                               No image
                            </div>
                         )}
                     </div>

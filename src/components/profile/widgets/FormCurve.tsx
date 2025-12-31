@@ -97,27 +97,44 @@ export function FormCurve({ data }: FormCurveProps) {
         </div>
       </div>
 
-      {/* Sparkline */}
-      <div className="flex-1 flex items-end gap-1 min-h-[80px]">
-        {data.map((week, index) => {
-          const height = (week.totalMiles / maxMiles) * 100;
-          const isThisWeek = index === data.length - 1;
-          
-          return (
-            <motion.div
-              key={week.weekStart}
-              initial={{ height: 0 }}
-              animate={{ height: `${Math.max(height, 5)}%` }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-              className={`flex-1 rounded-t transition-colors ${
-                isThisWeek 
-                  ? 'bg-gradient-to-t from-cyan-600 to-cyan-400' 
-                  : 'bg-zinc-700 hover:bg-zinc-600'
-              }`}
-              title={`Week of ${week.weekStart}: ${week.totalMiles} mi`}
-            />
-          );
-        })}
+      {/* Chart Area with Y-Axis */}
+      <div className="flex-1 flex gap-2 relative min-h-[80px]">
+         {/* Y-Axis Labels (Absolute or Flex) */}
+         <div className="flex flex-col justify-between text-[10px] text-zinc-500 font-mono py-1 text-right min-w-[30px]">
+            <span>{Math.round(maxMiles)}</span>
+            <span>{Math.round(maxMiles / 2)}</span>
+            <span>0</span>
+         </div>
+         
+         {/* Bars Container */}
+         <div className="flex-1 flex items-end gap-1 relative z-10">
+            {/* Grid Lines */}
+            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
+               <div className="border-t border-zinc-800/50 w-full h-0 dashed" />
+               <div className="border-t border-zinc-800/50 w-full h-0 dashed" />
+               <div className="border-t border-zinc-800/50 w-full h-0 dashed" />
+            </div>
+
+            {data.map((week, index) => {
+              const height = (week.totalMiles / maxMiles) * 100;
+              const isThisWeek = index === data.length - 1;
+              
+              return (
+                <motion.div
+                  key={week.weekStart}
+                  initial={{ height: 0 }}
+                  animate={{ height: `${Math.max(height, 5)}%` }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                  className={`flex-1 rounded-t transition-colors relative z-10 ${
+                    isThisWeek 
+                      ? 'bg-gradient-to-t from-cyan-600 to-cyan-400' 
+                      : 'bg-zinc-700 hover:bg-zinc-600'
+                  }`}
+                  title={`Week of ${week.weekStart}: ${week.totalMiles} mi`}
+                />
+              );
+            })}
+         </div>
       </div>
 
       {/* X-axis labels */}
