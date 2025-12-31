@@ -40,14 +40,37 @@ export function StatsHeader({ stats }: { stats: DashboardStats }) {
 }
 
 // Rewriting for 5 columns layout matching reference image
-export function StatsHeaderDetailed({ stats }: { stats: DashboardStats }) {
+export function StatsHeaderDetailed({ 
+  stats, 
+  scope = 'all_time', 
+  onScopeChange 
+}: { 
+  stats: DashboardStats;
+  scope?: 'all_time' | 'current_year';
+  onScopeChange?: (scope: 'all_time' | 'current_year') => void;
+}) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-5 gap-0 rounded-xl overflow-hidden shadow-2xl border border-cyan-900/20 mb-6">
-        {/* Title */}
-        <div className="bg-cyan-600 p-6 flex flex-col justify-center col-span-2 md:col-span-1">
+        {/* Title & Toggle */}
+        <div className="bg-cyan-600 p-6 flex flex-col justify-center col-span-2 md:col-span-1 relative group">
           <h2 className="text-4xl font-black text-white italic tracking-tighter uppercase mb-0 leading-none">
             Summary
           </h2>
+          <div className="flex items-center gap-2 mt-2">
+             <button 
+               onClick={() => onScopeChange?.('current_year')}
+               className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded transition-colors ${scope === 'current_year' ? 'bg-white text-cyan-900' : 'text-cyan-200 hover:text-white hover:bg-white/10'}`}
+             >
+               This Year
+             </button>
+             <span className="text-cyan-400/50">|</span>
+             <button 
+               onClick={() => onScopeChange?.('all_time')}
+               className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded transition-colors ${scope === 'all_time' ? 'bg-white text-cyan-900' : 'text-cyan-200 hover:text-white hover:bg-white/10'}`}
+             >
+               All Time
+             </button>
+          </div>
         </div>
   
         {/* Activities */}

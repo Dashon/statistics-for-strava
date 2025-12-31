@@ -41,6 +41,9 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
   // Edit Mode State
   const [isEditing, setIsEditing] = useState(false);
   
+  // Stats Scope State
+  const [statsScope, setStatsScope] = useState<'all_time' | 'current_year'>('current_year');
+
   // Local state for WYSIWYG editing
   const [userState, setUserState] = useState(data.user);
   
@@ -49,7 +52,13 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
   };
 
   const widgets: Record<string, React.ReactNode> = {
-    stats_header: <StatsHeaderDetailed stats={stats} />,
+    stats_header: (
+      <StatsHeaderDetailed 
+        stats={statsScope === 'current_year' ? data.currentYearStats : stats} 
+        scope={statsScope}
+        onScopeChange={setStatsScope}
+      />
+    ),
     next_race: <div className="h-full"><NextRace race={upcomingRaces?.[0] || null} upcomingRaces={upcomingRaces || []} /></div>,
     form_curve: <FormCurve data={formCurve || []} />,
     activity_map: (
@@ -186,7 +195,11 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
       case 'minimal':
         return (
           <div className="max-w-4xl mx-auto space-y-12">
-             <StatsHeaderDetailed stats={stats} />
+             <StatsHeaderDetailed 
+                stats={statsScope === 'current_year' ? data.currentYearStats : stats} 
+                scope={statsScope}
+                onScopeChange={setStatsScope}
+             />
              
              {/* Simple list for minimal */}
              <div className="grid grid-cols-1 gap-8">
@@ -210,7 +223,11 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
       case 'racer':
         return (
           <div className="max-w-[1600px] mx-auto space-y-8">
-             <StatsHeaderDetailed stats={stats} />
+             <StatsHeaderDetailed 
+                stats={statsScope === 'current_year' ? data.currentYearStats : stats} 
+                scope={statsScope}
+                onScopeChange={setStatsScope}
+             />
              
              {/* Racer Focus: Next Race & Form Curve */}
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -242,7 +259,11 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
       case 'global':
         return (
            <div className="max-w-[1800px] mx-auto space-y-8">
-               <StatsHeaderDetailed stats={stats} />
+               <StatsHeaderDetailed 
+                   stats={statsScope === 'current_year' ? data.currentYearStats : stats} 
+                   scope={statsScope}
+                   onScopeChange={setStatsScope}
+               />
                
                {/* Map Centric */}
                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -331,7 +352,11 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
             >
-              <StatsHeaderDetailed stats={stats} />
+              <StatsHeaderDetailed 
+                  stats={statsScope === 'current_year' ? data.currentYearStats : stats} 
+                  scope={statsScope}
+                  onScopeChange={setStatsScope}
+              />
             </motion.div>
 
             {/* Main Content Grid - Reordered for Mobile Priority */}

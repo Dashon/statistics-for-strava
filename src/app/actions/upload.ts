@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 import { auth } from '@/auth';
 
 export async function uploadProfilePicture(formData: FormData) {
@@ -23,7 +23,10 @@ export async function uploadProfilePicture(formData: FormData) {
     throw new Error('File size must be less than 2MB');
   }
 
-  const supabase = await createClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
   const fileExt = file.name.split('.').pop();
   const fileName = `${session.userId}-${Math.random().toString(36).substring(2)}.${fileExt}`;
   const filePath = `avatars/${fileName}`;

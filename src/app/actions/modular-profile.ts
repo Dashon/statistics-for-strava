@@ -107,6 +107,30 @@ export async function getFeaturedProfile(username: string, viewerId?: string) {
     totalElevation: Number(statsResult[0]?.elevation || 0),
   };
 
+  // 2b. Get Current Year Stats
+  const currentYear = new Date().getFullYear();
+  const startOfYear = `${currentYear}-01-01T00:00:00.000Z`;
+  
+  const yearStatsResult = await db
+    .select({
+      count: count(),
+      distance: sum(activity.distance),
+      duration: sum(activity.movingTimeInSeconds),
+      elevation: sum(activity.elevation),
+    })
+    .from(activity)
+    .where(and(
+      eq(activity.userId, userId),
+      gte(activity.startDateTime, startOfYear)
+    ));
+
+  const currentYearStats: DashboardStats = {
+    totalActivities: Number(yearStatsResult[0]?.count || 0),
+    totalDistance: Number(yearStatsResult[0]?.distance || 0),
+    totalTime: Number(yearStatsResult[0]?.duration || 0),
+    totalElevation: Number(yearStatsResult[0]?.elevation || 0),
+  };
+
   // 3. Get Recent Activities (Run/Ride)
   const recentActivitiesRaw = await db
     .select()
@@ -310,6 +334,7 @@ export async function getFeaturedProfile(username: string, viewerId?: string) {
   return {
     user,
     stats,
+    currentYearStats,
     recentActivities,
     previousRaces,
     upcomingEvents,
