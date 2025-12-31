@@ -111,20 +111,42 @@ export function NextRace({ race, upcomingRaces }: NextRaceProps) {
 
         {/* Countdown */}
         {countdown && (
-          <div className="flex gap-3 mb-4">
-            <div className="bg-zinc-800/50 rounded-lg px-4 py-2 text-center min-w-[60px] border border-zinc-700">
-              <div className="text-2xl font-black text-white">{countdown.days}</div>
-              <div className="text-[10px] uppercase text-zinc-500 font-bold">Days</div>
+          countdown.days === 0 && countdown.hours === 0 && countdown.minutes === 0 ? (
+            <div className="flex items-center gap-2 mb-4">
+              <div className="bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg px-6 py-3 text-center">
+                <div className="text-2xl font-black text-white uppercase tracking-wider">🏁 Race Day!</div>
+              </div>
             </div>
-            <div className="bg-zinc-800/50 rounded-lg px-4 py-2 text-center min-w-[60px] border border-zinc-700">
-              <div className="text-2xl font-black text-white">{countdown.hours}</div>
-              <div className="text-[10px] uppercase text-zinc-500 font-bold">Hours</div>
+          ) : countdown.days === 0 ? (
+            <div className="flex gap-3 mb-4">
+              <div className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/50 rounded-lg px-4 py-2 text-center">
+                <div className="text-lg font-black text-cyan-400 uppercase">Today</div>
+              </div>
+              <div className="bg-zinc-800/50 rounded-lg px-4 py-2 text-center min-w-[60px] border border-zinc-700">
+                <div className="text-2xl font-black text-white">{countdown.hours}</div>
+                <div className="text-[10px] uppercase text-zinc-500 font-bold">Hours</div>
+              </div>
+              <div className="bg-zinc-800/50 rounded-lg px-4 py-2 text-center min-w-[60px] border border-zinc-700">
+                <div className="text-2xl font-black text-white">{countdown.minutes}</div>
+                <div className="text-[10px] uppercase text-zinc-500 font-bold">Mins</div>
+              </div>
             </div>
-            <div className="bg-zinc-800/50 rounded-lg px-4 py-2 text-center min-w-[60px] border border-zinc-700">
-              <div className="text-2xl font-black text-white">{countdown.minutes}</div>
-              <div className="text-[10px] uppercase text-zinc-500 font-bold">Mins</div>
+          ) : (
+            <div className="flex gap-3 mb-4">
+              <div className="bg-zinc-800/50 rounded-lg px-4 py-2 text-center min-w-[60px] border border-zinc-700">
+                <div className="text-2xl font-black text-white">{countdown.days}</div>
+                <div className="text-[10px] uppercase text-zinc-500 font-bold">Days</div>
+              </div>
+              <div className="bg-zinc-800/50 rounded-lg px-4 py-2 text-center min-w-[60px] border border-zinc-700">
+                <div className="text-2xl font-black text-white">{countdown.hours}</div>
+                <div className="text-[10px] uppercase text-zinc-500 font-bold">Hours</div>
+              </div>
+              <div className="bg-zinc-800/50 rounded-lg px-4 py-2 text-center min-w-[60px] border border-zinc-700">
+                <div className="text-2xl font-black text-white">{countdown.minutes}</div>
+                <div className="text-[10px] uppercase text-zinc-500 font-bold">Mins</div>
+              </div>
             </div>
-          </div>
+          )
         )}
 
         {/* Goal Time */}
