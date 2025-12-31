@@ -25,7 +25,7 @@ export default async function SegmentsPage() {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent italic">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
           SEGMENTS
         </h1>
         <p className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-1">Battlegrounds of Excellence</p>
@@ -45,7 +45,7 @@ export default async function SegmentsPage() {
             {segments.map((s: any) => (
               <tr key={s.segmentid} className="hover:bg-zinc-900/50 transition-colors group">
                 <td className="px-8 py-6">
-                    <span className="text-white font-bold group-hover:text-orange-500 transition-colors uppercase tracking-tight">{s.name}</span>
+                    <span className="text-white font-bold group-hover:text-cyan-500 transition-colors uppercase tracking-tight">{s.name}</span>
                 </td>
                 <td className="px-8 py-6 text-zinc-400 font-mono text-sm">{s.effort_count}</td>
                 <td className="px-8 py-6 text-zinc-400 font-mono text-sm">

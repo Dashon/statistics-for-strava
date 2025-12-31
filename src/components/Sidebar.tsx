@@ -114,12 +114,12 @@ export function Sidebar({ profile }: SidebarProps) {
         className={clsx(
           "group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200",
           isActive
-            ? "bg-orange-500/10 text-orange-500"
+            ? "bg-cyan-500/10 text-cyan-500"
             : "text-zinc-400 hover:text-white hover:bg-zinc-900"
         )}
       >
         <div className="flex items-center gap-3">
-          <item.icon className={clsx("w-5 h-5 transition-colors", isActive ? "text-orange-500" : "text-zinc-500 group-hover:text-zinc-300")} />
+          <item.icon className={clsx("w-5 h-5 transition-colors", isActive ? "text-cyan-500" : "text-zinc-500 group-hover:text-zinc-300")} />
           {item.name}
         </div>
         {isActive && <ChevronRight className="w-4 h-4" />}
@@ -131,7 +131,7 @@ export function Sidebar({ profile }: SidebarProps) {
     <>
       {/* Mobile Top Header */}
       <div className="lg:hidden fixed top-0 inset-x-0 h-16 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900 z-50 flex items-center justify-between px-4">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent italic">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
           QT.run
         </h1>
         <button
@@ -158,7 +158,7 @@ export function Sidebar({ profile }: SidebarProps) {
         {/* Logo Section */}
         <div className="p-6 h-16 flex items-center">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent italic">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
                 QT.run
             </h1>
           </Link>

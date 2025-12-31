@@ -26,7 +26,7 @@ export default async function HeatmapPage() {
   return (
     <div className="p-8 space-y-8 h-screen flex flex-col">
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent italic">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
           HEATMAP
         </h1>
         <p className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-1">Paths of Glory</p>

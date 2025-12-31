@@ -66,7 +66,7 @@ export default async function RunLettersPage() {
     <div className="p-8 space-y-12">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 via-red-500 to-purple-600 bg-clip-text text-transparent italic uppercase tracking-tighter">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent italic uppercase tracking-tighter">
             RUN LETTERS
           </h1>
           <p className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-1">Poetry of Pavement</p>

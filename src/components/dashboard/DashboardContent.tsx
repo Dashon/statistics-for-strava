@@ -160,7 +160,7 @@ export default function DashboardContent({ unitPreference, initialData, readines
 
           {/* Top Metric Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-0 divide-x divide-zinc-800 border border-zinc-800 rounded-lg overflow-hidden">
-            <div className="bg-orange-600 p-6 flex items-center justify-center col-span-2 md:col-span-1 lg:col-span-1">
+            <div className="bg-cyan-600 p-6 flex items-center justify-center col-span-2 md:col-span-1 lg:col-span-1">
               <h1 className="text-5xl font-bold tracking-tighter leading-none text-center">
                 Summary
               </h1>
@@ -168,18 +168,18 @@ export default function DashboardContent({ unitPreference, initialData, readines
             <DashboardCard
               title="Activities"
               value={summary.totalActivities || 0}
-              className="bg-orange-600/95"
+              className="bg-cyan-600/95"
             />
             <DashboardCard
               title="Distance"
               value={Math.round(convertDistance(summary.totalDistance * 1000 || 0, unitPreference))}
               unit={getDistanceUnit(unitPreference)}
-              className="bg-orange-600/90"
+              className="bg-cyan-600/90"
             />
             <DashboardCard
               title="Time"
               value={formatSeconds(summary.totalMovingTime || 0)}
-              className="bg-orange-600/85"
+              className="bg-cyan-600/85"
             />
             <DashboardCard
               title="Elevation gain"
@@ -187,7 +187,7 @@ export default function DashboardContent({ unitPreference, initialData, readines
                 maximumFractionDigits: 0,
               })}
               unit="ft"
-              className="bg-orange-600/80"
+              className="bg-cyan-600/80"
             />
           </div>
 
@@ -226,10 +226,10 @@ export default function DashboardContent({ unitPreference, initialData, readines
                 </span>
                 <div className="flex items-center gap-4 text-xs font-mono">
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-orange-600"></div> Run
+                    <div className="w-2 h-2 rounded-full bg-cyan-600"></div> Run
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-orange-900"></div> Ride
+                    <div className="w-2 h-2 rounded-full bg-cyan-900"></div> Ride
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 rounded-full bg-zinc-600"></div> Other

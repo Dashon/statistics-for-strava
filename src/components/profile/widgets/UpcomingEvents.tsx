@@ -32,7 +32,7 @@ export function UpcomingEvents({ events }: UpcomingEventsProps) {
   return (
     <div className="flex flex-col gap-4 h-full">
       {/* Featured Next Event */}
-      <div className="bg-gradient-to-br from-orange-600 to-red-700 rounded-xl overflow-hidden shadow-lg border border-orange-500/20 relative group">
+      <div className="bg-gradient-to-br from-cyan-600 to-blue-700 rounded-xl overflow-hidden shadow-lg border border-cyan-500/20 relative group">
         <div className="absolute top-0 right-0 p-32 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
         
         <div className="p-6 relative z-10">
@@ -52,10 +52,10 @@ export function UpcomingEvents({ events }: UpcomingEventsProps) {
             {nextEvent.title}
           </h3>
           
-          <div className="flex items-center gap-2 text-orange-100 mb-6 font-medium">
+          <div className="flex items-center gap-2 text-cyan-100 mb-6 font-medium">
              <Calendar className="w-4 h-4" />
              {eventDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
-             <span className="text-orange-300">•</span>
+             <span className="text-cyan-300">•</span>
              <Timer className="w-4 h-4" />
              {eventDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
           </div>
@@ -91,7 +91,7 @@ export function UpcomingEvents({ events }: UpcomingEventsProps) {
                 {otherEvents.map(event => (
                     <div key={event.eventId} className="p-3 hover:bg-zinc-800/50 transition-colors flex justify-between items-center group">
                         <div>
-                            <div className="font-bold text-zinc-300 group-hover:text-orange-400 transition-colors text-sm">{event.title}</div>
+                            <div className="font-bold text-zinc-300 group-hover:text-cyan-400 transition-colors text-sm">{event.title}</div>
                             <div className="text-xs text-zinc-500">{new Date(event.startTime).toLocaleDateString()}</div>
                         </div>
                          {event.status === 'live' && (

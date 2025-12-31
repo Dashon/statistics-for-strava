@@ -41,7 +41,7 @@ export default function Heatmap({ polylines }: { polylines: string[] }) {
           <Polyline 
             key={i} 
             positions={route as any} 
-            pathOptions={{ color: '#f97316', weight: 1.5, opacity: 0.3 }} 
+            pathOptions={{ color: '#06b6d4', weight: 1.5, opacity: 0.3 }} 
           />
         ))}
         {allCoords.length > 0 && <ChangeView bounds={bounds} />}
@@ -49,7 +49,7 @@ export default function Heatmap({ polylines }: { polylines: string[] }) {
       
       <div className="absolute bottom-6 left-6 z-[60]] bg-zinc-950/80 backdrop-blur-md border border-zinc-800 px-6 py-3 rounded-2xl shadow-2xl">
           <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+               <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
               <span className="text-white font-bold text-sm tracking-widest uppercase">{polylines.length} ACTIVITIES MAPPED</span>
           </div>
       </div>

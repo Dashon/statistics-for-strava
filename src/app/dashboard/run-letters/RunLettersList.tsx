@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Heart, TrendingUp, Zap, Loader2 } from "lucide-react";
+import { Heart, TrendingUp, Zap, Loader2, Globe, Lock } from "lucide-react";
 import { getGenerationStatuses } from "@/app/actions/trigger-jobs";
+import { toggleLetterVisibility } from "@/app/actions/letters";
 
 type Activity = {
   activityId: string;
@@ -18,6 +19,7 @@ type Activity = {
 type Letter = {
   activityId: string;
   letterText: string;
+  isPublic: boolean | null;
 };
 
 type Insight = {
@@ -104,7 +106,7 @@ export default function RunLettersList({
                     {new Date(run.startDateTime).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}
                   </span>
                   <Link href={`/dashboard/activities/${run.activityId}`}>
-                    <h3 className="text-2xl font-black text-white uppercase tracking-tight hover:text-orange-500 transition-colors">
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tight hover:text-cyan-500 transition-colors">
                       {run.name || 'Unnamed Activity'}
                     </h3>
                   </Link>
@@ -125,7 +127,7 @@ export default function RunLettersList({
                 </div>
                 <Link
                   href={`/dashboard/activities/${run.activityId}`}
-                  className="bg-zinc-800 hover:bg-orange-500 text-zinc-400 hover:text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2"
+                  className="bg-zinc-800 hover:bg-cyan-500 text-zinc-400 hover:text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2"
                 >
                   <Zap className="w-3 h-3" />
                   View Details
@@ -137,14 +139,45 @@ export default function RunLettersList({
             <div className="grid md:grid-cols-2 divide-x divide-zinc-800">
               {/* Run Letter */}
               <div className="p-8 space-y-4">
-                <div className="flex items-center gap-2 text-orange-500 mb-4">
-                  <span className="text-xs font-black uppercase tracking-widest">Run Letter</span>
-                  {isLetterGenerating && <Loader2 className="w-3 h-3 animate-spin" />}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2 text-cyan-500">
+                    <span className="text-xs font-black uppercase tracking-widest">Run Letter</span>
+                    {isLetterGenerating && <Loader2 className="w-3 h-3 animate-spin" />}
+                  </div>
+                  
+                  {letter && !isLetterGenerating && (
+                    <button
+                      onClick={async () => {
+                        const newStatus = !letter.isPublic;
+                        const res = await toggleLetterVisibility(run.activityId, newStatus);
+                        if (res.success) {
+                          router.refresh();
+                        }
+                      }}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
+                        letter.isPublic 
+                        ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20" 
+                        : "bg-zinc-800 text-zinc-500 border border-zinc-700 hover:bg-zinc-700 hover:text-zinc-400"
+                      }`}
+                    >
+                      {letter.isPublic ? (
+                        <>
+                          <Globe className="w-3 h-3" />
+                          Public
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-3 h-3" />
+                          Private
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
                 <div className="bg-zinc-900/30 p-6 rounded-2xl border border-zinc-900/50 min-h-[200px]">
                   {isLetterGenerating ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-orange-500" />
+                      <Loader2 className="w-6 h-6 animate-spin text-cyan-500" />
                       <span className="ml-3 text-zinc-500 text-sm uppercase tracking-widest font-black">
                         Generating...
                       </span>

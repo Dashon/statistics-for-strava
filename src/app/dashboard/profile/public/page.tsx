@@ -30,7 +30,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const TEMPLATES = [
-  { id: 'runner', name: 'Runner', emoji: '🏃‍♂️', color: 'from-orange-500 to-red-600', desc: 'Bold, data-focused layout for serious mileage.' },
+  { id: 'runner', name: 'Runner', emoji: '🏃‍♂️', color: 'from-cyan-500 to-blue-600', desc: 'Bold, data-focused layout for serious mileage.' },
   { id: 'racer', name: 'Racer', emoji: '🏁', color: 'from-purple-500 to-pink-600', desc: 'Aggressive, high-contrast style for competitive spirits.' },
   { id: 'global', name: 'Global', emoji: '🌍', color: 'from-blue-500 to-cyan-600', desc: 'Clean, map-centric view for the world traveler.' },
   { id: 'minimal', name: 'Minimal', emoji: '✨', color: 'from-zinc-500 to-zinc-700', desc: 'Sophisticated, typography-first aesthetic.' },
@@ -255,7 +255,7 @@ export default function PublicProfileEditorPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
       </div>
     );
   }
@@ -264,19 +264,19 @@ export default function PublicProfileEditorPage() {
     <div className="min-h-screen bg-zinc-950 text-white pb-32">
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-20">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/30 rounded-full blur-[120px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-500/30 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-blue-500/20 rounded-full blur-[100px]" />
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-12 relative z-10">
         {/* Header */}
         <div className="mb-12">
-          <div className="flex items-center gap-2 text-orange-500 font-bold tracking-widest uppercase text-xs mb-4">
+          <div className="flex items-center gap-2 text-cyan-500 font-bold tracking-widest uppercase text-xs mb-4">
              <Settings className="w-4 h-4" />
              Athlete Settings
           </div>
           <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none mb-2">
-            Profile <span className="text-orange-500">Command</span>
+            Profile <span className="text-cyan-500">Command</span>
           </h1>
           <p className="text-zinc-400 max-w-xl text-lg">
             Master your digital presence. Configure your public ID and customize your profile aesthetics.
@@ -291,11 +291,11 @@ export default function PublicProfileEditorPage() {
             {/* Poster Control Center */}
             <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl overflow-hidden p-8 shadow-2xl relative group">
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <ImageIcon className="w-24 h-24 text-orange-400" />
+                    <ImageIcon className="w-24 h-24 text-cyan-400" />
                 </div>
                 
                 <h2 className="text-2xl font-black italic uppercase tracking-tight mb-4 flex items-center gap-3">
-                    <ImageIcon className="w-6 h-6 text-orange-500" />
+                    <ImageIcon className="w-6 h-6 text-cyan-500" />
                     Profile Poster
                 </h2>
                 <p className="text-zinc-400 mb-8 max-w-md">
@@ -321,7 +321,7 @@ export default function PublicProfileEditorPage() {
                         {isGenerating ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
-                            <Sparkles className="w-5 h-5 text-orange-400" />
+                            <Sparkles className="w-5 h-5 text-cyan-400" />
                         )}
                         {isGenerating ? "Creating Art..." : "Generate with AI"}
                     </button>
@@ -329,7 +329,7 @@ export default function PublicProfileEditorPage() {
                     <button 
                         onClick={() => posterInputRef.current?.click()}
                         disabled={isGenerating || isUploadingPoster}
-                        className="px-6 py-4 bg-white text-black font-black rounded-2xl hover:bg-orange-500 hover:text-white transition-all flex items-center gap-3 shadow-xl shadow-white/5"
+                        className="px-6 py-4 bg-white text-black font-black rounded-2xl hover:bg-cyan-500 hover:text-white transition-all flex items-center gap-3 shadow-xl shadow-white/5"
                     >
                         {isUploadingPoster ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
@@ -373,7 +373,7 @@ export default function PublicProfileEditorPage() {
                         onClick={() => setFormData(prev => ({ ...prev, templateId: t.id }))}
                         className={`p-6 rounded-2xl border-2 text-left transition-all ${
                             formData.templateId === t.id 
-                            ? 'border-orange-500 bg-orange-500/5 shadow-lg shadow-orange-500/10' 
+                            ? 'border-cyan-500 bg-cyan-500/5 shadow-lg shadow-cyan-500/10' 
                             : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700'
                         }`}
                     >
@@ -382,7 +382,7 @@ export default function PublicProfileEditorPage() {
                                 {t.emoji}
                             </div>
                             {formData.templateId === t.id && (
-                                <div className="bg-orange-500 rounded-full p-1">
+                                <div className="bg-cyan-500 rounded-full p-1">
                                     <Check className="w-3 h-3 text-white" />
                                 </div>
                             )}
@@ -409,7 +409,7 @@ export default function PublicProfileEditorPage() {
                         type="button"
                         onClick={() => setFormData((prev) => ({ ...prev, isPublic: !prev.isPublic }))}
                         className={`relative w-11 h-6 rounded-full transition-colors ${
-                            formData.isPublic ? 'bg-orange-500' : 'bg-zinc-700'
+                            formData.isPublic ? 'bg-cyan-500' : 'bg-zinc-700'
                         }`}
                     >
                         <span className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-all transform ${
@@ -431,11 +431,11 @@ export default function PublicProfileEditorPage() {
                                 type="text"
                                 value={formData.username}
                                 onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value.toLowerCase() }))}
-                                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-8 pr-4 py-4 text-white font-mono text-sm focus:outline-none focus:border-orange-500 transition-colors"
+                                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-8 pr-4 py-4 text-white font-mono text-sm focus:outline-none focus:border-cyan-500 transition-colors"
                                 placeholder="handle"
                             />
                             <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                                {usernameStatus === 'checking' && <Loader2 className="w-4 h-4 text-orange-500 animate-spin" />}
+                                {usernameStatus === 'checking' && <Loader2 className="w-4 h-4 text-cyan-500 animate-spin" />}
                                 {usernameStatus === 'available' && <Check className="w-4 h-4 text-green-500" />}
                                 {usernameStatus === 'taken' && <AlertCircle className="w-4 h-4 text-red-500" />}
                             </div>
@@ -449,7 +449,7 @@ export default function PublicProfileEditorPage() {
                             type="text"
                             value={formData.displayName}
                             onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
-                            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-orange-500 transition-colors"
+                            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-500 transition-colors"
                             placeholder="Alex Walker"
                         />
                     </div>
@@ -462,7 +462,7 @@ export default function PublicProfileEditorPage() {
                         type="text"
                         value={formData.tagline}
                         onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-orange-500 transition-colors"
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-cyan-500 transition-colors"
                         placeholder="Ultra Runner | Dreaming of UTMB 🇫🇷"
                     />
                </div>
@@ -483,7 +483,7 @@ export default function PublicProfileEditorPage() {
                    <button
                         type="submit"
                         disabled={isPending || usernameStatus === 'taken'}
-                        className="px-8 py-3 bg-zinc-100 text-black font-black rounded-xl hover:bg-orange-500 hover:text-white transition-all disabled:opacity-50"
+                        className="px-8 py-3 bg-zinc-100 text-black font-black rounded-xl hover:bg-cyan-500 hover:text-white transition-all disabled:opacity-50"
                    >
                         {isPending ? "Syncing..." : "Update Settings"}
                    </button>
@@ -498,7 +498,7 @@ export default function PublicProfileEditorPage() {
             <div className="bg-zinc-900/50 backdrop-blur-md border border-zinc-800 rounded-3xl p-6 shadow-xl">
                <div className="flex items-center justify-between mb-6">
                   <h3 className="font-bold flex items-center gap-2">
-                    <ImageIcon className="w-5 h-5 text-orange-500" />
+                    <ImageIcon className="w-5 h-5 text-cyan-500" />
                     AI Memories
                   </h3>
                </div>
@@ -526,12 +526,12 @@ export default function PublicProfileEditorPage() {
                   
                   {isUploadingRef && (
                     <div className="aspect-square rounded-xl bg-zinc-950 border border-zinc-800 border-dashed flex items-center justify-center">
-                        <Loader2 className="w-6 h-6 text-orange-500 animate-spin" />
+                        <Loader2 className="w-6 h-6 text-cyan-500 animate-spin" />
                     </div>
                   )}
 
-                  <label className="aspect-square rounded-xl bg-zinc-950 border-2 border-dashed border-zinc-800 hover:border-orange-500 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer group">
-                    <Plus className="w-6 h-6 text-zinc-600 group-hover:text-orange-500 transition-colors" />
+                  <label className="aspect-square rounded-xl bg-zinc-950 border-2 border-dashed border-zinc-800 hover:border-cyan-500 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer group">
+                    <Plus className="w-6 h-6 text-zinc-600 group-hover:text-cyan-500 transition-colors" />
                     <span className="text-[10px] font-bold text-zinc-600 group-hover:text-zinc-400 uppercase tracking-widest">Add Photo</span>
                     <input type="file" className="hidden" onChange={handleRefImageUpload} accept="image/*" />
                   </label>

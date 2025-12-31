@@ -2,11 +2,12 @@
 
 import { ActivitySummary } from "@/app/actions/modular-profile";
 import Link from "next/link";
-import { Trophy, ExternalLink, ChevronRight } from "lucide-react";
+import { Flag, ExternalLink, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface ActivityListProps {
   activities: ActivitySummary[];
+  linkPrefix?: string;
 }
 
 function formatDuration(seconds: number): string {
@@ -51,13 +52,18 @@ const rowVariants = {
     }
 };
 
-export function ActivityList({ activities }: ActivityListProps) {
+export function ActivityList({ activities, linkPrefix = "/activity" }: ActivityListProps) {
   return (
     <div className="bg-zinc-900/50 rounded-xl border border-zinc-800 overflow-hidden h-full flex flex-col">
-        <div className="p-4 border-b border-zinc-800 bg-zinc-900/80 flex justify-between items-center">
+        {/* Header removed here as it is often handled by parent, or if used standalone should be generic. 
+            But given current usage in ModularProfile, the parent provides the header "Recent Races".
+            If this component is used elsewhere, we might want to check.
+            For now, let's keep it clean or make it optional. 
+            Actually, let's just update the colors if we keep it. */}
+        {/* <div className="p-4 border-b border-zinc-800 bg-zinc-900/80 flex justify-between items-center">
             <h3 className="text-zinc-400 text-xs font-bold uppercase tracking-wider">Recent Activities</h3>
             <span className="text-zinc-500 text-xs">{activities.length} activities</span>
-        </div>
+        </div> */}
         
         <div className="overflow-auto flex-1 custom-scrollbar">
             <table className="w-full text-sm text-left">
@@ -88,22 +94,22 @@ export function ActivityList({ activities }: ActivityListProps) {
                                 variants={rowVariants}
                                 className={`group cursor-pointer transition-all duration-200 ${
                                     isRace 
-                                        ? 'bg-orange-500/5 hover:bg-orange-500/15' 
+                                        ? 'bg-cyan-900/10 hover:bg-cyan-900/20' 
                                         : 'hover:bg-zinc-800/50'
                                 }`}
                                 whileHover={{ 
                                     scale: 1.005, 
-                                    backgroundColor: isRace ? 'rgba(249, 115, 22, 0.15)' : 'rgba(39, 39, 42, 0.5)'
+                                    backgroundColor: isRace ? 'rgba(6, 182, 212, 0.15)' : 'rgba(39, 39, 42, 0.5)'
                                 }}
-                                onClick={() => window.location.href = `/dashboard/activities/${act.activityId}`}
+                                onClick={() => window.location.href = `${linkPrefix}/${act.activityId}`}
                             >
                                 <td className="px-4 py-3 text-zinc-400 whitespace-nowrap font-mono text-xs">
                                     {new Date(act.startDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
                                 </td>
                                 <td className="px-4 py-3 font-medium text-zinc-200">
                                     <div className="flex items-center gap-2">
-                                        {isRace && <Trophy className="w-3 h-3 text-yellow-500 flex-shrink-0" fill="currentColor" />}
-                                        <span className="truncate max-w-[200px] group-hover:text-orange-400 transition-colors">{act.name}</span>
+                                        {isRace && <Flag className="w-3 h-3 text-cyan-400 flex-shrink-0 fill-cyan-400" />}
+                                        <span className="truncate max-w-[200px] group-hover:text-cyan-400 transition-colors">{act.name}</span>
                                     </div>
                                 </td>
                                 <td className="px-4 py-3 text-zinc-400">
@@ -117,7 +123,7 @@ export function ActivityList({ activities }: ActivityListProps) {
                                 </td>
                                 <td className={`px-4 py-3 text-center font-mono font-bold ${
                                     (act.averageHeartRate || 0) > 160 ? 'text-red-500' : 
-                                    (act.averageHeartRate || 0) > 140 ? 'text-orange-500' : 'text-zinc-500'
+                                    (act.averageHeartRate || 0) > 140 ? 'text-cyan-500' : 'text-zinc-500'
                                 }`}>
                                     {act.averageHeartRate ? (
                                         <span className="bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded text-xs">
@@ -128,7 +134,7 @@ export function ActivityList({ activities }: ActivityListProps) {
                                 <td className="px-4 py-3 text-zinc-400 text-right font-mono">
                                     {formatElevation(act.totalElevationGain)}
                                 </td>
-                                <td className="px-4 py-2 text-zinc-600 group-hover:text-orange-500 transition-colors">
+                                <td className="px-4 py-2 text-zinc-600 group-hover:text-cyan-500 transition-colors">
                                     <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1 duration-200" />
                                 </td>
                             </motion.tr>

@@ -147,7 +147,7 @@ export default function EventManagementPage() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors"
+          className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-medium rounded-lg transition-colors"
         >
           + New Event
         </button>
@@ -162,7 +162,7 @@ export default function EventManagementPage() {
           </p>
           <Link
             href="/dashboard/profile/public"
-            className="text-orange-500 hover:underline text-sm mt-2 inline-block"
+            className="text-cyan-500 hover:underline text-sm mt-2 inline-block"
           >
             Set up public profile →
           </Link>
@@ -248,7 +248,7 @@ export default function EventManagementPage() {
                         <Link
                           href={`/athlete/${username}/live/${event.eventId}`}
                           target="_blank"
-                          className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded transition-colors"
+                          className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded transition-colors"
                         >
                           View →
                         </Link>
@@ -296,7 +296,7 @@ export default function EventManagementPage() {
                   value={newEvent.title}
                   onChange={(e) => setNewEvent((prev) => ({ ...prev, title: e.target.value }))}
                   required
-                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
               <div>
@@ -305,7 +305,7 @@ export default function EventManagementPage() {
                   value={newEvent.description}
                   onChange={(e) => setNewEvent((prev) => ({ ...prev, description: e.target.value }))}
                   rows={2}
-                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -314,7 +314,7 @@ export default function EventManagementPage() {
                   <select
                     value={newEvent.eventType}
                     onChange={(e) => setNewEvent((prev) => ({ ...prev, eventType: e.target.value as EventType }))}
-                    className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="marathon">Marathon</option>
                     <option value="ultra">Ultra</option>
@@ -330,7 +330,7 @@ export default function EventManagementPage() {
                     type="datetime-local"
                     value={newEvent.scheduledStart}
                     onChange={(e) => setNewEvent((prev) => ({ ...prev, scheduledStart: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
               </div>
@@ -341,7 +341,7 @@ export default function EventManagementPage() {
                   value={newEvent.streamUrl}
                   onChange={(e) => setNewEvent((prev) => ({ ...prev, streamUrl: e.target.value }))}
                   placeholder="https://youtube.com/live/..."
-                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
                 <p className="text-xs text-zinc-500 mt-1">YouTube, Twitch, or Vimeo URL</p>
               </div>
@@ -363,7 +363,7 @@ export default function EventManagementPage() {
                 <button
                   type="submit"
                   disabled={isPending || !newEvent.title}
-                  className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-zinc-700 text-white font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-zinc-700 text-white font-medium rounded-lg transition-colors"
                 >
                   {isPending ? 'Creating...' : 'Create Event'}
                 </button>
@@ -385,7 +385,7 @@ export default function EventManagementPage() {
                   type="text"
                   value={archiveData.title}
                   onChange={(e) => setArchiveData((prev) => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
               <div>
@@ -396,7 +396,7 @@ export default function EventManagementPage() {
                   onChange={(e) => setArchiveData((prev) => ({ ...prev, videoUrl: e.target.value }))}
                   placeholder="https://youtube.com/watch?v=..."
                   required
-                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
 
@@ -411,7 +411,7 @@ export default function EventManagementPage() {
                 <button
                   type="submit"
                   disabled={isPending || !archiveData.videoUrl}
-                  className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-zinc-700 text-white font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-zinc-700 text-white font-medium rounded-lg transition-colors"
                 >
                   {isPending ? 'Saving...' : 'Save Recording'}
                 </button>

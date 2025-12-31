@@ -53,13 +53,13 @@ export default async function AthleteProfilePage({ params }: PageProps) {
   // The dashboard view uses `ModularProfile`. 
   // I will use `ModularProfile` here.
   
-  const profileData = await getFeaturedProfile(username);
+  const profileData = await getFeaturedProfile(username, sessionUserId);
   
   if (!profileData) {
     notFound();
   }
 
-  const isOwner = sessionUserId === profileData.user.id || sessionUserId === profileData.user.userId;
+  const isOwner = sessionUserId === profileData.user.userId;
 
   return (
     <ModularProfile 

@@ -34,7 +34,7 @@ function getCountdown(targetDate: string): { days: number; hours: number; minute
 
 function getPriorityColor(priority: string): string {
   switch (priority) {
-    case 'A': return 'text-orange-500 bg-orange-500/10 border-orange-500/30';
+    case 'A': return 'text-cyan-500 bg-cyan-500/10 border-cyan-500/30';
     case 'B': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/30';
     case 'C': return 'text-zinc-400 bg-zinc-500/10 border-zinc-500/30';
     default: return 'text-zinc-400 bg-zinc-500/10 border-zinc-500/30';
@@ -74,13 +74,13 @@ export function NextRace({ race, upcomingRaces }: NextRaceProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-orange-500/10 via-zinc-900 to-zinc-900 rounded-xl border border-orange-500/20 overflow-hidden h-full flex flex-col"
+      className="bg-gradient-to-br from-cyan-500/10 via-zinc-900 to-zinc-900 rounded-xl border border-cyan-500/20 overflow-hidden h-full flex flex-col"
     >
       {/* Header with Priority Badge */}
       <div className="p-4 border-b border-zinc-800/50 bg-zinc-900/80 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Target className="w-4 h-4 text-orange-500" />
-          <span className="text-xs font-bold uppercase tracking-wider text-orange-500">Next Race</span>
+          <Target className="w-4 h-4 text-cyan-500" />
+          <span className="text-xs font-bold uppercase tracking-wider text-cyan-500">Next Race</span>
         </div>
         <span className={`text-xs font-bold px-2 py-0.5 rounded border ${getPriorityColor(race.priority)}`}>
           {race.priority === 'A' ? 'Goal Race' : race.priority === 'B' ? 'Key Race' : 'Tune-up'}
@@ -103,7 +103,7 @@ export function NextRace({ race, upcomingRaces }: NextRaceProps) {
             </div>
           )}
           {race.distanceClass && (
-            <div className="flex items-center gap-1 text-orange-400 font-bold">
+            <div className="flex items-center gap-1 text-cyan-400 font-bold">
               <span>{race.distanceClass}</span>
             </div>
           )}

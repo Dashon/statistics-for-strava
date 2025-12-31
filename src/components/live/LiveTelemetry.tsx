@@ -46,17 +46,17 @@ function StatCard({
   label,
   value,
   unit,
-  color = 'orange',
+  color = 'cyan',
   pulse = false,
 }: {
   label: string;
   value: string;
   unit?: string;
-  color?: 'orange' | 'red' | 'green' | 'blue';
+  color?: 'cyan' | 'red' | 'green' | 'blue';
   pulse?: boolean;
 }) {
   const colorClasses = {
-    orange: 'from-orange-500 to-red-600',
+    cyan: 'from-cyan-500 to-blue-600',
     red: 'from-red-500 to-pink-600',
     green: 'from-green-500 to-emerald-600',
     blue: 'from-blue-500 to-cyan-600',
@@ -161,7 +161,7 @@ export function LiveTelemetry({
         <StatCard
           label="Elapsed Time"
           value={formatTime(telemetry.elapsedTime)}
-          color="orange"
+          color="cyan"
         />
         <StatCard
           label="Distance"

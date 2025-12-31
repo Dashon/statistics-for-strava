@@ -15,7 +15,7 @@ export const PROVIDER_CONFIGS: Record<ProviderType, {
   available: boolean;
   scopes?: string;
 }> = {
-  strava: { name: 'Strava', color: 'bg-orange-500', type: 'oauth', available: true },
+  strava: { name: 'Strava', color: 'bg-cyan-500', type: 'oauth', available: true },
   garmin: { name: 'Garmin Connect', color: 'bg-blue-600', type: 'oauth1', available: true },
   oura: { name: 'Oura Ring', color: 'bg-purple-600', type: 'oauth', available: true },
   whoop: { name: 'WHOOP', color: 'bg-teal-600', type: 'oauth', available: true },

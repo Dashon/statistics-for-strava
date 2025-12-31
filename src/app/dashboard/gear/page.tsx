@@ -20,7 +20,7 @@ export default async function GearPage() {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent italic">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
           GEAR
         </h1>
         <p className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-1">Tools of the Trade</p>
@@ -57,7 +57,7 @@ export default async function GearPage() {
                           </span>
                           <span className="text-zinc-600 font-bold ml-2 uppercase text-xs">{getDistanceUnit(unitPreference)}</span>
                         </div>
-                        <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest italic group-hover:text-orange-500 transition-colors">Usage Stats &rarr;</span>
+                        <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest italic group-hover:text-cyan-500 transition-colors">Usage Stats &rarr;</span>
                     </div>
                 </div>
             ))}

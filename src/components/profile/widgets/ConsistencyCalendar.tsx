@@ -61,8 +61,8 @@ export function ConsistencyCalendar({ data }: ConsistencyCalendarProps) {
   }, [data]);
 
   const theme = {
-    light: ['#18181b', '#fed7aa', '#fdba74', '#fb923c', '#ea580c'], // zinc-900 to orange-600
-    dark: ['#27272a', '#431407', '#7c2d12', '#c2410c', '#ea580c'], // zinc-800 to orange-600 range
+    light: ['#18181b', '#cffafe', '#a5f3fc', '#67e8f9', '#0891b2'], // zinc-900 to cyan-600
+    dark: ['#27272a', '#083344', '#155e75', '#0e7490', '#0891b2'], // zinc-800 to cyan-600 range
   };
 
   return (

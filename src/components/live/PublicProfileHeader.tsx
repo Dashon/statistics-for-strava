@@ -47,7 +47,7 @@ export function PublicProfileHeader({ profile }: PublicProfileHeaderProps) {
   return (
     <div className="relative">
       {/* Cover Image */}
-      <div className="h-48 md:h-64 bg-gradient-to-br from-orange-900/30 to-zinc-900 rounded-xl overflow-hidden">
+      <div className="h-48 md:h-64 bg-gradient-to-br from-cyan-900/30 to-zinc-900 rounded-xl overflow-hidden">
         {profile.coverImageUrl && (
           <img
             src={profile.coverImageUrl}
@@ -69,7 +69,7 @@ export function PublicProfileHeader({ profile }: PublicProfileHeaderProps) {
                 className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-zinc-900 object-cover"
               />
             ) : (
-              <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-zinc-900 bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white text-4xl font-bold">
+              <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-zinc-900 bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-4xl font-bold">
                 {(profile.displayName || 'A')[0].toUpperCase()}
               </div>
             )}
@@ -95,7 +95,7 @@ export function PublicProfileHeader({ profile }: PublicProfileHeaderProps) {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-zinc-500 hover:text-orange-500 transition-colors"
+                      className="text-zinc-500 hover:text-cyan-500 transition-colors"
                       aria-label={platform}
                     >
                       {socialIcons[platform as keyof SocialLinks]}

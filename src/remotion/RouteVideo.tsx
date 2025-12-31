@@ -101,7 +101,7 @@ export const RouteVideo: React.FC<RouteVideoProps> = ({ coordinates, activityNam
                         )}
                         <Polyline 
                             positions={currentPath} 
-                            pathOptions={{ color: '#f97316', weight: 6, opacity: 0.9 }} 
+                            pathOptions={{ color: '#06b6d4', weight: 6, opacity: 0.9 }} 
                         />
                         {currentHead && icon && <Marker position={currentHead} icon={icon} />}
                     </MapContainer>
@@ -113,7 +113,7 @@ export const RouteVideo: React.FC<RouteVideoProps> = ({ coordinates, activityNam
 
             {/* Header / Title */}
             <AbsoluteFill className="flex flex-col items-center pt-24 z-20 pointer-events-none">
-                <div className="bg-orange-600 px-4 py-1 rounded-full mb-4 shadow-lg shadow-orange-900/40">
+                <div className="bg-cyan-600 px-4 py-1 rounded-full mb-4 shadow-lg shadow-cyan-900/40">
                     <span className="text-white font-bold tracking-widest uppercase text-lg">Strava Activity</span>
                 </div>
                 <h1 className="text-5xl font-black text-center max-w-2xl leading-tight drop-shadow-xl text-white">

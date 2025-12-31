@@ -166,7 +166,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
             </div>
             {location && (
             <div className="flex items-center gap-1.5 text-zinc-400 text-sm bg-zinc-900/50 px-3 py-1.5 rounded-full border border-zinc-800">
-                <MapPin className="w-4 h-4 text-orange-500" />
+                <MapPin className="w-4 h-4 text-cyan-500" />
                 {location}
             </div>
             )}
@@ -175,7 +175,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         <div className="flex flex-col md:flex-row gap-8 items-start">
           {/* Profile Picture Upload */}
           <div className="relative group">
-            <div className="w-32 h-32 rounded-3xl overflow-hidden bg-zinc-900 flex items-center justify-center border-2 border-zinc-800 transition-all group-hover:border-orange-500/50 shadow-2xl">
+            <div className="w-32 h-32 rounded-3xl overflow-hidden bg-zinc-900 flex items-center justify-center border-2 border-zinc-800 transition-all group-hover:border-cyan-500/50 shadow-2xl">
               {profilePicture ? (
                 <Image
                   src={profilePicture}
@@ -191,7 +191,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               )}
               {uploading && (
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
-                  <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}
             </div>
@@ -199,7 +199,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="absolute -bottom-2 -right-2 bg-orange-600 hover:bg-orange-700 p-2.5 rounded-2xl text-white shadow-xl transition-transform active:scale-90"
+              className="absolute -bottom-2 -right-2 bg-cyan-600 hover:bg-cyan-700 p-2.5 rounded-2xl text-white shadow-xl transition-transform active:scale-90"
             >
               <Camera className="w-5 h-5" />
             </button>
@@ -231,7 +231,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                     type="text"
                     value={formData.displayName ?? ''}
                     onChange={(e) => handleStringChange('displayName', e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all"
                     placeholder={stravaName}
                 />
                 </div>
@@ -245,7 +245,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                 value={formData.bio ?? ''}
                 onChange={(e) => handleStringChange('bio', e.target.value)}
                 rows={3}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all resize-none"
                 placeholder={initialData?.stravaBio || "Tell us about your running journey..."}
               />
               <p className="mt-2 text-[10px] text-zinc-600 uppercase tracking-wider font-bold">
@@ -274,7 +274,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               type="number"
               value={formData.maxHeartRate ?? ''}
               onChange={(e) => handleChange('maxHeartRate', e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
               placeholder="180"
             />
           </div>
@@ -287,7 +287,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               type="number"
               value={formData.restingHeartRate ?? ''}
               onChange={(e) => handleChange('restingHeartRate', e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
               placeholder="60"
             />
           </div>
@@ -300,7 +300,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               type="number"
               value={formData.functionalThresholdPower ?? ''}
               onChange={(e) => handleChange('functionalThresholdPower', e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
               placeholder="250"
             />
           </div>
@@ -314,7 +314,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               step="0.1"
               value={formData.weight ?? ''}
               onChange={(e) => handleChange('weight', e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
               placeholder={initialData?.stravaWeight?.toString() || "70"}
             />
           </div>
@@ -327,7 +327,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               type="number"
               value={formData.heightInCm ?? ''}
               onChange={(e) => handleChange('heightInCm', e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
               placeholder={initialData?.stravaHeight?.toString() || "175"}
             />
           </div>
@@ -340,7 +340,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               type="date"
               value={formData.dateOfBirth ?? ''}
               onChange={(e) => handleDateChange(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500"
             />
           </div>
 
@@ -351,7 +351,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
             <select
               value={formData.measurementUnit ?? 'metric'}
               onChange={(e) => handleStringChange('measurementUnit', e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 appearance-none cursor-pointer"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 appearance-none cursor-pointer"
             >
               <option value="metric">Metric (KM)</option>
               <option value="imperial">Imperial (MI)</option>
@@ -366,7 +366,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       <div className="space-y-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-5 h-5 text-orange-500" />
+            <Sparkles className="w-5 h-5 text-cyan-500" />
             <h3 className="text-xl font-bold text-white italic uppercase tracking-tight">AI THUMBNAILS</h3>
           </div>
           <p className="text-sm text-zinc-500">Upload reference photos for AI-generated run thumbnails.</p>
@@ -384,7 +384,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               type="button"
               onClick={() => referenceImageInputRef.current?.click()}
               disabled={uploadingReference}
-              className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-all inline-flex items-center gap-2"
+              className="bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-all inline-flex items-center gap-2"
             >
               <Upload className="w-5 h-5" />
               {uploadingReference ? 'UPLOADING...' : 'UPLOAD REFERENCE IMAGE'}
@@ -395,7 +395,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               {referenceImages.map((img) => (
                 <div key={img.imageId} className="relative group">
-                  <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 border-2 border-zinc-800 group-hover:border-orange-500/50 transition-all">
+                  <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 border-2 border-zinc-800 group-hover:border-cyan-500/50 transition-all">
                     <Image
                       src={img.imageUrl}
                       alt={`Reference ${img.imageType}`}
@@ -414,7 +414,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                   <div className="mt-2 flex items-center justify-between">
                     <span className="text-xs font-bold text-zinc-500 uppercase">{img.imageType}</span>
                     {img.isDefault && (
-                      <span className="text-xs bg-orange-600 text-white px-2 py-0.5 rounded-full font-bold">
+                      <span className="text-xs bg-cyan-600 text-white px-2 py-0.5 rounded-full font-bold">
                         DEFAULT
                       </span>
                     )}
@@ -444,7 +444,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
         <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4">
           <p className="text-xs text-zinc-500 leading-relaxed">
-            <strong className="text-orange-500">Tip:</strong> Upload clear photos of yourself in athletic gear.
+            <strong className="text-cyan-500">Tip:</strong> Upload clear photos of yourself in athletic gear.
             The AI will use these to generate realistic thumbnails of you running at your activity locations,
             using lat/long data from your Strava activities.
           </p>
@@ -455,7 +455,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         <button
           type="submit"
           disabled={saving}
-          className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black italic px-8 py-3 rounded-xl transition-all shadow-xl active:scale-95 flex items-center gap-2"
+          className="bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black italic px-8 py-3 rounded-xl transition-all shadow-xl active:scale-95 flex items-center gap-2"
         >
           {saving ? 'UPDATING...' : 'SAVE CHANGES'}
         </button>

@@ -113,7 +113,7 @@ export function MediaManager({
               className="space-y-4"
             >
               <div className="text-center space-y-2">
-                 <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl mx-auto flex items-center justify-center shadow-lg shadow-orange-500/20">
+                 <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl mx-auto flex items-center justify-center shadow-lg shadow-cyan-500/20">
                     <Sparkles className="w-6 h-6 text-white" />
                  </div>
                  <h3 className="text-lg font-bold text-white">Cinematic AI Poster</h3>
@@ -164,7 +164,7 @@ export function MediaManager({
                  className={`border-2 border-dashed border-zinc-700 rounded-xl p-8 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-zinc-500 transition-colors bg-zinc-900/50 ${isUploading ? 'opacity-50 cursor-wait' : ''}`}
                >
                  {isUploading ? (
-                   <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+                   <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
                  ) : (
                    <ImageIcon className="w-8 h-8 text-zinc-500" />
                  )}

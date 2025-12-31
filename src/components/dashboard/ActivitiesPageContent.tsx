@@ -102,7 +102,7 @@ export default function ActivitiesPageContent({ unitPreference }: ActivitiesPage
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent italic">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
             ACTIVITIES
           </h1>
           <p className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-1">
@@ -123,7 +123,7 @@ export default function ActivitiesPageContent({ unitPreference }: ActivitiesPage
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
                 params.activityType && params.activityType !== "All"
-                  ? "bg-orange-600 border-orange-600 text-white"
+                  ? "bg-cyan-600 border-cyan-600 text-white"
                   : "bg-zinc-800/50 border-zinc-700 text-zinc-300 hover:bg-zinc-800"
               )}
             >
@@ -132,7 +132,7 @@ export default function ActivitiesPageContent({ unitPreference }: ActivitiesPage
                 {params.activityType && params.activityType !== "All" ? params.activityType : "Filter"}
               </span>
               {activeFilters.length > 0 && (
-                <span className="ml-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="ml-1 bg-cyan-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {activeFilters.length}
                 </span>
               )}
@@ -151,7 +151,7 @@ export default function ActivitiesPageContent({ unitPreference }: ActivitiesPage
                       className={cn(
                         "w-full text-left px-3 py-2 rounded text-sm transition-colors",
                         params.activityType === type || (!params.activityType && type === "All")
-                          ? "bg-orange-600 text-white"
+                          ? "bg-cyan-600 text-white"
                           : "text-zinc-300 hover:bg-zinc-800"
                       )}
                     >
@@ -174,7 +174,7 @@ export default function ActivitiesPageContent({ unitPreference }: ActivitiesPage
           {activeFilters.map((filter, i) => (
             <span
               key={i}
-              className="px-3 py-1 bg-orange-600/20 border border-orange-600/50 rounded-full text-xs text-orange-400 font-medium"
+              className="px-3 py-1 bg-cyan-600/20 border border-cyan-600/50 rounded-full text-xs text-cyan-400 font-medium"
             >
               {filter}
             </span>

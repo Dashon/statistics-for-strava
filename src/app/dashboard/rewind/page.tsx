@@ -45,7 +45,7 @@ export default async function RewindPage({ searchParams }: { searchParams: Promi
     <div className="p-8 space-y-12 max-w-7xl mx-auto pb-24">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
-            <h1 className="text-5xl font-black bg-gradient-to-r from-orange-400 via-red-500 to-purple-600 bg-clip-text text-transparent italic">
+            <h1 className="text-5xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent italic">
                 {activeYear} REWIND
             </h1>
             <p className="text-zinc-500 text-lg mt-2 uppercase tracking-[0.2em] font-medium italic">Your Year in Motion</p>

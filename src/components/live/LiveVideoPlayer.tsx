@@ -144,7 +144,7 @@ export function LiveVideoPlayer({
           href={streamUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-orange-500 hover:text-orange-400 text-sm underline"
+          className="text-cyan-500 hover:text-cyan-400 text-sm underline"
         >
           Watch on external site →
         </a>

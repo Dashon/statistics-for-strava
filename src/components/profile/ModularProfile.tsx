@@ -10,8 +10,10 @@ import { ActivityHeatmap } from "./widgets/ActivityHeatmap";
 import { ConsistencyCalendar } from "./widgets/ConsistencyCalendar";
 import { NextRace } from "./widgets/NextRace";
 import { FormCurve } from "./widgets/FormCurve";
+import { RunLettersDiary } from "./widgets/RunLettersDiary";
+import { CountryFlags } from "./widgets/CountryFlags";
 import Image from "next/image";
-import { Instagram, Twitter, Youtube, Trophy, ExternalLink, Share2, Bell, Edit3 } from "lucide-react";
+import { Instagram, Twitter, Youtube, Trophy, ExternalLink, Share2, Bell, Edit3, Flag } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-grid-layout/css/styles.css";
@@ -21,12 +23,21 @@ import { CinematicHero } from "./CinematicHero";
 import { ProfileEditorDock } from "./ProfileEditorDock";
 import { AccoladeVault } from "./AccoladeVault";
 import { StoriesStrip } from "./StoriesStrip";
-import { cn } from "@/lib/utils";
+import { cn, formatDuration } from "@/lib/utils";
+
+const GridLayout = dynamic(() => import("react-grid-layout"), { ssr: false }) as any;
+
+export type ModularProfileData = NonNullable<Awaited<ReturnType<typeof getFeaturedProfile>>>;
+
+interface ModularProfileProps {
+  data: ModularProfileData;
+  isOwner?: boolean;
+}
 
 // ... existing code ...
 
 export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
-  const {  stats, recentActivities, previousRaces, upcomingEvents, upcomingRaces, calendarData, formCurve } = data;
+  const { stats, recentActivities, previousRaces, upcomingEvents, upcomingRaces, calendarData, formCurve, diaryEntries, countries } = data;
   
   // Edit Mode State
   const [isEditing, setIsEditing] = useState(false);
@@ -35,7 +46,7 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
   const [userState, setUserState] = useState(data.user);
   
   const handleProfileUpdate = (newData: Partial<typeof userState>) => {
-    setUserState(prev => ({ ...prev, ...newData }));
+    setUserState((prev: typeof userState) => ({ ...prev, ...newData }));
   };
 
   const widgets: Record<string, React.ReactNode> = {
@@ -43,8 +54,8 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
     next_race: <div className="h-full"><NextRace race={upcomingRaces?.[0] || null} upcomingRaces={upcomingRaces || []} /></div>,
     form_curve: <FormCurve data={formCurve || []} />,
     activity_map: (
-      <div className="h-full bg-zinc-900/50 rounded-xl border border-zinc-800 p-1 min-h-[280px]">
-         <ActivityHeatmap activities={recentActivities} />
+      <div className="h-full bg-zinc-900/50 rounded-xl border border-zinc-800 overflow-hidden min-h-[280px]">
+         <CountryFlags countries={countries || []} />
       </div>
     ),
     training_volume: (
@@ -58,23 +69,44 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
          <ConsistencyCalendar data={calendarData || []} />
       </div>
     ),
-    race_results: (
+    run_diary: (
+        <RunLettersDiary entries={(diaryEntries as any[]) || []} isOwner={isOwner} />
+    ),
+    recent_races: (
         <div className="h-full flex flex-col gap-6">
-           <div className="h-full bg-[#18181b] rounded-xl border border-orange-500/20 overflow-hidden flex flex-col relative">
-              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-orange-500 to-red-600" />
-              <div className="p-4 border-b border-zinc-800/50 bg-gradient-to-r from-orange-500/5 to-transparent">
-                 <h3 className="flex items-center gap-2 font-black italic uppercase tracking-wider text-xl text-orange-500">
+           <div className="h-full bg-zinc-900/50 rounded-xl border border-zinc-800 p-1 overflow-auto flex flex-col">
+              <div className="p-4 border-b border-zinc-800 sticky top-0 bg-zinc-900/90 backdrop-blur z-10">
+                 <h3 className="flex items-center gap-2 font-black italic uppercase tracking-wider text-xl text-cyan-500">
+                    <Flag className="w-5 h-5 fill-cyan-500" /> Recent Races
+                 </h3>
+              </div>
+              <div className="p-2">
+                  <ActivityList 
+                    activities={recentActivities} 
+                    linkPrefix={isOwner ? "/dashboard/activities" : "/activity"}
+                  />
+              </div>
+           </div>
+        </div>
+    ),
+    race_results_legacy: (
+        // Keeping this for reference if needed, but UI is switching to Diary on left
+        <div className="h-full flex flex-col gap-6">
+           <div className="h-full bg-[#18181b] rounded-xl border border-cyan-500/20 overflow-hidden flex flex-col relative">
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-cyan-500 to-blue-600" />
+              <div className="p-4 border-b border-zinc-800/50 bg-gradient-to-r from-cyan-500/5 to-transparent">
+                 <h3 className="flex items-center gap-2 font-black italic uppercase tracking-wider text-xl text-cyan-500">
                     <Trophy className="w-5 h-5" /> Race Results
                  </h3>
               </div>
               <div className="flex-1 overflow-auto p-2">
                  {previousRaces.length > 0 ? (
                    <div className="space-y-2">
-                      {previousRaces.map((race, index) => (
+                      {previousRaces.map((race: any, index: number) => (
                         <Link 
                           key={race.activityId} 
-                          href={`/dashboard/activities/${race.activityId}`}
-                          className="group block p-3 rounded-lg bg-zinc-900 hover:bg-zinc-800/80 transition-all border border-zinc-800 hover:border-orange-500/30 hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-500/10"
+                          href={isOwner ? `/dashboard/activities/${race.activityId}` : `/activity/${race.activityId}`}
+                          className="group block p-3 rounded-lg bg-zinc-900 hover:bg-zinc-800/80 transition-all border border-zinc-800 hover:border-cyan-500/30 hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-500/10"
                         >
                            <div className="flex justify-between items-start mb-1">
                               <span className="text-xs font-mono text-zinc-500">{new Date(race.startDate).getFullYear()}</span>
@@ -82,19 +114,19 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
                                  {race.type}
                               </span>
                            </div>
-                           <h4 className="font-bold text-white text-lg leading-tight group-hover:text-orange-400 transition-colors mb-2 flex items-center gap-2">
+                           <h4 className="font-bold text-white text-lg leading-tight group-hover:text-cyan-400 transition-colors mb-2 flex items-center gap-2">
                              {race.name}
                              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                            </h4>
                            <div className="grid grid-cols-3 gap-2 text-sm">
-                              <div>
-                                <div className="text-[10px] uppercase text-zinc-500 font-bold">Time</div>
-                                <div className="font-mono text-zinc-300">{formatDuration(race.movingTime)}</div>
-                              </div>
-                              <div>
-                                <div className="text-[10px] uppercase text-zinc-500 font-bold">Dist</div>
-                                <div className="font-mono text-zinc-300">{(race.distance * 0.000621371).toFixed(1)}mi</div>
-                              </div>
+                               <div>
+                                 <div className="text-[10px] uppercase text-zinc-500 font-bold">Time</div>
+                                 <div className="font-mono text-zinc-300">{formatDuration(race.movingTime)}</div>
+                               </div>
+                               <div>
+                                 <div className="text-[10px] uppercase text-zinc-500 font-bold">Dist</div>
+                                 <div className="font-mono text-zinc-300">{(race.distance * 0.000621371).toFixed(1)}mi</div>
+                               </div>
                            </div>
                         </Link>
                       ))}
@@ -107,11 +139,6 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
               </div>
            </div>
         </div>
-    ),
-    recent_activities: (
-       <div className="h-full bg-zinc-900/50 rounded-xl border border-zinc-800 p-1 overflow-auto">
-          <ActivityList activities={recentActivities} />
-       </div>
     ),
   };
   
@@ -166,8 +193,11 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
              <div className="grid grid-cols-1 gap-8">
                 <div>
                    <h3 className="line-clamp-1 mb-4 text-zinc-500 font-mono uppercase text-xs tracking-widest">Recent Activity</h3>
-                   <div className="bg-zinc-900/30 rounded-lg p-2 border border-zinc-800/50">
-                      <ActivityList activities={recentActivities.slice(0, 5)} />
+                   <div className="bg-zinc-900/30 rounded-lg p-2 border border-blue-500/20">
+                      <ActivityList 
+                        activities={recentActivities.slice(0, 5)} 
+                        linkPrefix={isOwner ? "/dashboard/activities" : "/activity"}
+                      />
                    </div>
                 </div>
                 <div>
@@ -196,7 +226,7 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
              {/* Results Priority */}
              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-1 h-[600px]">
-                   {widgets.race_results}
+                   {widgets.run_diary} 
                 </div>
                 <div className="lg:col-span-2 space-y-8">
                    <div className="bg-zinc-900/50 rounded-xl border border-zinc-800 p-1 h-[300px]">
@@ -236,11 +266,14 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
                
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div className="h-[400px]">
-                      {widgets.race_results}
+                      {widgets.run_diary}
                   </div>
-                  <div className="h-[400px] bg-zinc-900/50 rounded-xl border border-zinc-800 p-1 overflow-hidden">
-                      <ActivityList activities={recentActivities} />
-                  </div>
+                   <div className="h-[400px] bg-zinc-900/50 rounded-xl border border-zinc-800 p-1 overflow-hidden">
+                       <ActivityList 
+                         activities={recentActivities} 
+                         linkPrefix={isOwner ? "/dashboard/activities" : "/activity"}
+                       />
+                   </div>
                </div>
            </div>
         );
@@ -259,59 +292,57 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
               <StatsHeaderDetailed stats={stats} />
             </motion.div>
 
-            {/* NEW: Accolade Vault */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
-            >
-              <AccoladeVault 
-                  accolades={(userState.accolades as any[]) || []}
-                  isEditing={isEditing}
-              />
-            </motion.div>
-
-            {/* Row 2: Fan-First Hero Section - What's Next + Training Status */}
+            {/* Main Content Grid - Reordered for Mobile Priority */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
               className="grid grid-cols-1 lg:grid-cols-3 gap-6"
             >
-              {/* Left: Next Race Countdown (High Priority for Fans) */}
-              <div className="lg:col-span-1">
-                  <NextRace race={upcomingRaces?.[0] || null} upcomingRaces={upcomingRaces || []} />
-              </div>
-
-              {/* Center: Form Curve - Training Trend */}
-              <div className="lg:col-span-1">
+              {/* 1. Graph: Mileage & Pace (High Priority) */}
+              {/* Mobile: 1st, Desktop: 1st (Left 2/3) */}
+              <div className="order-1 lg:order-1 lg:col-span-2 min-h-[300px]">
                   <FormCurve data={formCurve || []} />
               </div>
 
-              {/* Right: Activity Heatmap - Where They Train */}
-              <div className="lg:col-span-1 bg-zinc-900/50 rounded-xl border border-zinc-800 p-1 min-h-[280px]">
+              {/* 3. Upcoming Events (Next Race) */}
+              {/* Mobile: 3rd, Desktop: 2nd (Right 1/3, next to Graph) */}
+              <div className="order-3 lg:order-2 lg:col-span-1">
+                  <NextRace race={upcomingRaces?.[0] || null} upcomingRaces={upcomingRaces || []} />
+              </div>
+
+              {/* 2. Accolade Vault (Trophy Case) */}
+              {/* Mobile: 2nd (Matches Image), Desktop: 3rd (Full Width below) */}
+              {userState?.accolades && <div className="order-2 lg:order-3 lg:col-span-3">
+                 <AccoladeVault 
+                    accolades={(userState.accolades as any[]) || []}
+                    isEditing={isEditing}
+                 />
+              </div>}
+
+              {/* 4. Activity Heatmap */}
+              {/* Mobile: 4th, Desktop: 4th (Left 1/3? or Full? Let's make it 1/3 to balance Training Vol) */}
+              <div className="order-4 lg:order-4 lg:col-span-1 bg-zinc-900/50 rounded-xl border border-zinc-800 p-1 min-h-[280px]">
                   <ActivityHeatmap activities={recentActivities} />
               </div>
+              
+              {/* 5. Training Volume */}
+               <div className="order-5 lg:order-5 lg:col-span-2 bg-zinc-900/50 rounded-xl border border-zinc-800 p-1">
+                  <TrainingVolume activities={recentActivities} />
+               </div>
+
             </motion.div>
 
             {/* Row 2.5: Stories Strip (Highlights) */}
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
             >
               <StoriesStrip activities={recentActivities} />
-            </motion.div>
+            </motion.div> */}
 
-            {/* Row 3: Training Volume Chart */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.25, ease: "easeOut" }}
-              className="bg-zinc-900/50 rounded-xl border border-zinc-800 p-1"
-            >
-              <TrainingVolume activities={recentActivities} />
-            </motion.div>
+
             
             {/* Row 3.5: Consistency Calendar */}
             <motion.div 
@@ -331,14 +362,14 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
               transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
               className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[400px] lg:min-h-[500px]"
             >
-              {/* Left: Previous Races / Highlights */}
+              {/* Left: Diary (Run Letters) */}
               <div className="lg:col-span-1 flex flex-col gap-6">
-                {widgets.race_results}
+                 {widgets.run_diary}
               </div>
 
-              {/* Right: Recent Activity Feed */}
-              <div className="lg:col-span-2 bg-zinc-900/50 rounded-xl border border-zinc-800 p-1">
-                  <ActivityList activities={recentActivities} />
+              {/* Right: Recent Races Feed */}
+              <div className="lg:col-span-2">
+                  {widgets.recent_races}
               </div>
             </motion.div>
           </div>
@@ -382,16 +413,14 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
         )}
       </AnimatePresence>
       
-      {/* Cinematic Hero - Always at top for Runner/Racer/Global, maybe smaller for Minimal? */}
+      {/* Cinematic Hero - Glass-effect background for the entire page */}
       {templateId !== 'minimal' && (
-         <div className="w-full">
-            <CinematicHero 
-              user={userState} 
-              heroImageUrl={userState.heroImageUrl}
-              isEditing={isEditing}
-              onHeroUpdate={(url) => handleProfileUpdate({ heroImageUrl: url })}
-            />
-         </div>
+        <CinematicHero 
+          user={userState} 
+          heroImageUrl={userState.heroImageUrl}
+          isEditing={isEditing}
+          onHeroUpdate={(url) => handleProfileUpdate({ heroImageUrl: url })}
+        />
       )}
 
       <div className="p-4 md:p-6 lg:p-8">
@@ -400,17 +429,17 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
              {!!userState.socialLinks && typeof userState.socialLinks === 'object' && (
                <>
                  {(userState.socialLinks as any).instagram && (
-                    <Link href={(userState.socialLinks as any).instagram} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
+                    <Link href={(userState.socialLinks as any).instagram} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-cyan-600 hover:text-white transition-colors text-zinc-400">
                         <Instagram className="w-4 h-4" />
                     </Link>
                  )}
                  {(userState.socialLinks as any).twitter && (
-                    <Link href={(userState.socialLinks as any).twitter} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
+                    <Link href={(userState.socialLinks as any).twitter} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-cyan-600 hover:text-white transition-colors text-zinc-400">
                         <Twitter className="w-4 h-4" />
                     </Link>
                  )}
                  {(userState.socialLinks as any).youtube && (
-                    <Link href={(userState.socialLinks as any).youtube} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-orange-600 hover:text-white transition-colors text-zinc-400">
+                    <Link href={(userState.socialLinks as any).youtube} target="_blank" className="p-2 bg-zinc-900 rounded-full hover:bg-cyan-600 hover:text-white transition-colors text-zinc-400">
                         <Youtube className="w-4 h-4" />
                     </Link>
                  )}

@@ -73,3 +73,20 @@ export async function generateRunLetter(activityId: string) {
     return { success: false, error: err.message };
   }
 }
+
+export async function toggleLetterVisibility(activityId: string, isPublic: boolean) {
+  const session = await auth();
+  if (!session) return { success: false, error: "Unauthorized" };
+
+  try {
+    await db.update(runLetters)
+      .set({ isPublic })
+      .where(eq(runLetters.activityId, activityId));
+
+    revalidatePath("/dashboard/run-letters");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+

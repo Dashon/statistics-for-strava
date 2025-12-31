@@ -287,6 +287,7 @@ export async function updateAccolades(accolades: any[]) {
       await db.insert(publicProfile).values({
         userId,
         accolades: accolades,
+        createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
     } else {

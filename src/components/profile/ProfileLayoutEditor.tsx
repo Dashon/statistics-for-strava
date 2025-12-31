@@ -98,7 +98,7 @@ export function ProfileLayoutEditor({ initialLayout }: ProfileLayoutEditorProps)
           <button
             onClick={saveLayout}
             disabled={saving}
-            className="px-4 py-2 rounded bg-orange-600 text-white hover:bg-orange-500 flex items-center gap-2 text-sm font-bold"
+            className="px-4 py-2 rounded bg-cyan-600 text-white hover:bg-cyan-500 flex items-center gap-2 text-sm font-bold"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save Layout

@@ -30,7 +30,7 @@ export default async function MonthlyStatsPage() {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent italic">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
           MONTHLY STATS
         </h1>
         <p className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-1">Endurance Over Time</p>

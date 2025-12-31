@@ -68,7 +68,7 @@ export default function TimeRangeSelector() {
         className={cn(
           "flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
           isFiltered
-            ? "bg-orange-600 border-orange-600 text-white"
+            ? "bg-cyan-600 border-cyan-600 text-white"
             : "bg-zinc-800/50 border-zinc-700 text-zinc-300 hover:bg-zinc-800"
         )}
       >
@@ -88,7 +88,7 @@ export default function TimeRangeSelector() {
                 handleClearFilter();
               }
             }}
-            className="ml-1 hover:bg-orange-700 rounded p-0.5 inline-flex items-center justify-center"
+            className="ml-1 hover:bg-cyan-700 rounded p-0.5 inline-flex items-center justify-center"
           >
             <X className="w-3 h-3" />
           </span>
@@ -108,7 +108,7 @@ export default function TimeRangeSelector() {
                 className={cn(
                   "w-full text-left px-3 py-2 rounded text-sm transition-colors",
                   params.range === range.value
-                    ? "bg-orange-600 text-white"
+                    ? "bg-cyan-600 text-white"
                     : "text-zinc-300 hover:bg-zinc-800"
                 )}
               >

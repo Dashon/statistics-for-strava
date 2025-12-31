@@ -77,7 +77,7 @@ export function MarkAsRace({ activityId, isRace, initialData }: MarkAsRaceProps)
         <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6 w-full max-w-md shadow-2xl">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-orange-500" />
+              <Trophy className="w-5 h-5 text-cyan-500" />
               Mark as Race
             </h3>
             <button onClick={() => setIsOpen(false)} className="text-zinc-500 hover:text-white">
@@ -93,7 +93,7 @@ export function MarkAsRace({ activityId, isRace, initialData }: MarkAsRaceProps)
                 required
                 value={formData.raceName}
                 onChange={e => setFormData({ ...formData, raceName: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
                 placeholder="e.g. Boston Marathon 2024"
               />
             </div>
@@ -104,7 +104,7 @@ export function MarkAsRace({ activityId, isRace, initialData }: MarkAsRaceProps)
                 <select
                   value={formData.distanceClass}
                   onChange={e => setFormData({ ...formData, distanceClass: e.target.value })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
                 >
                   <option value="5K">5K</option>
                   <option value="10K">10K</option>
@@ -120,7 +120,7 @@ export function MarkAsRace({ activityId, isRace, initialData }: MarkAsRaceProps)
                   type="number"
                   value={formData.placement || ''}
                   onChange={e => setFormData({ ...formData, placement: parseInt(e.target.value) || 0 })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
                   placeholder="Overall rank"
                 />
               </div>
@@ -132,7 +132,7 @@ export function MarkAsRace({ activityId, isRace, initialData }: MarkAsRaceProps)
                 id="isPr"
                 checked={formData.isPr}
                 onChange={e => setFormData({ ...formData, isPr: e.target.checked })}
-                className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-orange-500 focus:ring-orange-500"
+                className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-cyan-500 focus:ring-cyan-500"
               />
               <label htmlFor="isPr" className="text-sm text-white font-medium cursor-pointer">
                 This was a Personal Record (PR)
@@ -150,7 +150,7 @@ export function MarkAsRace({ activityId, isRace, initialData }: MarkAsRaceProps)
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-4 py-2 rounded bg-orange-600 text-white hover:bg-orange-500 font-bold flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 rounded bg-cyan-600 text-white hover:bg-cyan-500 font-bold flex items-center justify-center gap-2"
               >
                 {loading ? 'Saving...' : <><Save className="w-4 h-4" /> Save Race</>}
               </button>
@@ -168,7 +168,7 @@ export function MarkAsRace({ activityId, isRace, initialData }: MarkAsRaceProps)
       className={`
         px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-colors
         ${isRace 
-          ? 'bg-orange-500/10 text-orange-500 border border-orange-500/50 hover:bg-orange-500/20' 
+          ? 'bg-cyan-500/10 text-cyan-500 border border-cyan-500/50 hover:bg-cyan-500/20' 
           : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:bg-zinc-700 hover:text-white'
         }
       `}

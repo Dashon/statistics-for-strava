@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Camera, X } from 'lucide-react';
-import { generateProfileHero, updateCinematicProfile } from '@/app/actions/cinematic-profile';
+import { Camera, X } from 'lucide-react';
+import { generateProfileHero } from '@/app/actions/cinematic-profile';
 import { updateProfileHero } from '@/app/actions/media';
 import { MediaManager } from '../common/MediaManager';
 
@@ -18,6 +18,15 @@ interface CinematicHeroProps {
   onHeroUpdate?: (url: string) => void;
 }
 
+/**
+ * CinematicHero - Apple-style glassmorphic background
+ * 
+ * This component renders a subtle, faded background image with:
+ * - Heavy blur (40px) for frosted glass effect
+ * - Very low opacity (0.15) so it doesn't overwhelm content
+ * - Grain texture overlay for premium feel
+ * - Fixed position to cover entire viewport
+ */
 export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: CinematicHeroProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showMediaManager, setShowMediaManager] = useState(false);
@@ -33,7 +42,6 @@ export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: C
         setShowMediaManager(false);
       } else {
         console.error('Failed to generate hero:', result.error);
-        // Could add toast notification here
       }
     } catch (error) {
       console.error('Error generating hero:', error);
@@ -43,111 +51,118 @@ export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: C
   };
 
   const handleManualUpdate = async (url: string) => {
-    // 1. Update local state immediate for feedback
     setCurrentHeroUrl(url);
     onHeroUpdate?.(url);
-    
-    // 2. Persist to DB
     await updateProfileHero(url);
-    
-    // 3. Close manager
     setShowMediaManager(false);
   };
 
   return (
-    <div className="relative w-full h-[60vh] min-h-[500px] overflow-hidden rounded-2xl bg-zinc-900 group">
-      {/* Background Image */}
-      <AnimatePresence mode="wait">
-        {currentHeroUrl ? (
-          <motion.img
-            key={currentHeroUrl}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.7 }}
-            src={currentHeroUrl}
-            alt="Cinematic Hero"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
-            <div className="text-center p-8 opacity-50">
-              <Camera className="w-16 h-16 mx-auto mb-4 text-zinc-600" />
-              <p className="text-zinc-400">No cinematic poster yet</p>
-            </div>
-          </div>
-        )}
-      </AnimatePresence>
+    <>
+      {/* Fixed Background Layer - Apple Glass Effect */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        {/* Hero Image - Heavily blurred and faded */}
+        <AnimatePresence mode="wait">
+          {currentHeroUrl ? (
+            <motion.div
+              key={currentHeroUrl}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2 }}
+              className="absolute inset-0"
+            >
+              {/* The actual image with blur */}
+              <img
+                src={currentHeroUrl}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{
+                  filter: 'blur(40px) saturate(120%)',
+                  opacity: 0.15,
+                  transform: 'scale(1.1)', // Prevent blur edge artifacts
+                }}
+              />
+            </motion.div>
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-950 to-black" />
+          )}
+        </AnimatePresence>
 
-      {/* Cinematic Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent opacity-90" />
+        {/* Grain Texture Overlay for premium feel */}
+        <div 
+          className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'repeat',
+          }}
+        />
 
-      {/* Content */}
-      <div className="absolute bottom-0 left-0 w-full p-8 md:p-12 z-10 flex flex-col items-start">
-        {user.countryCode && (
-          <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white text-sm font-medium">
-             {/* Simple flag emoji fallback if no SVG available yet */}
-             <span>Running in</span>
-             <MapPin className="w-3 h-3 text-orange-500" />
-             <span className="uppercase tracking-wider">{user.countryCode}</span>
-          </div>
-        )}
+        {/* Vignette gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/30 to-zinc-950/80" />
         
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black italic tracking-tighter text-white uppercase leading-none drop-shadow-2xl">
-          {user.displayName || 'QT.run'}
-        </h1>
-        
-        {user.tagline && (
-          <div className="mt-4 flex items-center gap-3">
-             <div className="h-1 w-12 bg-orange-500 rounded-full" />
-             <p className="text-xl md:text-2xl font-medium text-zinc-200 tracking-wide">
-               {user.tagline}
-             </p>
-          </div>
-        )}
+        {/* Top fade for header area */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-zinc-950/60 to-transparent" />
       </div>
 
-      {/* Edit Overlay Button */}
+      {/* Edit Button - Only visible when editing */}
       {isEditing && !showMediaManager && (
-        <div className="absolute top-6 right-6 z-20">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-4 left-4 z-50"
+        >
           <button
             onClick={() => setShowMediaManager(true)}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-lg text-white font-bold transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 rounded-xl text-white font-medium transition-all flex items-center gap-2 shadow-2xl"
           >
-            <Camera className="w-5 h-5" />
-            <span>Edit Poster</span>
+            <Camera className="w-4 h-4" />
+            <span>Change Background</span>
           </button>
-        </div>
+        </motion.div>
       )}
 
-      {/* Media Manager Popover */}
+      {/* Media Manager Modal */}
       <AnimatePresence>
         {isEditing && showMediaManager && (
-           <motion.div 
-             initial={{ opacity: 0, y: -20 }}
-             animate={{ opacity: 1, y: 0 }}
-             exit={{ opacity: 0, scale: 0.95 }}
-             className="absolute top-6 right-6 z-30 w-[400px]"
-           >
-              <div className="relative">
-                 <button 
-                   onClick={() => setShowMediaManager(false)}
-                   className="absolute -top-3 -right-3 z-40 bg-zinc-800 text-white p-2 rounded-full border border-zinc-700 shadow-xl hover:bg-zinc-700"
-                 >
-                   <X className="w-4 h-4" />
-                 </button>
-                 <MediaManager 
-                    type="profile"
-                    currentUrl={currentHeroUrl}
-                    onUpdate={handleManualUpdate}
-                    onGenerate={handleGenerate}
-                    isGenerating={isGenerating}
-                 />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowMediaManager(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-[450px] max-w-[90vw]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowMediaManager(false)}
+                className="absolute -top-3 -right-3 z-40 bg-zinc-800 text-white p-2 rounded-full border border-zinc-700 shadow-xl hover:bg-zinc-700 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="bg-zinc-900/95 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+                <div className="p-4 border-b border-white/5">
+                  <h3 className="text-lg font-semibold text-white">Background Image</h3>
+                  <p className="text-sm text-zinc-400 mt-1">Choose a subtle background for your profile</p>
+                </div>
+                <MediaManager
+                  type="profile"
+                  currentUrl={currentHeroUrl}
+                  onUpdate={handleManualUpdate}
+                  onGenerate={handleGenerate}
+                  isGenerating={isGenerating}
+                />
               </div>
-           </motion.div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
 

@@ -1,8 +1,9 @@
 'use server';
 
 import { db } from '@/db';
-import { activity, liveEvent, publicProfile, athleteProfile, races } from '@/db/schema';
+import { activity, liveEvent, publicProfile, athleteProfile, races, runLetters } from '@/db/schema';
 import { eq, and, desc, asc, or, sum, count, gte, sql, lte } from 'drizzle-orm';
+import { getLifetimeCountries } from './countries';
 
 export interface DashboardStats {
   totalActivities: number;
@@ -62,7 +63,7 @@ export interface WeeklyFormData {
     activityCount: number;
 }
 
-export async function getFeaturedProfile(username: string) {
+export async function getFeaturedProfile(username: string, viewerId?: string) {
   // 1. Get User ID from Username
   const profile = await db
     .select({
@@ -71,8 +72,13 @@ export async function getFeaturedProfile(username: string) {
       tagline: publicProfile.tagline,
       coverImageUrl: publicProfile.coverImageUrl,
       avatarUrl: athleteProfile.stravaProfilePicture,
+      stravaProfilePicture: athleteProfile.stravaProfilePicture,
       socialLinks: publicProfile.socialLinks,
       layoutConfig: publicProfile.layoutConfig,
+      heroImageUrl: publicProfile.heroImageUrl,
+      templateId: publicProfile.templateId,
+      accolades: publicProfile.accolades,
+      countryCode: publicProfile.countryCode,
     })
     .from(publicProfile)
     .leftJoin(athleteProfile, eq(publicProfile.userId, athleteProfile.userId))
@@ -203,7 +209,7 @@ export async function getFeaturedProfile(username: string) {
   // We return the raw-ish list and let the component aggregate by day
   // But to save bandwidth, let's map it to a simpler structure
   const calendarData = calendarRaw.map(a => ({
-      date: a.startDateTime.split('T')[0],
+      date: a.startDateTime.substring(0, 10),
       movingTime: a.movingTime || 0,
       distance: a.distance || 0,
   }));
@@ -266,6 +272,41 @@ export async function getFeaturedProfile(username: string) {
     }))
     .sort((a, b) => a.weekStart.localeCompare(b.weekStart));
 
+  // 9. Get Run Letters (Diary Entries)
+  const isOwner = viewerId === userId;
+  
+  const lettersConditions = [
+      eq(activity.userId, userId)
+  ];
+
+  if (!isOwner) {
+      lettersConditions.push(eq(runLetters.isPublic, true));
+  }
+
+  const lettersRaw = await db
+    .select({
+       activityId: runLetters.activityId,
+       letterText: runLetters.letterText,
+       generatedAt: runLetters.generatedAt,
+       activityName: activity.name,
+       activityDate: activity.startDateTime,
+    })
+    .from(runLetters)
+    .innerJoin(activity, eq(runLetters.activityId, activity.activityId))
+    .where(and(...lettersConditions))
+    .orderBy(desc(runLetters.generatedAt))
+    .limit(10);
+
+  const diaryEntries = lettersRaw.map(l => ({
+    id: l.activityId,
+    title: l.activityName || 'Run Diary',
+    date: l.activityDate,
+    excerpt: l.letterText.substring(0, 150) + '...',
+  }));
+
+  // 10. Get Countries
+  const countries = await getLifetimeCountries(userId);
+
   return {
     user,
     stats,
@@ -275,5 +316,7 @@ export async function getFeaturedProfile(username: string) {
     upcomingRaces,
     calendarData,
     formCurve,
+    diaryEntries,
+    countries,
   };
 }

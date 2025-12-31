@@ -113,7 +113,7 @@ export function RaceList({ races, onEdit }: RaceListProps) {
                         <span className={`
                            inline-flex items-center px-2 py-0.5 rounded text-xs font-bold
                            ${race.priority === 'A' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 
-                             race.priority === 'B' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 
+                             race.priority === 'B' ? 'bg-cyan-500/10 text-cyan-500 border border-cyan-500/20' : 
                              'bg-green-500/10 text-green-500 border border-green-500/20'}
                         `}>
                            {race.priority} Race

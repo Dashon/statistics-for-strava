@@ -90,7 +90,7 @@ export const generateRunLetterTask = task({
         activityId: payload.activityId,
         letterText: letterText,
         generatedAt: Math.floor(Date.now() / 1000),
-        isPublic: false,
+        isPublic: true,
       }).onConflictDoUpdate({
         target: runLetters.activityId,
         set: {

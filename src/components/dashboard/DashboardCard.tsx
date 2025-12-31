@@ -11,7 +11,7 @@ interface DashboardCardProps {
 
 export default function DashboardCard({ title, value, unit, className, children }: DashboardCardProps) {
   return (
-    <div className={cn("bg-orange-600 p-4 flex flex-col justify-between min-h-[100px]", className)}>
+    <div className={cn("bg-cyan-600 p-4 flex flex-col justify-between min-h-[100px]", className)}>
       <div className="flex justify-between items-start">
         <span className="text-white text-lg font-medium">{title}</span>
       </div>

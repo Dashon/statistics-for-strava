@@ -164,7 +164,7 @@ export function LiveChat({ eventId, currentUserId, isEventHost = false }: LiveCh
       <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
-            <div className="animate-spin w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full" />
+            <div className="animate-spin w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full" />
           </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-zinc-500 text-sm">
@@ -187,7 +187,7 @@ export function LiveChat({ eventId, currentUserId, isEventHost = false }: LiveCh
                     className="w-8 h-8 rounded-full"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white text-sm font-medium">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-medium">
                     {(msg.userName || 'U')[0].toUpperCase()}
                   </div>
                 )}
@@ -210,7 +210,7 @@ export function LiveChat({ eventId, currentUserId, isEventHost = false }: LiveCh
                 <div
                   className={`inline-block px-3 py-2 rounded-2xl text-sm ${
                     msg.userId === currentUserId
-                      ? 'bg-orange-600 text-white'
+                      ? 'bg-cyan-600 text-white'
                       : 'bg-zinc-800 text-zinc-200'
                   }`}
                 >
@@ -251,12 +251,12 @@ export function LiveChat({ eventId, currentUserId, isEventHost = false }: LiveCh
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type a message..."
               maxLength={500}
-              className="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             />
             <button
               type="submit"
               disabled={!newMessage.trim() || isSending}
-              className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors"
+              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors"
             >
               {isSending ? (
                 <span className="animate-spin">↻</span>
@@ -269,7 +269,7 @@ export function LiveChat({ eventId, currentUserId, isEventHost = false }: LiveCh
       ) : (
         <div className="p-4 border-t border-zinc-800 text-center">
           <p className="text-sm text-zinc-500">
-            <a href="/api/auth/signin" className="text-orange-500 hover:underline">
+            <a href="/api/auth/signin" className="text-cyan-500 hover:underline">
               Sign in
             </a>{' '}
             to join the chat

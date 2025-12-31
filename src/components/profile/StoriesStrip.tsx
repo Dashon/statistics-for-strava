@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Play, MapPin, Calendar, Activity } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Activity as ActivityType } from '@/db/schema'; // We might need a looser type here if we don't have exact schema import easily available or just use any
+// import { activity as ActivityType } from '@/db/schema';
 
 interface Story {
   id: string;
@@ -22,14 +22,14 @@ interface StoriesStripProps {
   activities: any[]; // Using any[] for flexibility with the join data we receive
 }
 
-export function StoriesStrip({ activities }: StoriesStripProps) {
+export function StoriesStripProps({ activities }: StoriesStripProps) {
   if (!activities || activities.length === 0) return null;
 
   return (
     <div className="w-full py-8">
       <div className="flex items-center justify-between mb-6 px-2">
         <h3 className="text-xl font-black italic uppercase text-white flex items-center gap-2">
-          <Activity className="w-5 h-5 text-orange-500" />
+          <Activity className="w-5 h-5 text-cyan-500" />
           The Last Training Cycle
         </h3>
         <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
@@ -52,7 +52,7 @@ export function StoriesStrip({ activities }: StoriesStripProps) {
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="group relative w-72 h-44 bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800 hover:border-orange-500/50 transition-colors shadow-lg hover:shadow-orange-500/10 cursor-pointer"
+                className="group relative w-72 h-44 bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800 hover:border-cyan-500/50 transition-colors shadow-lg hover:shadow-cyan-500/10 cursor-pointer"
               >
                  {/* Thumbnail Image (Map or Photo) */}
                  <div className="absolute inset-0 bg-zinc-800">
@@ -65,7 +65,7 @@ export function StoriesStrip({ activities }: StoriesStripProps) {
                          </svg>
                          
                          {/* Play Button Overlay (implying this is a 'story' or video) */}
-                         <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 group-hover:bg-orange-500 transition-all z-10">
+                         <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-500 transition-all z-10">
                             <Play className="w-5 h-5 text-white fill-white ml-0.5" />
                          </div>
                     </div>
@@ -77,7 +77,7 @@ export function StoriesStrip({ activities }: StoriesStripProps) {
                  {/* Content */}
                  <div className="absolute bottom-0 left-0 w-full p-4">
                     <div className="flex items-center gap-2 mb-1">
-                       <span className="text-[10px] font-bold bg-orange-500 text-black px-1.5 py-0.5 rounded uppercase">
+                       <span className="text-[10px] font-bold bg-cyan-500 text-black px-1.5 py-0.5 rounded uppercase">
                           {activity.sportType || 'Run'}
                        </span>
                        <span className="text-zinc-400 text-xs font-mono flex items-center gap-1">
@@ -86,7 +86,7 @@ export function StoriesStrip({ activities }: StoriesStripProps) {
                        </span>
                     </div>
                     
-                    <h4 className="text-white font-bold text-sm leading-tight line-clamp-1 mb-1 group-hover:text-orange-400 transition-colors">
+                    <h4 className="text-white font-bold text-sm leading-tight line-clamp-1 mb-1 group-hover:text-cyan-400 transition-colors">
                        {activity.name}
                     </h4>
                     

@@ -46,9 +46,9 @@ const getHRColor = (hr?: number) => {
 
 const getKJColor = (kj?: number) => {
   if (!kj) return "transparent";
-  if (kj > 1000) return "bg-orange-600 text-white";
-  if (kj > 750) return "bg-orange-500 text-white";
-  if (kj > 500) return "bg-orange-400 text-white";
+  if (kj > 1000) return "bg-cyan-600 text-white";
+  if (kj > 750) return "bg-cyan-500 text-white";
+  if (kj > 500) return "bg-cyan-400 text-white";
   if (kj > 250) return "bg-yellow-500 text-zinc-900";
   return "bg-yellow-400 text-zinc-900";
 };
@@ -181,7 +181,7 @@ export default function ActivityTable({ activities, distanceUnit, pagination, sh
                   <div className="flex items-center gap-2">
                     {activity.type}
                     {activity.hasPolyline && (
-                      <span title="Has Route Map" className="text-[#f97316]">
+                      <span title="Has Route Map" className="text-[#06b6d4]">
                          <MapPin className="w-3 h-3" />
                       </span>
                     )}
@@ -272,7 +272,7 @@ export default function ActivityTable({ activities, distanceUnit, pagination, sh
                     className={cn(
                       "px-3 py-1 rounded border text-sm transition-colors",
                       pageNum === pagination.page
-                        ? "bg-orange-600 border-orange-600 text-white font-bold"
+                        ? "bg-cyan-600 border-cyan-600 text-white font-bold"
                         : "border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
                     )}
                   >

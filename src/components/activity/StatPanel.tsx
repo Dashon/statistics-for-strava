@@ -6,7 +6,7 @@ interface StatPanelProps {
   value: string | number;
   unit?: string;
   icon?: LucideIcon;
-  variant?: 'orange' | 'zinc' | 'red' | 'purple' | 'green' | 'transparent';
+  variant?: 'cyan' | 'zinc' | 'red' | 'purple' | 'green' | 'transparent';
   className?: string;
   subValue?: string;
   size?: 'sm' | 'md' | 'lg' | 'title';
@@ -24,8 +24,8 @@ export default function StatPanel({
 }: StatPanelProps) {
   const getVariantStyles = () => {
     switch (variant) {
-      case 'orange':
-        return 'bg-[#f97316] text-black border-none';
+      case 'cyan':
+        return 'bg-[#06b6d4] text-black border-none';
       case 'transparent':
         return 'bg-transparent border-zinc-800 text-zinc-400';
       case 'zinc':
@@ -45,15 +45,15 @@ export default function StatPanel({
   };
 
   const getLabelColor = () => {
-    return variant === 'orange' ? 'text-black/60' : 'text-zinc-500';
+    return variant === 'cyan' ? 'text-black/60' : 'text-zinc-500';
   };
 
   const getValueColor = () => {
-    return variant === 'orange' ? 'text-black' : 'text-white';
+    return variant === 'cyan' ? 'text-black' : 'text-white';
   };
 
   const getUnitColor = () => {
-    return variant === 'orange' ? 'text-black/40' : 'text-zinc-600';
+    return variant === 'cyan' ? 'text-black/40' : 'text-zinc-600';
   };
 
   return (

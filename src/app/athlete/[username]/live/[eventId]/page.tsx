@@ -55,7 +55,7 @@ export default async function LiveEventPage({ params }: PageProps) {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-zinc-500 mb-6">
-          <Link href={`/athlete/${username}`} className="hover:text-orange-500">
+          <Link href={`/athlete/${username}`} className="hover:text-cyan-500">
             {profile.displayName || username}
           </Link>
           <span>/</span>
@@ -119,14 +119,14 @@ export default async function LiveEventPage({ params }: PageProps) {
                     className="w-10 h-10 rounded-full"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold">
                     {(profile.displayName || username)[0].toUpperCase()}
                   </div>
                 )}
                 <div>
                   <Link
                     href={`/athlete/${username}`}
-                    className="font-medium text-white hover:text-orange-500 transition-colors"
+                    className="font-medium text-white hover:text-cyan-500 transition-colors"
                   >
                     {profile.displayName || username}
                   </Link>

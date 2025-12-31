@@ -102,7 +102,7 @@ export function RaceForm({ initialData, onSuccess, onCancel }: RaceFormProps) {
                 required
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 pl-9 text-white focus:outline-none focus:border-orange-500"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 pl-9 text-white focus:outline-none focus:border-cyan-500"
                 placeholder="Boston Marathon"
               />
               <Flag className="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" />
@@ -116,7 +116,7 @@ export function RaceForm({ initialData, onSuccess, onCancel }: RaceFormProps) {
                 required
                 value={formData.date}
                 onChange={e => setFormData({ ...formData, date: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 pl-9 text-white focus:outline-none focus:border-orange-500 [&::-webkit-calendar-picker-indicator]:invert"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 pl-9 text-white focus:outline-none focus:border-cyan-500 [&::-webkit-calendar-picker-indicator]:invert"
               />
               <Calendar className="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" />
             </div>
@@ -130,7 +130,7 @@ export function RaceForm({ initialData, onSuccess, onCancel }: RaceFormProps) {
             <select
               value={formData.distanceClass}
               onChange={e => setFormData({ ...formData, distanceClass: e.target.value })}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
             >
               <option value="5K">5K</option>
               <option value="10K">10K</option>
@@ -150,7 +150,7 @@ export function RaceForm({ initialData, onSuccess, onCancel }: RaceFormProps) {
                   onClick={() => setFormData({ ...formData, priority: p })}
                   className={`flex-1 text-sm font-bold py-1 rounded transition-colors ${
                     formData.priority === p 
-                      ? p === 'A' ? 'bg-red-500 text-white' : p === 'B' ? 'bg-orange-500 text-white' : 'bg-green-500 text-white' 
+                      ? p === 'A' ? 'bg-red-500 text-white' : p === 'B' ? 'bg-cyan-500 text-white' : 'bg-green-500 text-white' 
                       : 'text-zinc-500 hover:text-zinc-300'
                   }`}
                 >
@@ -170,7 +170,7 @@ export function RaceForm({ initialData, onSuccess, onCancel }: RaceFormProps) {
                 type="text"
                 value={formData.location}
                 onChange={e => setFormData({ ...formData, location: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 pl-9 text-white focus:outline-none focus:border-orange-500"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 pl-9 text-white focus:outline-none focus:border-cyan-500"
                 placeholder="City, State"
               />
               <MapPin className="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" />
@@ -183,7 +183,7 @@ export function RaceForm({ initialData, onSuccess, onCancel }: RaceFormProps) {
                 type="text"
                 value={formData.goalTimeStr}
                 onChange={e => setFormData({ ...formData, goalTimeStr: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 pl-9 text-white focus:outline-none focus:border-orange-500 font-mono"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 pl-9 text-white focus:outline-none focus:border-cyan-500 font-mono"
                 placeholder="03:59:59"
               />
               <Trophy className="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" />
@@ -197,7 +197,7 @@ export function RaceForm({ initialData, onSuccess, onCancel }: RaceFormProps) {
             <select
               value={formData.status}
               onChange={e => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-cyan-500"
             >
               <option value="upcoming">Upcoming</option>
               <option value="completed">Completed</option>
@@ -212,7 +212,7 @@ export function RaceForm({ initialData, onSuccess, onCancel }: RaceFormProps) {
           <textarea
             value={formData.notes}
             onChange={e => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-orange-500 h-24 resize-none"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-white focus:outline-none focus:border-cyan-500 h-24 resize-none"
             placeholder="Go out easy, push the hills..."
           />
         </div>

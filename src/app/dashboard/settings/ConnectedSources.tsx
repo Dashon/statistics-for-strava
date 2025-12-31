@@ -20,7 +20,7 @@ const PROVIDERS = [
   { 
     id: 'strava', 
     name: 'Strava', 
-    color: 'bg-orange-500', 
+    color: 'bg-cyan-500', 
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
         <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
@@ -163,7 +163,7 @@ export default function ConnectedSources({ apiKey: initialApiKey }: ConnectedSou
       {/* OAuth Providers Section */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Link2 className="w-5 h-5 text-orange-500" />
+          <Link2 className="w-5 h-5 text-cyan-500" />
           <h3 className="text-lg font-bold text-white uppercase tracking-tight">Connected Sources</h3>
         </div>
         <p className="text-sm text-zinc-500">
@@ -192,7 +192,7 @@ export default function ConnectedSources({ apiKey: initialApiKey }: ConnectedSou
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-white">{provider.name}</span>
                       {connection?.isPrimary && (
-                        <span className="text-[10px] bg-orange-600 text-white px-2 py-0.5 rounded-full font-bold uppercase">
+                        <span className="text-[10px] bg-cyan-600 text-white px-2 py-0.5 rounded-full font-bold uppercase">
                           Primary
                         </span>
                       )}
@@ -346,7 +346,7 @@ export default function ConnectedSources({ apiKey: initialApiKey }: ConnectedSou
 
               <ol className="space-y-3 text-sm text-zinc-300">
                 <li className="flex gap-3">
-                  <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                  <span className="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
                   <span>
                     {showWebhookGuide === 'apple_health' 
                       ? 'Download "Health Auto Export" from the App Store (~$5).'
@@ -354,11 +354,11 @@ export default function ConnectedSources({ apiKey: initialApiKey }: ConnectedSou
                   </span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                  <span className="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
                   <span>Open the app and go to Settings → REST API / Webhook.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                  <span className="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
                   <div className="space-y-2">
                     <span>Enter your Webhook URL:</span>
                     <code className="block bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs font-mono break-all">
@@ -367,7 +367,7 @@ export default function ConnectedSources({ apiKey: initialApiKey }: ConnectedSou
                   </div>
                 </li>
                 <li className="flex gap-3">
-                  <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
+                  <span className="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
                   <div className="space-y-2">
                     <span>Add header: <code className="bg-zinc-800 px-1 rounded">X-API-Key</code> with value:</span>
                     <code className="block bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs font-mono break-all">
@@ -376,14 +376,14 @@ export default function ConnectedSources({ apiKey: initialApiKey }: ConnectedSou
                   </div>
                 </li>
                 <li className="flex gap-3">
-                  <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">5</span>
+                  <span className="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">5</span>
                   <span>Enable automatic sync. Your workouts will now appear in QT!</span>
                 </li>
               </ol>
 
               <button
                 onClick={() => setShowWebhookGuide(null)}
-                className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl transition-all"
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-xl transition-all"
               >
                 Got it!
               </button>

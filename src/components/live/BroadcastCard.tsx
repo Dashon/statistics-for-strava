@@ -41,7 +41,7 @@ export function BroadcastCard({ broadcast, username }: BroadcastCardProps) {
   return (
     <Link
       href={`/athlete/${username}/broadcast/${broadcast.archiveId}`}
-      className="group block bg-zinc-900/50 rounded-xl border border-zinc-800 overflow-hidden hover:border-orange-500/50 transition-all"
+      className="group block bg-zinc-900/50 rounded-xl border border-zinc-800 overflow-hidden hover:border-cyan-500/50 transition-all"
     >
       {/* Thumbnail */}
       <div className="relative aspect-video bg-zinc-800">
@@ -84,7 +84,7 @@ export function BroadcastCard({ broadcast, username }: BroadcastCardProps) {
 
         {/* Play overlay on hover */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="w-14 h-14 rounded-full bg-orange-600 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-cyan-600 flex items-center justify-center">
             <svg
               className="w-6 h-6 text-white ml-1"
               fill="currentColor"
@@ -98,7 +98,7 @@ export function BroadcastCard({ broadcast, username }: BroadcastCardProps) {
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="font-semibold text-white group-hover:text-orange-400 transition-colors line-clamp-2">
+        <h3 className="font-semibold text-white group-hover:text-cyan-400 transition-colors line-clamp-2">
           {broadcast.title}
         </h3>
         {broadcast.description && (

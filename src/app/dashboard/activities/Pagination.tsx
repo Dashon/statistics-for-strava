@@ -66,7 +66,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
               className={`
                 px-4 py-2 rounded-lg font-medium transition-colors
                 ${isActive
-                  ? 'bg-orange-600 text-white'
+                  ? 'bg-cyan-600 text-white'
                   : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
                 }
               `}

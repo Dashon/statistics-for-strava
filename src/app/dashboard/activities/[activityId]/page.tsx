@@ -10,11 +10,11 @@ import { generateCoachingInsight, getCoachingInsight } from "@/app/actions/coach
 import { getAthleteProfile } from "@/app/actions/profile";
 import { convertDistance, getDistanceUnit, type MeasurementUnit } from "@/lib/units";
 import { activityStream } from "@/db/schema";
-import ActivityCharts from "./ActivityCharts";
-import StatPanel from "./StatPanel";
+import ActivityCharts from "@/components/activity/ActivityCharts";
+import StatPanel from "@/components/activity/StatPanel";
 import { syncActivityStreams } from "@/app/actions/sync";
-import MapWrapper from "./MapWrapper";
-import AiThumbnail from "./AiThumbnail";
+import MapWrapper from "@/components/activity/MapWrapper";
+import AiThumbnail from "@/components/activity/AiThumbnail";
 import { MarkAsRace } from "@/components/activity/MarkAsRace";
 
 export const metadata: Metadata = {
@@ -127,7 +127,7 @@ export default async function ActivityDetailPage({
     : "0:00";
 
   return (
-    <div className="min-h-screen bg-black text-zinc-300 font-sans selection:bg-[#f97316] selection:text-black">
+    <div className="min-h-screen bg-black text-zinc-300 font-sans selection:bg-[#06b6d4] selection:text-black">
       {/* Precision Top Bar (Breadcrumbs / Search) */}
       <div className="px-6 py-2 border-b border-zinc-900 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-[#09090b]">
         <div className="flex items-center gap-4">
@@ -161,8 +161,8 @@ export default async function ActivityDetailPage({
       <div className="p-4 space-y-4 max-w-[1920px] mx-auto">
       {/* 1:1 Replica Header Section */}
       <div className="grid grid-cols-12 gap-4 lg:gap-1 min-h-[140px] h-auto lg:h-[140px]">
-        {/* Main Orange Banner Block */}
-        <div className="col-span-12 lg:col-span-7 bg-[#f97316] rounded-sm overflow-hidden flex flex-col">
+        {/* Main Cyan Banner Block */}
+        <div className="col-span-12 lg:col-span-7 bg-[#06b6d4] rounded-sm overflow-hidden flex flex-col">
             {/* Title Bar */}
             <div className="px-6 py-3 border-b border-black/10 flex justify-between items-center">
                 <h1 className="text-xl lg:text-3xl font-black text-black tracking-tighter uppercase break-words pr-2">{activityData.name}</h1>
@@ -174,9 +174,9 @@ export default async function ActivityDetailPage({
             </div>
             {/* Clustered Metrics In Banner */}
             <div className="flex-1 grid grid-cols-3 divide-x divide-black/10">
-                <StatPanel label="Moving time" value={durationFormatted} variant="orange" size="lg" />
-                <StatPanel label="Distance" value={distance} unit={getDistanceUnit(unitPreference)} variant="orange" size="lg" />
-                <StatPanel label="Pace" value={pace} unit={`/${getDistanceUnit(unitPreference)}`} variant="orange" size="lg" />
+                <StatPanel label="Moving time" value={durationFormatted} variant="cyan" size="lg" />
+                <StatPanel label="Distance" value={distance} unit={getDistanceUnit(unitPreference)} variant="cyan" size="lg" />
+                <StatPanel label="Pace" value={pace} unit={`/${getDistanceUnit(unitPreference)}`} variant="cyan" size="lg" />
             </div>
         </div>
 
@@ -185,7 +185,7 @@ export default async function ActivityDetailPage({
             <div className="bg-zinc-900 rounded-sm flex flex-col items-center justify-center p-4">
                 <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-black text-white">{activityData.kudoCount || 0}</span>
-                    <Trophy className="w-6 h-6 text-orange-500" />
+                    <Trophy className="w-6 h-6 text-cyan-500" />
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 mt-2">Achievements</span>
             </div>
@@ -388,8 +388,8 @@ export default async function ActivityDetailPage({
                                 ? formatPace((effort.moving_time / 60) / convertDistance(effort.distance, unitPreference))
                                 : "0:00";
                              return (
-                            <tr key={effort.id} className="hover:bg-[#f97316]/5 transition-colors group">
-                                <td className="px-6 py-3 font-bold text-zinc-200 border-r border-zinc-900 group-hover:text-[#f97316]">
+                            <tr key={effort.id} className="hover:bg-[#06b6d4]/5 transition-colors group">
+                                <td className="px-6 py-3 font-bold text-zinc-200 border-r border-zinc-900 group-hover:text-[#06b6d4]">
                                     {effort.name}
                                 </td>
                                 <td className="px-6 py-3 border-r border-zinc-900">

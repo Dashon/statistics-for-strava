@@ -26,6 +26,7 @@ interface AiThumbnailProps {
       movingTime: string;
       elevation: string;
   };
+  isReadOnly?: boolean;
 }
 
 export default function AiThumbnail({ 
@@ -35,7 +36,8 @@ export default function AiThumbnail({
     videoUrl,
     activityName = "Activity",
     polyline,
-    stats
+    stats,
+    isReadOnly = false
 }: AiThumbnailProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
@@ -141,7 +143,7 @@ export default function AiThumbnail({
         <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-20 pointer-events-none">
           <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-sm border border-white/10 pointer-events-auto">
             <p className="text-[10px] font-bold uppercase tracking-widest text-white flex items-center gap-2">
-              <MapPin className="w-3 h-3 text-[#f97316]" />
+              <MapPin className="w-3 h-3 text-[#06b6d4]" />
               {isPlayingVideo ? "Route Video" : "Street View"}
             </p>
           </div>
@@ -163,7 +165,7 @@ export default function AiThumbnail({
             </button>
 
             {/* Edit Visuals Button */}
-            {!showMediaManager && (
+            {!showMediaManager && !isReadOnly && (
                 <button 
                     onClick={() => setShowMediaManager(true)}
                     className="bg-black/60 backdrop-blur-md px-3 py-2 rounded-sm border border-white/10 hover:bg-black transition-colors flex items-center gap-2"
@@ -214,7 +216,7 @@ export default function AiThumbnail({
     <div className="w-full h-full min-h-[400px] bg-zinc-900/50 border border-zinc-800 rounded-sm flex flex-col items-center justify-center gap-4">
       {isGenerating ? (
         <>
-          <Loader2 className="w-10 h-10 text-[#f97316] animate-spin" />
+          <Loader2 className="w-10 h-10 text-[#06b6d4] animate-spin" />
           <div className="text-center">
             <p className="text-xs text-zinc-500 uppercase tracking-widest">Generating Visuals</p>
           </div>
@@ -238,13 +240,15 @@ export default function AiThumbnail({
          <div className="text-center">
             <MapPin className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
             <p className="text-zinc-500 text-sm mb-4">No visuals generated</p>
+            {!isReadOnly && (
             <button 
               onClick={handleGenerate}
-              className="px-4 py-2 bg-orange-600 text-white font-bold rounded hover:bg-orange-500 transition-colors flex items-center gap-2 mx-auto"
+              className="px-4 py-2 bg-cyan-600 text-white font-bold rounded hover:bg-cyan-500 transition-colors flex items-center gap-2 mx-auto"
             >
                <RefreshCw className="w-4 h-4" />
                Generate Visuals
             </button>
+            )}
          </div>
       )}
     </div>

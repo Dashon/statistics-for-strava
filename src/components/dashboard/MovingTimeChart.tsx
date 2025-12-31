@@ -71,7 +71,7 @@ function MovingTimeChart({ data, granularity = 'month' }: MovingTimeChartProps) 
       <h3 className="text-zinc-400 text-sm font-medium mb-4 uppercase tracking-wider">
         Moving time
         {params.from && params.to && (
-          <span className="ml-2 text-xs text-orange-500 font-normal normal-case">
+          <span className="ml-2 text-xs text-cyan-500 font-normal normal-case">
             ({formatTimeRange(params.from, params.to)})
           </span>
         )}
@@ -114,7 +114,7 @@ function MovingTimeChart({ data, granularity = 'month' }: MovingTimeChartProps) 
           <Bar
             dataKey="run"
             name="Run"
-            fill="#ea580c"
+            fill="#06b6d4"
             stackId="a"
             radius={[0, 0, 0, 0]}
             onClick={(props: any) => {
@@ -125,7 +125,7 @@ function MovingTimeChart({ data, granularity = 'month' }: MovingTimeChartProps) 
           <Bar
             dataKey="ride"
             name="Ride"
-            fill="#9a3412"
+            fill="#0891b2"
             stackId="a"
             radius={[0, 0, 0, 0]}
              onClick={(props: any) => {
@@ -145,7 +145,7 @@ function MovingTimeChart({ data, granularity = 'month' }: MovingTimeChartProps) 
           <Brush
             dataKey="period"
             height={20}
-            stroke="#ea580c"
+            stroke="#06b6d4"
             fill="#18181b"
             onChange={handleBrushChange}
             tickFormatter={(value) => formatPeriodLabel(value, granularity)}

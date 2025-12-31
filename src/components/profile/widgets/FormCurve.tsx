@@ -111,7 +111,7 @@ export function FormCurve({ data }: FormCurveProps) {
               transition={{ duration: 0.5, delay: index * 0.05 }}
               className={`flex-1 rounded-t transition-colors ${
                 isThisWeek 
-                  ? 'bg-gradient-to-t from-orange-600 to-orange-400' 
+                  ? 'bg-gradient-to-t from-cyan-600 to-cyan-400' 
                   : 'bg-zinc-700 hover:bg-zinc-600'
               }`}
               title={`Week of ${week.weekStart}: ${week.totalMiles} mi`}

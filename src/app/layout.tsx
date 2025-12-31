@@ -6,7 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { CoachChat } from "@/components/coach/CoachChat";
+
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -35,7 +35,7 @@ export default function RootLayout({
             <QueryProvider>
               <ToastProvider>
                 {children}
-                <CoachChat />
+
               </ToastProvider>
             </QueryProvider>
           </NuqsAdapter>

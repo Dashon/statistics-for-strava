@@ -29,7 +29,7 @@ interface ProfileEditorDockProps {
 }
 
 const TEMPLATES = [
-  { id: 'runner', name: 'Runner', emoji: '🏃‍♂️', color: 'from-orange-500 to-red-600' },
+  { id: 'runner', name: 'Runner', emoji: '🏃‍♂️', color: 'from-cyan-500 to-blue-600' },
   { id: 'racer', name: 'Racer', emoji: '🏁', color: 'from-purple-500 to-pink-600' },
   { id: 'global', name: 'Global', emoji: '🌍', color: 'from-blue-500 to-cyan-600' },
   { id: 'minimal', name: 'Minimal', emoji: '✨', color: 'from-zinc-500 to-zinc-700' },
@@ -135,7 +135,7 @@ export function ProfileEditorDock({ initialData, onUpdate, onClose }: ProfileEdi
                   onClick={() => handleCreatePreview({ templateId: template.id as ProfileTemplate })}
                   className={`relative p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-2 text-center group ${
                     formData.templateId === template.id
-                      ? 'border-orange-500 bg-zinc-800'
+                      ? 'border-cyan-500 bg-zinc-800'
                       : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
                   }`}
                 >
@@ -165,7 +165,7 @@ export function ProfileEditorDock({ initialData, onUpdate, onClose }: ProfileEdi
                       type="text" 
                       value={formData.displayName}
                       onChange={(e) => handleCreatePreview({ displayName: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors"
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
                       placeholder="Your Name"
                    />
                 </div>
@@ -175,7 +175,7 @@ export function ProfileEditorDock({ initialData, onUpdate, onClose }: ProfileEdi
                       type="text" 
                       value={formData.tagline}
                       onChange={(e) => handleCreatePreview({ tagline: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors"
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
                       placeholder="Ultra Runner | Trail Enthusiast"
                    />
                 </div>
