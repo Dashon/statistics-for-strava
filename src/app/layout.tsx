@@ -11,14 +11,21 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 const outfit = Outfit({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "QT | Statistics for Strava",
-  description: "Cinematic statistics and AI-powered insights for your Strava activities. Track performance, analyze workouts, and get personalized coaching advice.",
-  keywords: ["Strava", "statistics", "running", "cycling", "fitness", "AI coaching", "workout analysis"],
-  authors: [{ name: "QT Statistics" }],
+  title: "Qt.run | Your AI-Powered Running Coach",
+  description: "Qt.run delivers cinematic statistics, AI-powered insights, and personalized coaching for runners. Track performance, analyze workouts, and achieve your running goals.",
+  keywords: ["Qt.run", "running", "AI coaching", "training", "fitness", "workout analysis", "running coach", "performance tracking"],
+  authors: [{ name: "Qt.run" }],
   openGraph: {
-    title: "QT | Statistics for Strava",
-    description: "Cinematic statistics and AI-powered insights for your Strava activities.",
+    title: "Qt.run | Your AI-Powered Running Coach",
+    description: "Qt.run delivers cinematic statistics, AI-powered insights, and personalized coaching for runners.",
     type: "website",
+    siteName: "Qt.run",
+    url: "https://qt.run",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Qt.run | Your AI-Powered Running Coach",
+    description: "Qt.run delivers cinematic statistics, AI-powered insights, and personalized coaching for runners.",
   },
 };
 
