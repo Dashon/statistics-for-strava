@@ -23,7 +23,9 @@ import {
   LogOut,
   ChevronRight,
   Video,
-  Globe
+  Globe,
+  Flag,
+  LayoutTemplate
 } from "lucide-react";
 
 import { signOut } from "next-auth/react";
@@ -33,6 +35,7 @@ const navigation = [
     group: "Main",
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, exact: true },
+      { name: "Race Calendar", href: "/dashboard/races", icon: Flag },
       { name: "Activities", href: "/dashboard/activities", icon: List },
       { name: "Heatmap", href: "/dashboard/heatmap", icon: MapPin },
     ]
@@ -59,6 +62,7 @@ const navigation = [
     items: [
       { name: "Live Events", href: "/dashboard/events", icon: Video },
       { name: "Public Profile", href: "/dashboard/profile/public", icon: Globe },
+      { name: "Page Layout", href: "/dashboard/profile/layout", icon: LayoutTemplate },
     ]
   },
   {

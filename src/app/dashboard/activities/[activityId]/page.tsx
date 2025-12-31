@@ -15,6 +15,7 @@ import StatPanel from "./StatPanel";
 import { syncActivityStreams } from "@/app/actions/sync";
 import MapWrapper from "./MapWrapper";
 import AiThumbnail from "./AiThumbnail";
+import { MarkAsRace } from "@/components/activity/MarkAsRace";
 
 export const metadata: Metadata = {
   title: "Activity Detail | QT Statistics for Strava",
@@ -67,6 +68,15 @@ export default async function ActivityDetailPage({
       aiThumbnailUrl: true,
       aiThumbnailPrompt: true,
       aiVideoUrl: true,
+      
+      // Race fields
+      isRace: true,
+      raceName: true,
+      raceDistanceClass: true,
+      officialTime: true,
+      placement: true,
+      isPr: true,
+      
       data: true, // Needed for segment efforts
     }
   });
@@ -126,6 +136,17 @@ export default async function ActivityDetailPage({
             <span className="text-zinc-400">Strava Activity Overview</span>
         </div>
         <div className="flex items-center gap-6">
+            <MarkAsRace 
+              activityId={activityData.activityId} 
+              isRace={!!activityData.isRace} 
+              initialData={{
+                raceName: activityData.raceName,
+                distanceClass: activityData.raceDistanceClass,
+                officialTime: activityData.officialTime,
+                placement: activityData.placement,
+                isPr: activityData.isPr,
+              }}
+            />
             <div className="flex items-center gap-2">
                 <RefreshCw className="w-3 h-3 animate-spin duration-[3000ms]" />
                 <span>{new Date(activityData.startDateTime || "").toLocaleString()}</span>
@@ -414,7 +435,6 @@ function formatDuration(seconds: number): string {
   }
   return `${minutes}:${secs.toString().padStart(2, "0")}`;
 }
-
 function formatPace(minPerMile: number): string {
   const minutes = Math.floor(minPerMile);
   const seconds = Math.floor((minPerMile % 1) * 60);

@@ -85,6 +85,20 @@ export const activity = pgTable("activity", {
   elevLow: doublePrecision("elev_low"),
   averageTemp: integer("average_temp"),
   sufferScore: integer("suffer_score"),
+  
+  // Race fields
+  isRace: boolean("is_race").default(false),
+  raceName: varchar("race_name", { length: 255 }),
+  raceDistanceClass: varchar("race_distance_class", { length: 50 }),
+  officialTime: integer("official_time"), // chip time in seconds
+  placement: integer("placement"),
+  ageGroupPlacement: integer("age_group_placement"),
+  genderPlacement: integer("gender_placement"),
+  isPr: boolean("is_pr").default(false),
+  raceNotes: text("race_notes"),
+  linkedRaceId: varchar("linked_race_id", { length: 255 }),
+  raceDetected: boolean("race_detected").default(false),
+  raceDetectionConfidence: doublePrecision("race_detection_confidence"),
 }, (table) => {
     return {
         sportTypeIdx: index("activity_sporttype").on(table.sportType),
@@ -390,6 +404,7 @@ export const publicProfile = pgTable("public_profile", {
     tagline: text("tagline"), // "Ultra Runner | 100-mile finisher"
     coverImageUrl: text("cover_image_url"),
     socialLinks: json("social_links"), // { instagram, twitter, strava, youtube }
+    layoutConfig: json("layout_config"), // Layout preferences and privacy settings
     featuredActivityId: varchar("featured_activity_id", { length: 255 }),
     createdAt: timestamp("created_at", { mode: "string" }).notNull(),
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
@@ -448,3 +463,62 @@ export const broadcastArchive = pgTable("broadcast_archive", {
 }, (table) => ({
     userIdx: index("broadcast_archive_user").on(table.userId),
 }));
+
+// Races - Upcoming and past race events
+export const races = pgTable("races", {
+    id: varchar("id", { length: 255 }).primaryKey(),
+    userId: varchar("user_id", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    date: timestamp("date", { mode: "string" }).notNull(),
+    distance: integer("distance"), // meters
+    distanceClass: varchar("distance_class", { length: 50 }), // '5k', '10k', 'half', 'marathon', etc.
+    location: varchar("location", { length: 255 }),
+    goalTime: integer("goal_time"), // seconds
+    priority: varchar("priority", { length: 20 }).default("A"), // A, B, C
+    status: varchar("status", { length: 20 }).default("upcoming"), // upcoming, completed, dns, dnf
+    raceUrl: text("race_url"),
+    courseUrl: text("course_url"),
+    bibNumber: varchar("bib_number", { length: 50 }),
+    notes: text("notes"),
+    linkedActivityId: varchar("linked_activity_id", { length: 255 }),
+    resultTime: integer("result_time"), // actual finish time
+    resultPlacement: integer("result_placement"),
+    resultAgeGroupPlacement: integer("result_age_group_placement"),
+    resultGenderPlacement: integer("result_gender_placement"),
+    isPr: boolean("is_pr").default(false),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }),
+}, (table) => ({
+    userIdx: index("races_user").on(table.userId),
+    dateIdx: index("races_date").on(table.date),
+    statusIdx: index("races_status").on(table.status),
+    userDateIdx: index("races_user_date").on(table.userId, table.date),
+}));
+
+// Activity Media - Photos, videos, AI-generated content
+export const activityMedia = pgTable("activity_media", {
+    id: varchar("id", { length: 255 }).primaryKey(),
+    activityId: varchar("activity_id", { length: 255 }).notNull(),
+    userId: varchar("user_id", { length: 255 }).notNull(),
+    mediaType: varchar("media_type", { length: 20 }).notNull(), // photo, video, ai_thumbnail, route_video
+    storageUrl: text("storage_url").notNull(),
+    thumbnailUrl: text("thumbnail_url"),
+    caption: text("caption"),
+    isFeatured: boolean("is_featured").default(false),
+    sortOrder: integer("sort_order").default(0),
+    source: varchar("source", { length: 50 }).default("upload"), // upload, strava, ai_generated
+    metadata: jsonText<any>("metadata"),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+}, (table) => ({
+    activityIdx: index("activity_media_activity").on(table.activityId),
+    userIdx: index("activity_media_user").on(table.userId),
+    featuredIdx: index("activity_media_featured").on(table.activityId, table.isFeatured),
+}));
+
+// Standard Distances - Reference table for race detection
+export const standardDistances = pgTable("standard_distances", {
+    id: varchar("id", { length: 50 }).primaryKey(),
+    name: varchar("name", { length: 50 }).notNull(),
+    distanceMeters: integer("distance_meters").notNull(),
+    tolerancePercent: doublePrecision("tolerance_percent").default(2.0),
+});

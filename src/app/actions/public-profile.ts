@@ -215,3 +215,16 @@ export async function updatePublicProfile(data: {
     return { success: false, error: 'Failed to update profile' };
   }
 }
+
+export async function updateLayoutConfig(config: any) {
+  const session = await auth() as any;
+  if (!session?.userId) throw new Error("Unauthorized");
+
+  await db
+    .update(publicProfile)
+    .set({ layoutConfig: config, updatedAt: new Date().toISOString() })
+    .where(eq(publicProfile.userId, session.userId));
+
+  revalidatePath('/athlete/[username]', 'page');
+  revalidatePath('/dashboard/profile/layout');
+}
