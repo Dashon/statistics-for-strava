@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Loader2, Camera, MapPin, RefreshCw } from 'lucide-react';
-import { generateProfileHero } from '@/app/actions/cinematic-profile';
+import { MapPin, Camera, X } from 'lucide-react';
+import { generateProfileHero, updateCinematicProfile } from '@/app/actions/cinematic-profile';
+import { updateProfileHero } from '@/app/actions/media';
+import { MediaManager } from '../common/MediaManager';
 
 interface CinematicHeroProps {
   heroImageUrl?: string | null;
@@ -18,6 +20,7 @@ interface CinematicHeroProps {
 
 export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: CinematicHeroProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showMediaManager, setShowMediaManager] = useState(false);
   const [currentHeroUrl, setCurrentHeroUrl] = useState(heroImageUrl);
 
   const handleGenerate = async () => {
@@ -27,6 +30,7 @@ export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: C
       if (result.success && result.heroUrl) {
         setCurrentHeroUrl(result.heroUrl);
         onHeroUpdate?.(result.heroUrl);
+        setShowMediaManager(false);
       } else {
         console.error('Failed to generate hero:', result.error);
         // Could add toast notification here
@@ -36,6 +40,18 @@ export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: C
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleManualUpdate = async (url: string) => {
+    // 1. Update local state immediate for feedback
+    setCurrentHeroUrl(url);
+    onHeroUpdate?.(url);
+    
+    // 2. Persist to DB
+    await updateProfileHero(url);
+    
+    // 3. Close manager
+    setShowMediaManager(false);
   };
 
   return (
@@ -91,49 +107,47 @@ export function CinematicHero({ heroImageUrl, user, isEditing, onHeroUpdate }: C
         )}
       </div>
 
-      {/* Edit Overlay */}
-      {isEditing && (
+      {/* Edit Overlay Button */}
+      {isEditing && !showMediaManager && (
         <div className="absolute top-6 right-6 z-20">
           <button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="relative overflow-hidden group/btn px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-xl text-white font-bold transition-all flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => setShowMediaManager(true)}
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-lg text-white font-bold transition-all flex items-center gap-2"
           >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin text-orange-500" />
-                <span>Creating Poster...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5 text-orange-400 group-hover/btn:text-orange-300 transition-colors" />
-                <span>
-                   {currentHeroUrl ? 'Regenerate Poster' : 'Generate Poster'}
-                </span>
-              </>
-            )}
-            
-            {/* Shimmer effect */}
-            {!isGenerating && (
-               <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            )}
+            <Camera className="w-5 h-5" />
+            <span>Edit Poster</span>
           </button>
         </div>
       )}
 
-      {/* Loading Overlay */}
-      {isGenerating && (
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-30 flex items-center justify-center">
-           <div className="text-center">
-              <div className="relative w-20 h-20 mx-auto mb-6">
-                 <div className="absolute inset-0 border-4 border-zinc-700 rounded-full" />
-                 <div className="absolute inset-0 border-4 border-orange-500 rounded-full border-t-transparent animate-spin" />
+      {/* Media Manager Popover */}
+      <AnimatePresence>
+        {isEditing && showMediaManager && (
+           <motion.div 
+             initial={{ opacity: 0, y: -20 }}
+             animate={{ opacity: 1, y: 0 }}
+             exit={{ opacity: 0, scale: 0.95 }}
+             className="absolute top-6 right-6 z-30 w-[400px]"
+           >
+              <div className="relative">
+                 <button 
+                   onClick={() => setShowMediaManager(false)}
+                   className="absolute -top-3 -right-3 z-40 bg-zinc-800 text-white p-2 rounded-full border border-zinc-700 shadow-xl hover:bg-zinc-700"
+                 >
+                   <X className="w-4 h-4" />
+                 </button>
+                 <MediaManager 
+                    type="profile"
+                    currentUrl={currentHeroUrl}
+                    onUpdate={handleManualUpdate}
+                    onGenerate={handleGenerate}
+                    isGenerating={isGenerating}
+                 />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Creating Cinematic Poster</h3>
-              <p className="text-zinc-400">Analyzing your location & recent activity...</p>
-           </div>
-        </div>
-      )}
+           </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+

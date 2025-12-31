@@ -4,21 +4,28 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 /**
  * GET /api/reference-image
  * Fetch all reference images for the current user
  */
 export async function GET(request: Request) {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
+    const session = await auth() as any;
+    const userId = session?.user?.id || session?.userId;
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const images = await db.query.userReferenceImages.findMany({
-      where: eq(userReferenceImages.userId, session.user.id),
+      where: eq(userReferenceImages.userId, userId),
     });
 
     return NextResponse.json({ images });
@@ -38,13 +45,14 @@ export async function GET(request: Request) {
  * - isDefault: boolean
  */
 export async function POST(request: Request) {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
+    const session = await auth() as any;
+    const userId = session?.user?.id || session?.userId;
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const imageType = formData.get("imageType") as string || "general";
@@ -64,28 +72,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "File size must be less than 5MB" }, { status: 400 });
     }
 
-    // Convert file to base64 or upload to storage service
-    // For now, we'll store as base64 (in production, use S3, Supabase Storage, etc.)
+    // Upload to Supabase Storage
+    const imageId = nanoid();
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    const filePath = `reference-images/${userId}/${imageId}.${fileExt}`;
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const base64 = buffer.toString('base64');
-    const imageUrl = `data:${file.type};base64,${base64}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('profile-assets')
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        upsert: true
+      });
+
+    if (uploadError) {
+      console.error("Supabase upload error:", uploadError);
+      return NextResponse.json({ error: "Storage upload failed" }, { status: 500 });
+    }
+
+    const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-assets/${filePath}`;
 
     // If this is set as default, unset any existing defaults for this image type
     if (isDefault) {
       await db.update(userReferenceImages)
         .set({ isDefault: false })
-        .where(eq(userReferenceImages.userId, session.user.id));
+        .where(eq(userReferenceImages.userId, userId));
     }
 
     // Insert new reference image
-    const imageId = nanoid();
     const now = new Date().toISOString();
 
     await db.insert(userReferenceImages).values({
       imageId,
-      userId: session.user.id,
-      imageUrl,
+      userId: userId,
+      imageUrl: publicUrl,
       imageType,
       isDefault,
       uploadedAt: now,
@@ -95,6 +116,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       imageId,
+      imageUrl: publicUrl,
       message: "Reference image uploaded successfully",
     });
 
@@ -109,13 +131,14 @@ export async function POST(request: Request) {
  * Delete a reference image
  */
 export async function DELETE(request: Request) {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
+    const session = await auth() as any;
+    const userId = session?.user?.id || session?.userId;
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const imageId = searchParams.get("imageId");
 
@@ -128,9 +151,14 @@ export async function DELETE(request: Request) {
       where: eq(userReferenceImages.imageId, imageId),
     });
 
-    if (!image || image.userId !== session.user.id) {
+    if (!image || image.userId !== userId) {
       return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }
+
+    // Attempt to delete from storage (optional, but good for cleanup)
+    // Extract path from URL or reconstruct it if we followed specific naming convention
+    // Since we didn't store the storage path, we might skip this or fallback to regex
+    // For now, removing from DB is sufficient for the user experience.
 
     await db.delete(userReferenceImages)
       .where(eq(userReferenceImages.imageId, imageId));
@@ -145,3 +173,5 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+

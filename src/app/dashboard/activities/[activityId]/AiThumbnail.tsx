@@ -3,11 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import { generateThumbnail } from "@/app/actions/generate-thumbnail";
 import { getGenerationStatus } from "@/app/actions/get-generation-status";
-import { MapPin, RefreshCw, Loader2, Play } from "lucide-react";
+import { updateActivityImage } from "@/app/actions/media";
+import { MapPin, RefreshCw, Loader2, Play, Camera, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ActivityVideoPlayer from "@/components/dashboard/ActivityVideoPlayer";
 import { decodePolyline } from "@/lib/polyline";
+import { MediaManager } from "@/components/common/MediaManager";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AiThumbnailProps {
   activityId: string;
@@ -36,6 +39,7 @@ export default function AiThumbnail({
 }: AiThumbnailProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+  const [showMediaManager, setShowMediaManager] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const hasTriggered = useRef(false);
@@ -63,7 +67,10 @@ export default function AiThumbnail({
           if (result.thumbnailStatus === 'completed' || result.thumbnailStatus === 'failed') {
              setIsGenerating(false);
              clearInterval(interval);
-             router.refresh();
+             router.refresh(); // Refresh to show new image
+             if (result.thumbnailStatus === 'completed') {
+                 setShowMediaManager(false);
+             }
           }
 
         } catch (e) {
@@ -86,6 +93,16 @@ export default function AiThumbnail({
       setError(error.message);
       setIsGenerating(false);
     }
+  };
+
+  const handleManualUpdate = async (url: string) => {
+      // Optimistically update UI could be done here if we had local state for url, 
+      // but simplistic approach is to wait for DB update + router refresh
+      await updateActivityImage(activityId, url);
+      setShowMediaManager(false);
+      
+      // Force refresh to show new image
+      router.refresh();
   };
 
   // Show the thumbnail/video if we have data
@@ -129,7 +146,7 @@ export default function AiThumbnail({
             </p>
           </div>
           
-          <div className="flex gap-2 pointer-events-auto">
+          <div className="flex gap-2 pointer-events-auto items-center">
             {/* Play/Stop Video Button */}
             <button 
                 onClick={() => setIsPlayingVideo(!isPlayingVideo)}
@@ -145,21 +162,54 @@ export default function AiThumbnail({
                 )}
             </button>
 
-            <button 
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="bg-black/60 backdrop-blur-md p-2 rounded-sm border border-white/10 hover:bg-black transition-colors"
-                title="Regenerate"
-            >
-                <RefreshCw className={`w-4 h-4 text-zinc-400 ${isGenerating ? 'animate-spin' : ''}`} />
-            </button>
+            {/* Edit Visuals Button */}
+            {!showMediaManager && (
+                <button 
+                    onClick={() => setShowMediaManager(true)}
+                    className="bg-black/60 backdrop-blur-md px-3 py-2 rounded-sm border border-white/10 hover:bg-black transition-colors flex items-center gap-2"
+                    title="Edit Visuals"
+                >
+                    <Camera className="w-4 h-4 text-white" />
+                    <span className="text-xs font-bold text-white hidden md:inline">Edit</span>
+                </button>
+            )}
           </div>
         </div>
+
+        {/* Media Manager Popover */}
+        <AnimatePresence>
+            {showMediaManager && (
+                <div className="absolute top-16 right-4 z-50 w-[360px] max-w-[calc(100vw-32px)]">
+                    <motion.div 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="relative shadow-2xl rounded-xl overflow-hidden"
+                    >
+                        <button 
+                            onClick={() => setShowMediaManager(false)}
+                            className="absolute top-2 right-2 z-50 bg-zinc-800/80 text-white p-1 rounded-full hover:bg-zinc-700"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                        <MediaManager 
+                            type="activity"
+                            id={activityId}
+                            currentUrl={thumbnailUrl}
+                            onUpdate={handleManualUpdate}
+                            onGenerate={handleGenerate}
+                            isGenerating={isGenerating}
+                        />
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
+
       </div>
     );
   }
 
-  // Loading / Error states
+  // Loading / Error states (Initial Generation)
   return (
     <div className="w-full h-full min-h-[400px] bg-zinc-900/50 border border-zinc-800 rounded-sm flex flex-col items-center justify-center gap-4">
       {isGenerating ? (
@@ -183,10 +233,19 @@ export default function AiThumbnail({
           </div>
         </>
       ) : (
-        <>
-          <MapPin className="w-10 h-10 text-zinc-600" />
-          <p className="text-xs text-zinc-500">Loading...</p>
-        </>
+         /* If we don't have a thumbnail but aren't generating/error => probably never generated or waiting on manual action */
+         /* Showing empty state with generate button */
+         <div className="text-center">
+            <MapPin className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
+            <p className="text-zinc-500 text-sm mb-4">No visuals generated</p>
+            <button 
+              onClick={handleGenerate}
+              className="px-4 py-2 bg-orange-600 text-white font-bold rounded hover:bg-orange-500 transition-colors flex items-center gap-2 mx-auto"
+            >
+               <RefreshCw className="w-4 h-4" />
+               Generate Visuals
+            </button>
+         </div>
       )}
     </div>
   );

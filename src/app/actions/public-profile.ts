@@ -20,11 +20,13 @@ export type PublicProfileData = {
   displayName: string | null;
   tagline: string | null;
   coverImageUrl: string | null;
+  heroImageUrl: string | null;
   socialLinks: SocialLinks | null;
   featuredActivityId: string | null;
   createdAt: string;
   updatedAt: string;
 };
+
 
 export type PublicProfileWithStats = PublicProfileData & {
   avatarUrl: string | null;

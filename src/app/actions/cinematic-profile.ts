@@ -236,3 +236,76 @@ export async function getCinematicProfileData() {
     profileSetupComplete: profile?.profileSetupComplete || false,
   };
 }
+
+// ... existing code
+
+/**
+ * Generate a signed upload URL for an accolade image
+ */
+export async function getAccoladeUploadUrl(extension: string) {
+  const session = await auth() as any;
+  const userId = session?.user?.id || session?.userId;
+  if (!userId) return { error: "Unauthorized" };
+
+  const fileName = `accolades/${userId}/${crypto.randomUUID()}.${extension}`;
+  
+  const { data, error } = await supabase.storage
+    .from('profile-assets') // Consistent with other profile assets
+    .createSignedUploadUrl(fileName);
+
+  if (error) {
+    console.error('Error creating signed url:', error);
+    return { error: error.message };
+  }
+
+  return { 
+    signedUrl: data.signedUrl, 
+    path: fileName,
+    publicUrl: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-assets/${fileName}`
+  };
+}
+
+/**
+ * Add or remove accolades from the profile
+ */
+export async function updateAccolades(accolades: any[]) {
+  const session = await auth() as any;
+  const userId = session?.user?.id || session?.userId;
+  if (!userId) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+     const existing = await db
+      .select({ userId: publicProfile.userId, username: publicProfile.username })
+      .from(publicProfile)
+      .where(eq(publicProfile.userId, userId))
+      .limit(1);
+
+    if (existing.length === 0) {
+      // Create profile if not exists (unlikely but safe)
+      await db.insert(publicProfile).values({
+        userId,
+        accolades: accolades,
+        updatedAt: new Date().toISOString(),
+      });
+    } else {
+      await db
+        .update(publicProfile)
+        .set({
+          accolades: accolades,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(publicProfile.userId, userId));
+    }
+
+    revalidatePath('/dashboard/profile/layout');
+    if (existing[0]?.username) {
+       revalidatePath(`/athlete/${existing[0].username}`, 'page'); 
+    }
+    return { success: true };
+  } catch (error) {
+     console.error("Error updating accolades:", error);
+     return { success: false, error: "Failed to update accolades" };
+  }
+}

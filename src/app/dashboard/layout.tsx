@@ -1,6 +1,6 @@
-
 import { Sidebar } from "@/components/Sidebar";
 import { getAthleteProfile } from "@/app/actions/profile";
+import { getMyPublicProfile } from "@/app/actions/public-profile";
 import { getEffectiveDisplayName, getEffectiveProfilePicture } from "@/app/actions/profile-utils";
 
 export default async function DashboardLayout({
@@ -8,11 +8,15 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const profile = await getAthleteProfile();
+  const [profile, publicProfile] = await Promise.all([
+    getAthleteProfile(),
+    getMyPublicProfile(),
+  ]);
   
   const sidebarProfile = profile ? {
     displayName: getEffectiveDisplayName(profile),
     profilePicture: getEffectiveProfilePicture(profile),
+    username: publicProfile?.username,
   } : null;
 
   return (

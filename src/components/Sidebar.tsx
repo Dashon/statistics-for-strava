@@ -30,54 +30,11 @@ import {
 
 import { signOut } from "next-auth/react";
 
-const navigation = [
-  { 
-    group: "Main",
-    items: [
-      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, exact: true },
-      { name: "Race Calendar", href: "/dashboard/races", icon: Flag },
-      { name: "Activities", href: "/dashboard/activities", icon: List },
-      { name: "Heatmap", href: "/dashboard/heatmap", icon: MapPin },
-    ]
-  },
-  {
-    group: "Analysis",
-    items: [
-      { name: "Run Letters", href: "/dashboard/run-letters", icon: BookOpen },
-      { name: "Monthly Stats", href: "/dashboard/monthly-stats", icon: Calendar },
-      { name: "Eddington", href: "/dashboard/eddington", icon: TrendingUp },
-      { name: "Rewind", href: "/dashboard/rewind", icon: History },
-    ]
-  },
-  {
-    group: "Achievements & Gear",
-    items: [
-      { name: "Segments", href: "/dashboard/segments", icon: Map },
-      { name: "Challenges", href: "/dashboard/challenges", icon: Trophy },
-      { name: "Gear", href: "/dashboard/gear", icon: Zap },
-    ]
-  },
-  {
-    group: "Creator",
-    items: [
-      { name: "Live Events", href: "/dashboard/events", icon: Video },
-      { name: "Public Profile", href: "/dashboard/profile/public", icon: Globe },
-      { name: "Page Layout", href: "/dashboard/profile/layout", icon: LayoutTemplate },
-    ]
-  },
-  {
-    group: "System",
-    items: [
-      { name: "Settings", href: "/dashboard/settings", icon: Settings },
-    ]
-  }
-];
-
-
 interface SidebarProps {
   profile?: {
     displayName: string;
     profilePicture: string | null;
+    username?: string | null;
   } | null;
 }
 
@@ -87,6 +44,50 @@ export function Sidebar({ profile }: SidebarProps) {
 
   const displayName = profile?.displayName || 'Athlete';
   const profilePicture = profile?.profilePicture;
+  const username = profile?.username;
+
+  const navigation = [
+    { 
+      group: "Main",
+      items: [
+        { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, exact: true },
+        { name: "Race Calendar", href: "/dashboard/races", icon: Flag },
+        { name: "Activities", href: "/dashboard/activities", icon: List },
+        { name: "Heatmap", href: "/dashboard/heatmap", icon: MapPin },
+      ]
+    },
+    {
+      group: "Analysis",
+      items: [
+        { name: "Run Letters", href: "/dashboard/run-letters", icon: BookOpen },
+        { name: "Monthly Stats", href: "/dashboard/monthly-stats", icon: Calendar },
+        { name: "Eddington", href: "/dashboard/eddington", icon: TrendingUp },
+        { name: "Rewind", href: "/dashboard/rewind", icon: History },
+      ]
+    },
+    {
+      group: "Achievements & Gear",
+      items: [
+        { name: "Segments", href: "/dashboard/segments", icon: Map },
+        { name: "Challenges", href: "/dashboard/challenges", icon: Trophy },
+        { name: "Gear", href: "/dashboard/gear", icon: Zap },
+      ]
+    },
+    {
+      group: "Creator",
+      items: [
+        { name: "Live Events", href: "/dashboard/events", icon: Video },
+        ...(username ? [{ name: "View Profile", href: `/athlete/${username}`, icon: User }] : []),
+        { name: "Profile Settings", href: "/dashboard/profile/public", icon: Globe },
+      ]
+    },
+    {
+      group: "System",
+      items: [
+        { name: "Settings", href: "/dashboard/settings", icon: Settings },
+      ]
+    }
+  ];
 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
