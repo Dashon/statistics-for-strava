@@ -10,6 +10,7 @@ import {
 } from '@/app/actions/public-profile';
 import { getMediaUploadUrl, updateProfileHero } from '@/app/actions/media';
 import { generateProfileHero } from '@/app/actions/cinematic-profile';
+import { handleSignOut } from '@/app/actions/auth';
 import { 
   Sparkles, 
   Settings, 
@@ -262,6 +263,20 @@ export default function PublicProfileEditorPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white pb-32">
+      {/* Header with Sign Out */}
+      <div className="p-4 flex justify-between items-center border-b border-zinc-900">
+        <div className="flex items-center gap-4">
+          <span className="text-zinc-500 text-sm">Dashboards &gt; Profile Settings</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <form action={handleSignOut}>
+            <button className="text-zinc-500 hover:text-white text-xs uppercase tracking-widest font-bold">
+              Sign Out
+            </button>
+          </form>
+        </div>
+      </div>
+
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-20">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-500/30 rounded-full blur-[120px]" />

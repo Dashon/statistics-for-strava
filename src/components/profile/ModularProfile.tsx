@@ -22,7 +22,6 @@ import dynamic from "next/dynamic";
 import { CinematicHero } from "./CinematicHero";
 import { ProfileEditorDock } from "./ProfileEditorDock";
 import { AccoladeVault } from "./AccoladeVault";
-import { StoriesStrip } from "./StoriesStrip";
 import { cn, formatDuration } from "@/lib/utils";
 
 const GridLayout = dynamic(() => import("react-grid-layout"), { ssr: false }) as any;
@@ -320,10 +319,10 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
                  />
               </div>}
 
-              {/* 4. Activity Heatmap */}
+              {/* 4. Country Flags */}
               {/* Mobile: 4th, Desktop: 4th (Left 1/3? or Full? Let's make it 1/3 to balance Training Vol) */}
-              <div className="order-4 lg:order-4 lg:col-span-1 bg-zinc-900/50 rounded-xl border border-zinc-800 p-1 min-h-[280px]">
-                  <ActivityHeatmap activities={recentActivities} />
+              <div className="order-4 lg:order-4 lg:col-span-1 bg-zinc-900/50 rounded-xl border border-zinc-800 overflow-hidden min-h-[280px]">
+                  <CountryFlags countries={countries || []} />
               </div>
               
               {/* 5. Training Volume */}
@@ -379,11 +378,25 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
 
   return (
     <div className={cn(
-      "min-h-screen bg-zinc-950 text-white pb-32 font-sans relative",
+      "min-h-screen text-white pb-32 font-sans relative",
       // Template specific background tweaks
       templateId === 'minimal' && "bg-black"
     )}>
       
+      {/* App Header */}
+      <div className="p-4 flex justify-between items-center border-b border-zinc-900 sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-md">
+         <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
+                QT.run
+            </h1>
+         </div>
+         <div className="flex items-center gap-4">
+             <Link href="/dashboard" className="px-4 py-2 bg-white text-black hover:bg-zinc-200 text-xs font-bold uppercase tracking-widest rounded-full transition-colors flex items-center gap-2">
+                Dashboard
+             </Link>
+         </div>
+      </div>
+
       {/* Edit Toggle for Owner */}
       {isOwner && !isEditing && (
         <motion.button
@@ -445,9 +458,9 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
                  )}
                </>
              )}
-             <Link href="/dashboard" className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full font-bold text-sm transition-colors border border-zinc-700">
+             {/* <Link href="/dashboard" className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full font-bold text-sm transition-colors border border-zinc-700">
                 Dashboard
-             </Link>
+             </Link> */}
         </div>
 
         {/* Minimal Hero (if selected) */}
