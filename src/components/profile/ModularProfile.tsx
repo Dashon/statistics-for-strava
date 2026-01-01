@@ -453,7 +453,7 @@ export function ModularProfile({ data, isOwner = false }: ModularProfileProps) {
       {/* App Header */}
       <div className="p-4 flex justify-between items-center border-b border-white/5 sticky top-0 z-40 bg-transparent backdrop-blur-md">
          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent italic">
+            <h1 className="text-2xl font-bold italic">
                 QT.run
             </h1>
          </div>
